@@ -1,6 +1,6 @@
 {
-    "name": "fulmenef/magphi",
-    "version": "0.1.0",
+    "name": "fulmenef/magephi",
+    "version": "0.2.0",
     "type": "application",
     "license": "MIT",
     "authors": [
@@ -38,7 +38,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Magphi\\": "src/"
+            "Magephi\\": "src/"
         }
     },
     "replace": {

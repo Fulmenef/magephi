@@ -1,8 +1,8 @@
 <?php
 
-namespace Magphi\Component;
+namespace Magephi\Component;
 
-use Magphi\Entity\Environment;
+use Magephi\Entity\Environment;
 use Symfony\Component\Process\Process;
 
 class DockerCompose

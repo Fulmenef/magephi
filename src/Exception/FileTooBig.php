@@ -1,6 +1,6 @@
 <?php
 
-namespace Magphi\Exception;
+namespace Magephi\Exception;
 
 class FileTooBig extends \Exception
 {

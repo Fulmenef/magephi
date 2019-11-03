@@ -1,6 +1,6 @@
 <?php
 
-namespace Magphi;
+namespace Magephi;
 
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -43,7 +43,7 @@ class Kernel extends BaseKernel
             throw new InvalidConfigurationException('Unable to determine the home directory.');
         }
 
-        return "{$home}/.magphi";
+        return "{$home}/.magephi";
     }
 
     public function getProjectDir(): string

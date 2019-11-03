@@ -1,6 +1,6 @@
 <?php
 
-namespace Magphi\Command\Docker;
+namespace Magephi\Command\Docker;
 
 class MysqlCommand extends AbstractDockerCommand
 {

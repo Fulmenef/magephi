@@ -1,8 +1,6 @@
 #!/usr/bin/env php
 <?php
 
-use Magphi\Command\DefaultCommand;
-use Magphi\Kernel;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Debug\Debug;
@@ -38,7 +36,7 @@ if ($_SERVER['APP_DEBUG']) {
     }
 }
 
-$kernel = new Kernel($_SERVER['APP_ENV'], (bool) $_SERVER['APP_DEBUG']);
-$application = new \Magphi\Application($kernel);
-$application->setDefaultCommand(DefaultCommand::getDefaultName());
+$kernel = new \Magephi\Kernel($_SERVER['APP_ENV'], (bool) $_SERVER['APP_DEBUG']);
+$application = new \Magephi\Application($kernel);
+$application->setDefaultCommand(\Magephi\Command\DefaultCommand::getDefaultName());
 $application->run($input);

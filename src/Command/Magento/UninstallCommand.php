@@ -1,9 +1,9 @@
 <?php
 
-namespace Magphi\Command\Magento;
+namespace Magephi\Command\Magento;
 
 use Exception;
-use Magphi\Entity\Environment;
+use Magephi\Entity\Environment;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 

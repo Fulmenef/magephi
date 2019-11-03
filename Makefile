@@ -1,19 +1,19 @@
 ##
 ## ----------------------------------------------------------------------------
-##   MAGPHI
+##   MAGEPHI
 ## ----------------------------------------------------------------------------
 ##
 
 box: ## Compiles the project into a PHAR archive
-	rm -rf ${HOME}/.magphi/cache/* ${HOME}/.magphi/logs/* var/*
+	rm -rf ${HOME}/.magephi/cache/* ${HOME}/.magephi/logs/* var/*
 	composer dump-env prod
 	box compile
 	rm .env.local.php
-	openssl sha1 build/magphi.phar
+	openssl sha1 build/magephi.phar
 .PHONY: box
 
 install: ## Executes a copy/paste analysis
-	mv -f ./build/magphi.phar /usr/local/bin/magphi
+	mv -f ./build/magephi.phar /usr/local/bin/magephi
 .PHONY: install
 
 php-cs-fixer: ## Fixes code style in all PHP files

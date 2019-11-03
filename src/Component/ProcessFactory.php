@@ -1,6 +1,6 @@
 <?php
 
-namespace Magphi\Component;
+namespace Magephi\Component;
 
 use Symfony\Component\Console\Output\OutputInterface;
 

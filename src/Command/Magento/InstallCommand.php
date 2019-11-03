@@ -1,15 +1,15 @@
 <?php
 
-namespace Magphi\Command\Magento;
+namespace Magephi\Command\Magento;
 
 use Exception;
-use Magphi\Component\DockerCompose;
-use Magphi\Component\Mutagen;
-use Magphi\Component\Process;
-use Magphi\Component\ProcessFactory;
-use Magphi\Entity\Environment;
-use Magphi\Exception\FileTooBig;
-use Magphi\Helper\Installation;
+use Magephi\Component\DockerCompose;
+use Magephi\Component\Mutagen;
+use Magephi\Component\Process;
+use Magephi\Component\ProcessFactory;
+use Magephi\Entity\Environment;
+use Magephi\Exception\FileTooBig;
+use Magephi\Helper\Installation;
 use Nadar\PhpComposerReader\ComposerReader;
 use Nette\Utils\RegexpException;
 use Symfony\Component\Console\Helper\ProgressBar;

@@ -1,13 +1,13 @@
 <?php
 
-namespace Magphi\Helper;
+namespace Magephi\Helper;
 
-use Magphi\Component\DockerCompose;
-use Magphi\Component\Mutagen;
-use Magphi\Component\Process;
-use Magphi\Component\ProcessFactory;
-use Magphi\Entity\Environment;
-use Magphi\Exception\FileTooBig;
+use Magephi\Component\DockerCompose;
+use Magephi\Component\Mutagen;
+use Magephi\Component\Process;
+use Magephi\Component\ProcessFactory;
+use Magephi\Entity\Environment;
+use Magephi\Exception\FileTooBig;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;

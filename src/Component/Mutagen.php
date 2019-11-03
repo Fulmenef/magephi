@@ -1,8 +1,8 @@
 <?php
 
-namespace Magphi\Component;
+namespace Magephi\Component;
 
-use Magphi\Entity\Environment;
+use Magephi\Entity\Environment;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;

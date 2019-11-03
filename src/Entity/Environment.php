@@ -1,6 +1,6 @@
 <?php
 
-namespace Magphi\Entity;
+namespace Magephi\Entity;
 
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Symfony\Component\Finder\Exception\DirectoryNotFoundException;

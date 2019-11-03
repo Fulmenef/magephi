@@ -1,10 +1,10 @@
 <?php
 
-namespace Magphi\Command;
+namespace Magephi\Command;
 
 use Herrera\Phar\Update\Manager;
 use Herrera\Phar\Update\Manifest;
-use Magphi\Application;
+use Magephi\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;

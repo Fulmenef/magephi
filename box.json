@@ -1,6 +1,6 @@
 {
   "main": "bin/console",
-  "output": "build/magphi.phar",
+  "output": "build/magephi.phar",
   "directories": [
     "config",
     "src",

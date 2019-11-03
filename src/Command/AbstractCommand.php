@@ -1,9 +1,9 @@
 <?php
 
-namespace Magphi\Command;
+namespace Magephi\Command;
 
-use Magphi\Component\DockerCompose;
-use Magphi\Component\ProcessFactory;
+use Magephi\Component\DockerCompose;
+use Magephi\Component\ProcessFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;

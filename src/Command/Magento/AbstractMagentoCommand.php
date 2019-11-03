@@ -1,8 +1,8 @@
 <?php
 
-namespace Magphi\Command\Magento;
+namespace Magephi\Command\Magento;
 
-use Magphi\Command\AbstractCommand;
+use Magephi\Command\AbstractCommand;
 
 abstract class AbstractMagentoCommand extends AbstractCommand
 {

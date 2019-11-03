@@ -1,6 +1,6 @@
 <?php
 
-namespace Magphi\Command;
+namespace Magephi\Command;
 
 use Exception;
 use Symfony\Component\Console\Application;

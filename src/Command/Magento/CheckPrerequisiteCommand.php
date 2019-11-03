@@ -1,10 +1,10 @@
 <?php
 
-namespace Magphi\Command\Magento;
+namespace Magephi\Command\Magento;
 
-use Magphi\Component\DockerCompose;
-use Magphi\Component\ProcessFactory;
-use Magphi\Helper\Installation;
+use Magephi\Component\DockerCompose;
+use Magephi\Component\ProcessFactory;
+use Magephi\Helper\Installation;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;

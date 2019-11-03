@@ -1,11 +1,11 @@
 <?php
 
-namespace Magphi\Command\Magento;
+namespace Magephi\Command\Magento;
 
-use Magphi\Component\DockerCompose;
-use Magphi\Component\ProcessFactory;
-use Magphi\Entity\Environment;
-use Magphi\Helper\Installation;
+use Magephi\Component\DockerCompose;
+use Magephi\Component\ProcessFactory;
+use Magephi\Entity\Environment;
+use Magephi\Helper\Installation;
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;

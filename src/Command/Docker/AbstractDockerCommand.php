@@ -1,9 +1,9 @@
 <?php
 
-namespace Magphi\Command\Docker;
+namespace Magephi\Command\Docker;
 
-use Magphi\Command\AbstractCommand;
-use Magphi\Entity\Environment;
+use Magephi\Command\AbstractCommand;
+use Magephi\Entity\Environment;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
