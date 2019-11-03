@@ -3,10 +3,14 @@
 namespace Magphi\Command\Magento;
 
 use Magphi\Component\DockerCompose;
+use Magphi\Component\Mutagen;
+use Magphi\Component\Process;
 use Magphi\Component\ProcessFactory;
 use Magphi\Helper\Installation;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
 
 class StartCommand extends AbstractMagentoCommand
 {
@@ -14,15 +18,18 @@ class StartCommand extends AbstractMagentoCommand
 
     /** @var Installation */
     private $installation;
+    private $mutagen;
 
     public function __construct(
         ProcessFactory $processFactory,
         DockerCompose $dockerCompose,
         Installation $installation,
+        Mutagen $mutagen,
         string $name = null
     ) {
         parent::__construct($processFactory, $dockerCompose, $name);
         $this->installation = $installation;
+        $this->mutagen = $mutagen;
     }
 
     protected function initialize(InputInterface $input, OutputInterface $output)
@@ -42,20 +49,47 @@ class StartCommand extends AbstractMagentoCommand
         ;
     }
 
-    /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     *
-     * @return null|int
-     */
     protected function execute(InputInterface $input, OutputInterface $output): ?int
     {
+        $this->interactive->section('Starting environment');
+
         try {
-            $this->installation->start();
+            try {
+                $process = $this->installation->startMake(true);
+                if (!$process->isSuccessful()) {
+                    throw new \Exception($process->getErrorOutput());
+                }
+            } catch (ProcessTimedOutException $e) {
+                /** @var Process $startProcess */
+                $startProcess = $e->getProcess();
+                $this->installation->startMutagen();
+                $progressBar = $startProcess->getProgressBar();
+                if (!$progressBar instanceof ProgressBar) {
+                    throw new \Exception('The progress bar is not defined.');
+                }
+                $progressBar->setMaxSteps($progressBar->getProgress());
+                $progressBar->finish();
+                $this->interactive->newLine();
+                $this->interactive->text('Containers are up.');
+                $this->interactive->section('File synchronization');
+                $synced = $this->mutagen->monitorUntilSynced($output);
+                if (!$synced) {
+                    throw new \Exception(
+                        'Something happened during the sync, check the situation with <fg=yellow>mutagen monitor</>.'
+                    );
+                }
+            }
+
+            $this->interactive->success('Environment started');
 
             return null;
         } catch (\Exception $e) {
-            $this->interactive->error($e->getMessage());
+            $this->interactive->error(
+                [
+                    "Environment couldn't been started:",
+                    $e->getMessage(),
+                ]
+            );
 
             return 1;
         }

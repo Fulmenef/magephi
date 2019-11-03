@@ -20,11 +20,6 @@ class ImportCommand extends AbstractMagentoCommand
 
     /**
      * ImportCommand constructor.
-     *
-     * @param ProcessFactory $processFactory
-     * @param DockerCompose  $dockerCompose
-     * @param Installation   $installation
-     * @param null|string    $name
      */
     public function __construct(
         ProcessFactory $processFactory,
@@ -57,12 +52,6 @@ class ImportCommand extends AbstractMagentoCommand
         parent::initialize($input, $output);
     }
 
-    /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     *
-     * @return null|int
-     */
     protected function execute(InputInterface $input, OutputInterface $output): ?int
     {
         $environment = new Environment();
@@ -106,8 +95,6 @@ class ImportCommand extends AbstractMagentoCommand
      * @param mixed $string
      *
      * @throws InvalidTypeException
-     *
-     * @return string
      */
     private function convertToString($string): string
     {

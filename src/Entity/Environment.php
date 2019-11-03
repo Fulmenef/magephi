@@ -82,11 +82,6 @@ class Environment
 
     /**
      * Search files matching the given pattern from the current directory.
-     *
-     * @param string $pattern
-     * @param string $key
-     *
-     * @return array
      */
     public function retrieveFile(string $pattern, string $key): array
     {
@@ -114,8 +109,6 @@ class Environment
 
     /**
      * Retrieves environment variables required to run processes.
-     *
-     * @return array
      */
     public function getDockerRequiredVariables(): array
     {
@@ -130,8 +123,6 @@ class Environment
     /**
      * Retrieve default database defined in the local .env file.
      * Return an empty string if database not found or undefined.
-     *
-     * @return string
      */
     public function getDefaultDatabase(): string
     {
@@ -149,9 +140,6 @@ class Environment
         return '';
     }
 
-    /**
-     * @return int
-     */
     public function getContainers(): int
     {
         if (\is_int($this->containers)) {
@@ -165,9 +153,6 @@ class Environment
         return $this->containers;
     }
 
-    /**
-     * @return string
-     */
     public function getDockerComposeContent(): string
     {
         if (\is_string($this->dockerComposeContent)) {
@@ -183,9 +168,6 @@ class Environment
         return $this->dockerComposeContent;
     }
 
-    /**
-     * @return int
-     */
     public function getVolumes(): int
     {
         if (\is_int($this->volumes)) {

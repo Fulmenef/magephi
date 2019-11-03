@@ -26,16 +26,12 @@ class StopCommand extends AbstractMagentoCommand
         ;
     }
 
-    /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     *
-     * @return null|int
-     */
     protected function execute(InputInterface $input, OutputInterface $output): ?int
     {
         $environment = new Environment();
         $environment->autoLocate();
+
+        $this->interactive->section('Stopping environment');
 
         $process = $this->processFactory->runProcessWithProgressBar(
             ['make', 'stop'],
@@ -46,6 +42,19 @@ class StopCommand extends AbstractMagentoCommand
             $output,
             $environment->getContainers() + 1
         );
+
+        if ($process->isSuccessful()) {
+            $this->interactive->success('Environment stopped.');
+        } else {
+            $this->interactive->error(
+                [
+                    "Environment couldn't be stopped: ",
+                    $process->getErrorOutput(),
+                ]
+            );
+
+            return 1;
+        }
 
         return null;
     }

@@ -27,13 +27,29 @@ abstract class AbstractCommand extends Command
         parent::__construct($name);
     }
 
-    /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     */
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
         $this->interactive = new SymfonyStyle($input, $output);
         parent::initialize($input, $output);
+    }
+
+    /**
+     * Checks a condition, outputs a message, and exits if failed.
+     *
+     * @param string   $success   the success message
+     * @param string   $failure   the failure message
+     * @param callable $condition the condition to check
+     * @param bool     $exit      whether to exit on failure
+     */
+    protected function check($success, $failure, $condition, $exit = true)
+    {
+        if ($condition()) {
+            $this->interactive->writeln("<fg=green>  [*] {$success}</>");
+        } elseif (!$exit) {
+            $this->interactive->writeln("<fg=yellow>  [!] {$failure}</>");
+        } else {
+            $this->interactive->writeln("<fg=red>  [X] {$failure}</>");
+            exit(1);
+        }
     }
 }

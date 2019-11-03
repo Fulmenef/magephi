@@ -2,8 +2,8 @@
 
 namespace Magphi\Command\Magento;
 
-use Magphi\Entity\Environment;
 use Exception;
+use Magphi\Entity\Environment;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -21,12 +21,7 @@ class UninstallCommand extends AbstractMagentoCommand
     }
 
     /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     *
      * @throws Exception
-     *
-     * @return null|int
      */
     protected function execute(InputInterface $input, OutputInterface $output): ?int
     {

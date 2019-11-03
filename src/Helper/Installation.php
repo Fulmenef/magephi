@@ -8,7 +8,6 @@ use Magphi\Component\Process;
 use Magphi\Component\ProcessFactory;
 use Magphi\Entity\Environment;
 use Magphi\Exception\FileTooBig;
-use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -37,17 +36,11 @@ class Installation
         $this->environment->autoLocate();
     }
 
-    /**
-     * @param OutputInterface $outputInterface
-     */
     public function setOutputInterface(OutputInterface $outputInterface): void
     {
         $this->outputInterface = $outputInterface;
     }
 
-    /**
-     * @return array
-     */
     public function checkSystemPrerequisites(): array
     {
         return [
@@ -69,13 +62,8 @@ class Installation
     }
 
     /**
-     * @param string $database
-     * @param string $filename
-     *
-     * @return Process
-     *@throws FileException
+     * @throws FileException
      * @throws FileNotFoundException
-     *
      * @throws FileTooBig
      */
     public function databaseImport(string $database, string $filename): Process
@@ -141,82 +129,46 @@ class Installation
     }
 
     /**
-     * @param bool $newSetup
-     *
-     * @throws \Exception
-     *
-     * @return bool
+     * @throws ProcessTimedOutException
      */
-    public function start(bool $newSetup = false): bool
+    public function startMake(bool $install = false): Process
     {
-        $manualSync = false;
+        $process = $this->processFactory->runProcessWithProgressBar(
+            ['make', 'start'],
+            30,
+            function (/* @noinspection PhpUnusedParameterInspection */ $type, $buffer) {
+                return (strpos($buffer, 'Creating') !== false
+                        && (
+                            strpos($buffer, 'network')
+                            || strpos($buffer, 'volume')
+                            || strpos($buffer, 'done')
+                        ))
+                    || (strpos($buffer, 'Starting') && strpos($buffer, 'done'));
+            },
+            $this->outputInterface,
+            $install ? $this->environment->getContainers() + $this->environment->getVolumes()
+                + 2 : $this->environment->getContainers() + 1
+        );
 
-        try {
-            $process = $this->processFactory->runProcessWithProgressBar(
-                ['make', 'start'],
-                30,
-                function (/* @noinspection PhpUnusedParameterInspection */ $type, $buffer) {
-                    return (strpos($buffer, 'Creating') !== false
-                            && (
-                                strpos($buffer, 'network')
-                                || strpos($buffer, 'volume')
-                                || strpos($buffer, 'done')
-                            ))
-                        || (strpos($buffer, 'Starting') && strpos($buffer, 'done'));
-                },
-                $this->outputInterface,
-                $newSetup ? $this->environment->getContainers() + $this->environment->getVolumes()
-                    + 2 : $this->environment->getContainers() + 1
-            );
-        } catch (ProcessTimedOutException $e) {
-            if (!$this->mutagen->isExistingSession()) {
-                $this->outputInterface->writeln(
-                    "\n Seems like the mutagen session has not been created correctly, let me try again..."
-                );
-                $process = $this->mutagen->createSession();
-                if ($process->isSuccessful()) {
-                    $this->outputInterface->writeln(" The session has been created, it's syncing...");
-                    $this->mutagen->monitorUntilSynced();
-                    $manualSync = true;
-                    $this->outputInterface->writeln(' Sync is done.');
-                } else {
-                    $this->outputInterface->writeln("<error>Mutagen session couldn't be created.</error>");
-                }
-            } else {
-                if ($this->mutagen->isPaused()) {
-                    $this->mutagen->resumeSession();
-                }
-                /** @var Process $process */
-                $process = $e->getProcess();
-                $progressBar = $process->getProgressBar();
-                if (!$progressBar instanceof ProgressBar) {
-                    throw new \Exception('The progress bar is not defined.');
-                }
-                $step = $progressBar->getProgress();
-                $progressBar->clear();
-                $this->outputInterface->writeln("Don't worry, the sync is still in progress.\n");
-                $process = clone $process;
-                $progressBar = $process->getProgressBar();
-                if (!$progressBar instanceof ProgressBar) {
-                    throw new \Exception('The progress bar is not defined.');
-                }
-                $progressBar->setProgress($step);
-                $process->start();
+        return $process;
+    }
+
+    public function startMutagen(): bool
+    {
+        if ($this->mutagen->isExistingSession()) {
+            if ($this->mutagen->isPaused()) {
+                $this->mutagen->resumeSession();
             }
-        }
-
-        if (!$manualSync && !$process->isSuccessful()) {
-            throw new \Exception($process->getErrorOutput());
+        } else {
+            $process = $this->mutagen->createSession();
+            if (!$process->isSuccessful()) {
+                throw new \Exception('Mutagen session could not be created');
+            }
         }
 
         return true;
     }
 
-    /**
-     * @param string $binary
-     *
-     * @return bool
-     */
     private function isInstalled(string $binary): bool
     {
         if (\defined('PHP_WINDOWS_VERSION_BUILD')) {
@@ -230,12 +182,8 @@ class Installation
     }
 
     /**
-     * @param string $filename
-     *
-     * @throws FileNotFoundException
      * @throws FileException
-     *
-     * @return int
+     * @throws FileNotFoundException
      */
     private function countLines(string $filename): int
     {

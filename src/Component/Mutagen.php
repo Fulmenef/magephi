@@ -3,6 +3,8 @@
 namespace Magphi\Component;
 
 use Magphi\Entity\Environment;
+use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 
 class Mutagen
@@ -19,9 +21,6 @@ class Mutagen
         $this->environment->autoLocate();
     }
 
-    /**
-     * @return Process
-     */
     public function createSession(): Process
     {
         $command = [
@@ -53,9 +52,6 @@ class Mutagen
         );
     }
 
-    /**
-     * @return bool
-     */
     public function isExistingSession(): bool
     {
         $process = $this->processFactory->runProcess(
@@ -95,7 +91,7 @@ class Mutagen
         return stripos($process->getOutput(), '[Paused]') !== false;
     }
 
-    public function monitorUntilSynced(): bool
+    public function monitorUntilSynced(OutputInterface $output): bool
     {
         try {
             $process = $this->processFactory->createProcess(
@@ -106,14 +102,27 @@ class Mutagen
                 ],
                 300
             );
-            $re = '/Status: (.*)$/i';
+            $progressBar = new ProgressBar($output, 100);
+            $reStatus = '/Status: (.*)$/i';
+            $reProgress = '/Staging files on beta: (\d+)%/i';
             $process->start();
+            $progressBar->start();
             $process->waitUntil(
-                function (string $type, string $buffer) use ($re) {
-                    preg_match($re, $buffer, $match);
-                    return rtrim($match[1]) === 'Watching for changes';
+                function (string $type, string $buffer) use ($reStatus, $reProgress, $progressBar) {
+                    preg_match($reStatus, $buffer, $statusMatch);
+                    if (isset($statusMatch[1])) {
+                        preg_match($reProgress, $statusMatch[1], $progressMatch);
+                        if (!empty($progressMatch)) {
+                            $progressBar->setProgress($progressMatch[1]);
+                        }
+
+                        return rtrim($statusMatch[1]) === 'Watching for changes';
+                    }
+
+                    return false;
                 }
             );
+            $progressBar->finish();
 
             return true;
         } catch (ProcessTimedOutException $e) {

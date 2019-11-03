@@ -32,8 +32,6 @@ class Kernel extends BaseKernel
      * Retrieves the custom directory located in the HOME directory of the current user.
      *
      * @throws InvalidConfigurationException
-     *
-     * @return string
      */
     public function getCustomDir(): string
     {
@@ -55,8 +53,6 @@ class Kernel extends BaseKernel
 
     /**
      * Checks whether the application is currently run as a PHAR.
-     *
-     * @return bool
      */
     public function isArchiveContext(): bool
     {

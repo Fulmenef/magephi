@@ -35,12 +35,6 @@ class CheckPrerequisiteCommand extends AbstractMagentoCommand
         ;
     }
 
-    /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     *
-     * @return null|int
-     */
     protected function execute(InputInterface $input, OutputInterface $output): ?int
     {
         $table = new Table($output);
