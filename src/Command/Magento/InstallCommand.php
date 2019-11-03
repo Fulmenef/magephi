@@ -13,8 +13,6 @@ use Nette\Utils\RegexpException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\Process\Process;
-use Symfony\Component\Process\ProcessUtils;
 
 class InstallCommand extends AbstractMagentoCommand
 {
@@ -254,9 +252,6 @@ class InstallCommand extends AbstractMagentoCommand
 	protected function buildContainers()
 	{
 		$this->interactive->section('Building containers');
-		dump(class_exists(Process::class));
-		dump(class_exists(\Symfony\Component\Console\Style\SymfonyStyle::class));
-		dump(class_exists(ProcessUtils::class));
 		$process = $this->processFactory->runProcessWithProgressBar(
 			['make', 'build'],
 			3600,

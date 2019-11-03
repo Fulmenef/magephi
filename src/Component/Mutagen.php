@@ -66,7 +66,7 @@ class Mutagen
             ]
         );
 
-        return strpos($process->getProcess()->getOutput(), 'No sessions found') === false;
+        return strpos($process->getOutput(), 'No sessions found') === false;
     }
 
     public function isSynced(): bool
@@ -79,7 +79,7 @@ class Mutagen
             ]
         );
 
-        return stripos($process->getProcess()->getOutput(), 'Watching for changes') !== false;
+        return stripos($process->getOutput(), 'Watching for changes') !== false;
     }
 
     public function isPaused(): bool
@@ -92,7 +92,7 @@ class Mutagen
             ]
         );
 
-        return stripos($process->getProcess()->getOutput(), '[Paused]') !== false;
+        return stripos($process->getOutput(), '[Paused]') !== false;
     }
 
     public function monitorUntilSynced(): bool
@@ -108,7 +108,7 @@ class Mutagen
             );
             $re = '/Status: (.*)$/i';
             $process->start();
-            $process->getProcess()->waitUntil(
+            $process->waitUntil(
                 function (string $type, string $buffer) use ($re) {
                     preg_match($re, $buffer, $match);
                     return rtrim($match[1]) === 'Watching for changes';

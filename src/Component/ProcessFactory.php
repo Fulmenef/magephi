@@ -31,7 +31,7 @@ class ProcessFactory
     {
         $process = $this->createProcess($command, $timeout);
         $process->start();
-        $process->getProcess()->wait();
+        $process->wait();
 
         return $process;
     }
@@ -71,7 +71,7 @@ class ProcessFactory
      */
     public function runInteractiveProcess(array $command, ?float $timeout = null, array $env = null)
     {
-        $process = ($this->createProcess($command, $timeout, $env))->getProcess();
+        $process = $this->createProcess($command, $timeout, $env);
 
         $process->setTty(Process::isTtySupported());
         $process->run(

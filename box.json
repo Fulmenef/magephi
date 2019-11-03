@@ -1,5 +1,6 @@
 {
   "main": "bin/console",
+  "output": "build/magphi.phar",
   "directories": [
     "config",
     "src",
@@ -9,7 +10,6 @@
     ".env.local.php"
   ],
   "force-autodiscovery": true,
-  "output": "build/magphi.phar",
   "git-version": "package_version",
   "compression": "GZ"
 }

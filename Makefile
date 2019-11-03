@@ -12,6 +12,10 @@ box: ## Compiles the project into a PHAR archive
 	openssl sha1 build/magphi.phar
 .PHONY: box
 
+install: ## Executes a copy/paste analysis
+	mv -f ./build/magphi.phar /usr/local/bin/magphi
+.PHONY: install
+
 php-cs-fixer: ## Fixes code style in all PHP files
 	./vendor/bin/php-cs-fixer fix --verbose
 .PHONY: php-cs-fixer

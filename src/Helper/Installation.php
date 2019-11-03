@@ -72,11 +72,11 @@ class Installation
      * @param string $database
      * @param string $filename
      *
-     * @throws FileTooBig
-     * @throws FileException
+     * @return Process
+     *@throws FileException
      * @throws FileNotFoundException
      *
-     * @return Process
+     * @throws FileTooBig
      */
     public function databaseImport(string $database, string $filename): Process
     {
@@ -171,14 +171,14 @@ class Installation
         } catch (ProcessTimedOutException $e) {
             if (!$this->mutagen->isExistingSession()) {
                 $this->outputInterface->writeln(
-                    'Seems like the mutagen session has not been created correctly, let me try again...'
+                    "\n Seems like the mutagen session has not been created correctly, let me try again..."
                 );
                 $process = $this->mutagen->createSession();
                 if ($process->isSuccessful()) {
-                    $this->outputInterface->writeln("The session has been created, it's syncing...");
+                    $this->outputInterface->writeln(" The session has been created, it's syncing...");
                     $this->mutagen->monitorUntilSynced();
                     $manualSync = true;
-                    $this->outputInterface->writeln('Sync is done.');
+                    $this->outputInterface->writeln(' Sync is done.');
                 } else {
                     $this->outputInterface->writeln("<error>Mutagen session couldn't be created.</error>");
                 }
@@ -206,7 +206,7 @@ class Installation
         }
 
         if (!$manualSync && !$process->isSuccessful()) {
-            throw new \Exception($process->getProcess()->getErrorOutput());
+            throw new \Exception($process->getErrorOutput());
         }
 
         return true;
