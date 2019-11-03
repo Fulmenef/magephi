@@ -1,0 +1,19 @@
+  <?php
+return PhpCsFixer\Config::create()
+    ->setRules(
+        [
+            '@Symfony' => true,
+            '@PhpCsFixer' => true,
+            '@PhpCsFixer:risky' => true,
+            '@DoctrineAnnotation' => true,
+            'yoda_style' => false,
+        ]
+    )
+    ->setRiskyAllowed(true)
+    ->setFinder(
+        PhpCsFixer\Finder::create()
+            ->in([__DIR__.'/src', __DIR__.'/tests'])
+            ->append([__FILE__])
+    )
+    ->setCacheFile(__DIR__.'/var/.php_cs.cache')
+;
