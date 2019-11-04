@@ -14,6 +14,7 @@ class Kernel extends BaseKernel
 {
     use MicroKernelTrait;
 
+    const NAME = 'Magephi';
     const VERSION = '@package_version@';
 
     private const CONFIG_EXTS = '.{php,xml,yaml,yml}';

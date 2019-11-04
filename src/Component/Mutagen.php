@@ -21,6 +21,11 @@ class Mutagen
         $this->environment->autoLocate();
     }
 
+	/**
+	 * Create Mutagen session for the project
+	 *
+	 * @return Process
+	 */
     public function createSession(): Process
     {
         $command = [
@@ -41,6 +46,11 @@ class Mutagen
         return $this->processFactory->runProcess($command, 60);
     }
 
+	/**
+	 * Try to resume the Mutagen session. Obviously, it must have been initialized first.
+	 *
+	 * @return Process
+	 */
     public function resumeSession(): Process
     {
         return $this->processFactory->runProcess(
@@ -52,6 +62,11 @@ class Mutagen
         );
     }
 
+	/**
+	 * Check if the mutagen session for the project exists. Return true if it does.
+	 *
+	 * @return bool
+	 */
     public function isExistingSession(): bool
     {
         $process = $this->processFactory->runProcess(
@@ -65,6 +80,11 @@ class Mutagen
         return strpos($process->getOutput(), 'No sessions found') === false;
     }
 
+	/**
+	 * Check if the file synchronization is done.
+	 *
+	 * @return bool
+	 */
     public function isSynced(): bool
     {
         $process = $this->processFactory->runProcess(
@@ -78,6 +98,11 @@ class Mutagen
         return stripos($process->getOutput(), 'Watching for changes') !== false;
     }
 
+	/**
+	 * Check if the mutagen session is paused.
+	 *
+	 * @return bool
+	 */
     public function isPaused(): bool
     {
         $process = $this->processFactory->runProcess(
@@ -91,6 +116,13 @@ class Mutagen
         return stripos($process->getOutput(), '[Paused]') !== false;
     }
 
+	/**
+	 * Display a progress bar until the file synchronization is done.
+	 *
+	 * @param OutputInterface $output
+	 *
+	 * @return bool
+	 */
     public function monitorUntilSynced(OutputInterface $output): bool
     {
         try {

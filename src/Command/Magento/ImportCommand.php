@@ -11,6 +11,11 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Command to import a database dump. The MySQL container must be started.
+ *
+ * @package Magephi\Command\Magento
+ */
 class ImportCommand extends AbstractMagentoCommand
 {
     protected $command = 'import';

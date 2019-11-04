@@ -9,6 +9,12 @@ use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Command to scan environment and determine if all prerequisites are filled to install a Magento2 project using
+ * emakinafr/docker-magento2.
+ *
+ * @package Magephi\Command\Magento
+ */
 class CheckPrerequisiteCommand extends AbstractMagentoCommand
 {
     protected $command = 'prerequisites';

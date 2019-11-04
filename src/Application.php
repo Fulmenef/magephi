@@ -10,6 +10,6 @@ class Application extends \Symfony\Bundle\FrameworkBundle\Console\Application
     public function __construct(KernelInterface $kernel)
     {
         parent::__construct($kernel);
-        BaseApplication::__construct('Magephi', Kernel::VERSION);
+        BaseApplication::__construct(Kernel::NAME, Kernel::VERSION);
     }
 }

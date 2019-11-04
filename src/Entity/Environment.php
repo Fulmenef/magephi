@@ -140,6 +140,11 @@ class Environment
         return '';
     }
 
+	/**
+	 * Return number of containers defined in the docker-compose.yml
+	 *
+	 * @return int
+	 */
     public function getContainers(): int
     {
         if (\is_int($this->containers)) {
@@ -153,6 +158,11 @@ class Environment
         return $this->containers;
     }
 
+	/**
+	 * Return the content of the docker-compose.yml
+	 *
+	 * @return string
+	 */
     public function getDockerComposeContent(): string
     {
         if (\is_string($this->dockerComposeContent)) {
@@ -168,6 +178,11 @@ class Environment
         return $this->dockerComposeContent;
     }
 
+	/**
+	 * Return the number of volumes defined in docker-compose.yml
+	 *
+	 * @return int
+	 */
     public function getVolumes(): int
     {
         if (\is_int($this->volumes)) {

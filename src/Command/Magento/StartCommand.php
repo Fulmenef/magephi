@@ -12,6 +12,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 
+/**
+ * Command to start the environment. The install command must have been executed before.
+ *
+ * @package Magephi\Command\Magento
+ */
 class StartCommand extends AbstractMagentoCommand
 {
     protected $command = 'start';
@@ -55,7 +60,7 @@ class StartCommand extends AbstractMagentoCommand
 
         try {
             try {
-                $process = $this->installation->startMake(true);
+                $process = $this->installation->startMake();
                 if (!$process->isSuccessful()) {
                     throw new \Exception($process->getErrorOutput());
                 }
@@ -80,6 +85,7 @@ class StartCommand extends AbstractMagentoCommand
                 }
             }
 
+            $this->interactive->newLine(2);
             $this->interactive->success('Environment started');
 
             return null;

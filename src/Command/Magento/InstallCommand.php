@@ -10,6 +10,7 @@ use Magephi\Component\ProcessFactory;
 use Magephi\Entity\Environment;
 use Magephi\Exception\FileTooBig;
 use Magephi\Helper\Installation;
+use Magephi\Kernel;
 use Nadar\PhpComposerReader\ComposerReader;
 use Nette\Utils\RegexpException;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -18,6 +19,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 
+/**
+ * Command to install the Magento2 project. It'll check if the prerequisites are filled before installing dependencies
+ * and setup the Docker environment.
+ *
+ * @package Magephi\Command\Magento
+ */
 class InstallCommand extends AbstractMagentoCommand
 {
     const DOCKER_LOCAL_ENV = 'docker/local/.env';
@@ -354,7 +361,7 @@ class InstallCommand extends AbstractMagentoCommand
             if ($this->interactive->confirm(
                 'It seems like this host is not in your hosts file yet, do you want to add it ?'
             )) {
-                $hosts .= "# Added by Emag\n";
+                $hosts .= sprintf("# Added by %s\n", Kernel::NAME);
                 $hosts .= "127.0.0.1   {$serverName}\n";
                 file_put_contents('/etc/hosts', $hosts);
                 $this->interactive->text('Server added in your host file.');

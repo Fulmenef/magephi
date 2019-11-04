@@ -9,6 +9,11 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Command to upgrade the application to the latest version.
+ *
+ * @package Magephi\Command
+ */
 class UpdateCommand extends Command
 {
     const MANIFEST_FILE = '';
