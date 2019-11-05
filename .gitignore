@@ -1,4 +1,5 @@
 build
+downloads
 
 ###> symfony/framework-bundle ###
 /.env.local
