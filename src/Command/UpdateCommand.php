@@ -16,7 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class UpdateCommand extends Command
 {
-    const MANIFEST_FILE = '';
+    const MANIFEST_FILE = 'https://fulmenef.github.io/magephi/manifest.json';
 
     protected function configure()
     {

@@ -54,7 +54,7 @@ git checkout gh-pages
 cp build/magephi.phar downloads/magephi-${TAG}.phar
 git add downloads/magephi-${TAG}.phar
 
-SHA1=$(openssl sha1 build/magephi.phar)
+SHA1=$(openssl sha1 -r build/magephi.phar | cut -d ' ' -f 1)
 
 JSON='name:"magephi.phar"'
 JSON="${JSON},sha1:\"${SHA1}\""
@@ -68,7 +68,7 @@ cat manifest.json | jsawk -a "this.push({${JSON}})" | python -mjson.tool > manif
 mv manifest.json.tmp manifest.json
 git add manifest.json
 
-git commit -m "Release version ${TAG}"
+#git commit -m "Release version ${TAG}"
 
 #
 # Go back to master
