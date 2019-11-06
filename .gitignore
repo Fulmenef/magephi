@@ -1,5 +1,6 @@
 build
 downloads
+.github_token
 
 ###> symfony/framework-bundle ###
 /.env.local

@@ -27,12 +27,13 @@ class ProcessFactory
 	 * @param array $command
 	 * @param float $timeout
 	 * @param array $env Environment variables
+	 * @param bool $shell Should the process be executed as shell command directly
 	 *
 	 * @return Process
 	 */
-	public function runProcess(array $command, float $timeout = 3600.00, array $env = []): Process
+	public function runProcess(array $command, float $timeout = 3600.00, array $env = [], bool $shell = false): Process
 	{
-		$process = $this->createProcess($command, $timeout, $env);
+		$process = $this->createProcess($command, $timeout, $env, $shell);
 		$process->start();
 		$process->wait();
 

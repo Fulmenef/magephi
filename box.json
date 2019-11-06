@@ -11,5 +11,8 @@
   ],
   "force-autodiscovery": true,
   "git-version": "package_version",
-  "compression": "GZ"
+  "compression": "GZ",
+  "replacements": {
+    "@mode@": "prod"
+  }
 }

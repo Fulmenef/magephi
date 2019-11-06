@@ -9,7 +9,6 @@ box: ## Compiles the project into a PHAR archive
 	composer dump-env prod
 	box compile
 	rm .env.local.php
-	openssl sha1 build/magephi.phar
 .PHONY: box
 
 install: ## Executes a copy/paste analysis

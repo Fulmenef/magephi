@@ -16,6 +16,7 @@ class Kernel extends BaseKernel
 
 	const NAME = 'Magephi';
 	const VERSION = '@package_version@';
+	const MODE = '@mode@';
 
 	private const CONFIG_EXTS = '.{php,xml,yaml,yml}';
 

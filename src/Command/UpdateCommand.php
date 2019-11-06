@@ -26,9 +26,9 @@ class UpdateCommand extends Command
 	protected function configure()
 	{
 		$this
-			->setName('magphi:update')
+			->setName('magephi:update')
 			->setAliases(['update'])
-			->setDescription('Updates Magphi to the latest version');
+			->setDescription('Updates Magephi to the latest version');
 	}
 
 	protected function initialize(InputInterface $input, OutputInterface $output)
