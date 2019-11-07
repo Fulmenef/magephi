@@ -3,8 +3,8 @@ services:
         arguments:
             - '@Github\HttpClient\Builder'
         # Uncomment to enable authentication
-        #calls:
-        #    - ['authenticate', ['%env(GITHUB_USERNAME)%', '%env(GITHUB_SECRET)%', '%env(GITHUB_AUTH_METHOD)%']]
+        calls:
+            - ['authenticate', ['%env(GITHUB_USERNAME)%', '%env(GITHUB_SECRET)%', '%env(GITHUB_AUTH_METHOD)%']]
 
     Github\HttpClient\Builder:
         arguments:

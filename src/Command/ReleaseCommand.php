@@ -32,7 +32,6 @@ class ReleaseCommand extends Command
 {
 	const USER_NAME = 'fulmenef';
 	const REPO_NAME = 'magephi';
-	const TOKEN_FILE = '.github_token';
 	const DOC_BRANCH = 'gh-pages';
 	const MANIFEST = 'manifest.json';
 
@@ -100,6 +99,7 @@ class ReleaseCommand extends Command
 	 * @param OutputInterface $output
 	 *
 	 * @return int|null
+	 * @throws Exception
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output): ?int
 	{
@@ -107,7 +107,6 @@ class ReleaseCommand extends Command
 		$version = $input->getArgument('version');
 		try {
 			$this->validateVersion($version);
-			$token = $this->getToken();
 		} catch (Exception $e) {
 			$this->interactive->error($e->getMessage());
 
@@ -174,7 +173,6 @@ class ReleaseCommand extends Command
 		}
 
 		$client = new Client();
-		$client->authenticate($token, null, Client::AUTH_HTTP_TOKEN);
 		/** @var Repo $api */
 		$api = $client->api('repo');
 		/** @var Releases $releases */
@@ -205,25 +203,8 @@ class ReleaseCommand extends Command
 	}
 
 	/**
-	 * Check if the token file exists, if not throw an exception, else return the token inside the file
+	 * Add release content to manifest.json
 	 *
-	 * @return string Token inside the file
-	 *
-	 * @throws Exception
-	 */
-	private function getToken(): string
-	{
-		$tokenFile = $this->findFile(self::TOKEN_FILE);
-		$token = $tokenFile->getContents();
-
-		if (empty($token)) {
-			throw new Exception('Token cannot be empty');
-		}
-
-		return $token;
-	}
-
-	/**
 	 * @param array $data
 	 *
 	 * @return string
@@ -240,6 +221,7 @@ class ReleaseCommand extends Command
 
 		$fs = new Filesystem();
 		$fs->dumpFile($fileInfo->getRelativePathname(), $content);
+
 		return $fileInfo->getRelativePathname();
 	}
 
