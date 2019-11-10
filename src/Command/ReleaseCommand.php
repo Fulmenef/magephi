@@ -17,6 +17,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
@@ -172,7 +173,10 @@ class ReleaseCommand extends Command
 			return 1;
 		}
 
+		$dotenv = new Dotenv();
+		$dotenv->load($this->kernel->getProjectDir() . '/.env.local');
 		$client = new Client();
+		$client->authenticate($_ENV['GITHUB_SECRET'], null, $_ENV['GITHUB_AUTH_METHOD']);
 		/** @var Repo $api */
 		$api = $client->api('repo');
 		/** @var Releases $releases */
