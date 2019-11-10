@@ -222,10 +222,8 @@ class Installation
 			throw new FileNotFoundException($filename . ' not found.');
 		}
 		while (!feof($handle)) {
+			/** @var string $line */
 			$line = fgets($handle);
-			if ($line === false) {
-				throw new FileException('Unexpected end of file.');
-			}
 			preg_match_all('/^.(?:(?!-).)*$/m', $line, $matches);
 			$linecount += \count($matches[0]);
 		}

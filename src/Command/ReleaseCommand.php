@@ -217,7 +217,7 @@ class ReleaseCommand extends Command
 		$content = json_decode($content, true);
 		$content[] = $data;
 		/** @var string $content */
-		$content = json_encode($content);
+		$content = json_encode($content, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
 		$fs = new Filesystem();
 		$fs->dumpFile($fileInfo->getRelativePathname(), $content);

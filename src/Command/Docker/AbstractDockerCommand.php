@@ -20,7 +20,7 @@ abstract class AbstractDockerCommand extends AbstractCommand
 	protected function configure()
 	{
 		$this
-			->setName('magphi:docker:' . $this->service)
+			->setName('magephi:docker:' . $this->service)
 			->setAliases([$this->service])
 			->setDescription("Open a terminal to the {$this->service} container.")
 			->setHelp("This command allows you to connect to the {$this->service} container.");

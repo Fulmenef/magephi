@@ -14,7 +14,7 @@ class DefaultCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected static $defaultName = 'magphi:default';
+    protected static $defaultName = 'magephi:default';
 
     /**
      * {@inheritdoc}
@@ -36,7 +36,7 @@ class DefaultCommand extends Command
         $application = $this->getApplication();
 
         $command = $application->find('list');
-        $arguments = ['namespace' => 'magphi'];
+        $arguments = ['namespace' => 'magephi'];
 
         $listInput = new ArrayInput($arguments);
 
