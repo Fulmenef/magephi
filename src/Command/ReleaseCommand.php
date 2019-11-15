@@ -155,7 +155,6 @@ class ReleaseCommand extends Command
 		$data = [
 			'name'    => 'magephi.phar',
 			'sha1'    => $sha1,
-			'date'    => (new \DateTime())->format('Y-m-d H:i:s'),
 			'url'     => "https://fulmenef.github.io/magephi/$downloadPath",
 			'version' => $version
 		];
@@ -165,7 +164,7 @@ class ReleaseCommand extends Command
 
 		try {
 			$this->git->checkout();
-			$this->git->push();
+			$this->git->push($version);
 			$this->git->push(self::DOC_BRANCH);
 		} catch (GitException $e) {
 			$this->interactive->error($e->getMessage());
@@ -196,6 +195,7 @@ class ReleaseCommand extends Command
 				]
 			);
 		} catch (RuntimeException|MissingArgumentException $e) {
+			dump('This is an error');
 			$this->interactive->error($e->getMessage());
 
 			return 1;
