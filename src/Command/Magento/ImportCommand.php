@@ -13,8 +13,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Command to import a database dump. The MySQL container must be started.
- *
- * @package Magephi\Command\Magento
  */
 class ImportCommand extends AbstractMagentoCommand
 {
@@ -64,9 +62,8 @@ class ImportCommand extends AbstractMagentoCommand
 
         $file = $this->convertToString($input->getArgument('file'));
 
-        if ($input->hasArgument('database')) {
-            $database = $this->convertToString($input->getArgument('database'));
-        } else {
+        $database = $this->convertToString($input->getArgument('database'));
+        if (empty($database)) {
             $database = $environment->getDefaultDatabase();
         }
 
@@ -86,6 +83,7 @@ class ImportCommand extends AbstractMagentoCommand
 
         if (!$process->isSuccessful()) {
             $this->interactive->error($process->getOutput());
+            $this->interactive->error($process->getErrorOutput());
 
             return 1;
         }
@@ -96,17 +94,17 @@ class ImportCommand extends AbstractMagentoCommand
         return null;
     }
 
-    /**
-     * @param mixed $string
-     *
-     * @throws InvalidTypeException
-     */
+	/**
+	 * @param mixed $string
+	 *
+	 * @return string
+	 *
+	 * @throws InvalidTypeException
+	 */
     private function convertToString($string): string
     {
-        if (!\is_string($string) || $string === '') {
-            throw new InvalidTypeException(
-                'The value must be a string. '.\gettype($string).' provided.'
-            );
+        if (!\is_string($string)) {
+            return '';
         }
 
         return $string;

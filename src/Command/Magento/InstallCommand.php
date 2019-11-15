@@ -22,8 +22,6 @@ use Symfony\Component\Process\Exception\ProcessTimedOutException;
 /**
  * Command to install the Magento2 project. It'll check if the prerequisites are filled before installing dependencies
  * and setup the Docker environment.
- *
- * @package Magephi\Command\Magento
  */
 class InstallCommand extends AbstractMagentoCommand
 {
@@ -179,9 +177,13 @@ class InstallCommand extends AbstractMagentoCommand
         return $composer;
     }
 
-    /**
-     * @throws Exception
-     */
+	/**
+	 * @param ComposerReader $composer
+	 *
+	 * @return string
+	 *
+	 * @throws RegexpException
+	 */
     protected function prepareEnvironment(ComposerReader $composer): string
     {
         $this->interactive->section('Configuring docker environment');
@@ -259,7 +261,7 @@ class InstallCommand extends AbstractMagentoCommand
         $this->interactive->section('Building containers');
         $process = $this->processFactory->runProcessWithProgressBar(
             ['make', 'build'],
-            3600,
+            600,
             function (/* @noinspection PhpUnusedParameterInspection */ $type, $buffer) {
                 return strpos($buffer, 'skipping') || strpos($buffer, 'tagged');
             },
@@ -297,11 +299,10 @@ class InstallCommand extends AbstractMagentoCommand
             $startProcess = $e->getProcess();
             $this->installation->startMutagen();
             $progressBar = $startProcess->getProgressBar();
-            if (!$progressBar instanceof ProgressBar) {
-                throw new \Exception('The progress bar is not defined.');
+            if ($progressBar instanceof ProgressBar) {
+                $progressBar->setMaxSteps($progressBar->getProgress());
+                $progressBar->finish();
             }
-            $progressBar->setMaxSteps($progressBar->getProgress());
-            $progressBar->finish();
             $this->interactive->newLine();
             $this->interactive->text('Containers are up.');
             $this->interactive->section('File synchronization');
