@@ -52,9 +52,13 @@ class UpdateCommand extends Command
 		$app = $this->getApplication();
 		if ($app instanceof Application) {
 			$manager = new Manager(Manifest::loadFile(self::MANIFEST_FILE));
-			$manager->update($app->getVersion(), true);
+			$result = $manager->update($app->getVersion(), true, true);
 
-			$this->interactive->success(sprintf("%s has been upgraded to the latest version", Kernel::NAME));
+			if($result) {
+				$this->interactive->success(sprintf("%s has been upgraded to the latest version", Kernel::NAME));
+			} else {
+				$this->interactive->note('No new version to download');
+			}
 		} else {
 			throw new \Exception(
 				sprintf('Application must be type of %s, %s found.', Application::class, \gettype($app))
