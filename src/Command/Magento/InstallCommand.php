@@ -258,15 +258,7 @@ class InstallCommand extends AbstractMagentoCommand
     protected function buildContainers()
     {
         $this->interactive->section('Building containers');
-        $process = $this->processFactory->runProcessWithProgressBar(
-            ['make', 'build'],
-            600,
-            function (/* @noinspection PhpUnusedParameterInspection */ $type, $buffer) {
-                return strpos($buffer, 'skipping') || strpos($buffer, 'tagged');
-            },
-            $this->output,
-            $this->environment->getContainers()
-        );
+        $process = $this->installation->buildMake();
 
         if (!$process->isSuccessful()) {
             $this->interactive->newLine(2);

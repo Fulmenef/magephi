@@ -27,20 +27,9 @@ class UninstallCommand extends AbstractMagentoCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output): ?int
     {
-        $environnement = new Environment();
-        $environnement->autoLocate();
+        $environment = new Environment();
+        $environment->autoLocate();
         if ($this->interactive->confirm('Are you sure you want to uninstall this project ?', false)) {
-            $content = file_get_contents($environnement->__get('dockerComposeFile'));
-            if (!\is_string($content)) {
-                $this->interactive->error($environnement->__get('dockerComposeFile') . ' is not found.');
-
-                return 1;
-            }
-            $dockerComposeContent = $content;
-            preg_match_all('/^( {2})\w+:$/im', $dockerComposeContent, $matches);
-            $containers = $matches[0];
-            preg_match_all('/^( {2})\w+: {}$/im', $dockerComposeContent, $matches);
-            $volumes = $matches[0];
 
             $this->processFactory->runProcessWithProgressBar(
                 ['make', 'purge'],
@@ -62,10 +51,10 @@ class UninstallCommand extends AbstractMagentoCommand
                         );
                 },
                 $output,
-                \count($containers) * 2 + \count($volumes) + 2
+                $environment->getContainers() * 2 + $environment->getVolumes() + 2
             );
 
-            $this->interactive->newLine();
+            $this->interactive->newLine(2);
             $this->interactive->success('This project has been successfully uninstalled.');
         }
 

@@ -83,7 +83,7 @@ class StartCommand extends AbstractMagentoCommand
             }
 
             $this->interactive->newLine(2);
-            $this->interactive->success('Environment started');
+            $this->interactive->success('Environment started.');
 
             return null;
         } catch (\Exception $e) {
