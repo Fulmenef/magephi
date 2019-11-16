@@ -230,7 +230,6 @@ class ReleaseCommand extends Command
 			);
 			$this->logger->debug('Release created.');
 		} catch (RuntimeException|MissingArgumentException $e) {
-			dump('This is an error');
 			$this->interactive->error($e->getMessage());
 
 			return 1;
