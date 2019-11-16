@@ -45,8 +45,8 @@ class UpdateCommand extends AbstractCommand
             $newVersion = Parser::toVersion($update);
             $version = $app->getVersion();
             $parsedVersion = Parser::toVersion($version);
-            if ($newVersion->getMajor() > $parsedVersion->getMajor()
-                && $this->interactive->confirm(
+            if ($newVersion->getMajor() <= $parsedVersion->getMajor()
+                || $this->interactive->confirm(
                     sprintf(
                         'You are going to update from version %s to %s, huge changes has been made, are you sure you want to upgrade ?',
                         $version,
