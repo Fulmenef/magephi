@@ -24,6 +24,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
 
 /**
  * Command to create and release a new version.
@@ -185,12 +186,23 @@ class ReleaseCommand extends Command
 			$this->logger->debug('Moved back on master.');
 			$this->git->push();
 			$this->logger->debug('Master pushed.');
+		} catch (GitException $e) {
+			$this->interactive->error($e->getMessage());
+
+			return 1;
+		} catch (ProcessTimedOutException $e){
+			$this->interactive->note($e->getMessage());
+		}
+
+		try {
 			$this->git->push(self::DOC_BRANCH);
 			$this->logger->debug('Doc pushed.');
 		} catch (GitException $e) {
 			$this->interactive->error($e->getMessage());
 
 			return 1;
+		} catch (ProcessTimedOutException $e){
+			$this->interactive->note($e->getMessage());
 		}
 
 		$dotenv = new Dotenv();

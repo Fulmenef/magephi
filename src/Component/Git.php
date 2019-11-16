@@ -120,7 +120,7 @@ class Git
 	public function pull(): bool
 	{
 		$command = ['git', 'pull'];
-		$process = $this->processFactory->runProcess($command, 10, []);
+		$process = $this->processFactory->runProcess($command, 10);
 
 		if (!$process->isSuccessful()) {
 			throw new GitException("Unable to update branch. Cause:\n {$process->getErrorOutput()}");
@@ -141,7 +141,7 @@ class Git
 	public function push(string $branch = 'master', string $remote = 'origin'): bool
 	{
 		$command = ['git', 'push', $remote, $branch];
-		$process = $this->processFactory->runProcess($command, 20, []);
+		$process = $this->processFactory->runProcess($command, 60);
 
 		if (!$process->isSuccessful()) {
 			throw new GitException("Unable to push branch $branch to $remote. Cause:\n {$process->getErrorOutput()}");

@@ -5,13 +5,13 @@
 ##
 
 box: ## Compiles the project into a PHAR archive
-	rm -rf ${HOME}/.magephi/cache/* ${HOME}/.magephi/logs/* var/*
 	composer dump-env prod
 	box compile
 	rm .env.local.php
 .PHONY: box
 
 install: ## Executes a copy/paste analysis
+	rm -rf ${HOME}/.magephi/cache/* ${HOME}/.magephi/logs/*
 	mv -f ./build/magephi.phar /usr/local/bin/magephi
 .PHONY: install
 
