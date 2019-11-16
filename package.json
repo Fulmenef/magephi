@@ -22,7 +22,7 @@
     }
   },
   "lint-staged": {
-    "src/*.php": [
+    "src/**/*.php": [
       "make php-cs-fixer",
       "make phpstan"
     ]

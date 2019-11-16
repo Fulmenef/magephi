@@ -4,6 +4,7 @@ namespace Magephi\Command;
 
 use Herrera\Phar\Update\Manager;
 use Herrera\Phar\Update\Manifest;
+use Herrera\Phar\Update\Update;
 use Herrera\Version\Parser;
 use Herrera\Version\Version;
 use Magephi\Application;
@@ -51,9 +52,10 @@ abstract class AbstractCommand extends Command
 
         $version = Parser::toVersion($version);
         $manager = new Manager(Manifest::loadFile(self::MANIFEST_FILE));
+        /** @var null|Update $update */
         $update = $manager->getManifest()->findRecent($version, true, true);
 
-        return $update ? $this->rebuildVersion($update->getVersion()) : $update;
+        return $update !== null ? $this->rebuildVersion($update->getVersion()) : $update;
     }
 
     protected function initialize(InputInterface $input, OutputInterface $output)
