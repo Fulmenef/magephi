@@ -11,6 +11,7 @@ use Github\Exception\RuntimeException;
 use Magephi\Component\Git;
 use Magephi\Component\ProcessFactory;
 use Magephi\Exception\GitException;
+use Nadar\PhpComposerReader\ComposerReader;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -156,6 +157,21 @@ class ReleaseCommand extends Command
         }
         $this->logger->debug('Changes found.');
 
+        try {
+            $files = ['composer.json', 'package.json'];
+
+            foreach ($files as $file) {
+                $this->updateJsonFile($version, $file);
+                $this->git->add($file);
+            }
+
+            $this->git->commitRelease($version);
+        } catch (\Exception $e) {
+            $this->interactive->error($e->getMessage());
+
+            return 1;
+        }
+
         if (!$this->git->createTag($version)) {
             $this->interactive->error("A tag for version {$version} already exists");
 
@@ -171,7 +187,8 @@ class ReleaseCommand extends Command
         }
         $this->logger->debug('Phar application created.');
 
-        $buildPath = 'build/magephi.phar';
+        $filename = 'magephi.phar';
+        $buildPath = 'build/' . $filename;
         $sha1 = $this->processFactory->runProcess(['openssl', 'sha1', '-r', $buildPath]);
         $sha1 = explode(' ', $sha1->getOutput())[0];
         $this->logger->debug("Sha1: {$sha1}");
@@ -188,11 +205,13 @@ class ReleaseCommand extends Command
 
         $downloadPath = "downloads/magephi-{$version}.phar";
         $this->processFactory->runProcess(['cp', $buildPath, $downloadPath], 10);
+        $this->processFactory->runProcess(['cp', '-f', $buildPath, $filename], 10);
         $this->git->add($downloadPath);
+        $this->git->add($filename);
         $this->logger->debug('Phar added to git.');
 
         $data = [
-            'name'    => 'magephi.phar',
+            'name'    => $filename,
             'sha1'    => $sha1,
             'url'     => "https://fulmenef.github.io/magephi/{$downloadPath}",
             'version' => $version,
@@ -256,7 +275,9 @@ class ReleaseCommand extends Command
             return 1;
         }
 
-        $this->interactive->success("Version {$version} has been release ! You can see it here: {$response['html_url']}");
+        $this->interactive->success(
+            "Version {$version} has been release ! You can see it here: {$response['html_url']}"
+        );
 
         return null;
     }
@@ -299,5 +320,25 @@ class ReleaseCommand extends Command
         $iterator->rewind();
 
         return $iterator->current();
+    }
+
+    /**
+     * Update json files (composer.json, package.json...) with the new version.
+     * The field must be names "version".
+     *
+     * @param string $version
+     * @param string $file
+     *
+     * @throws Exception
+     */
+    private function updateJsonFile(string $version, string $file): void
+    {
+        /** @var ComposerReader $json */
+        $json = new ComposerReader($file);
+        if (!$json->canRead()) {
+            throw new Exception('Unable to read json.');
+        }
+        $json->updateSection('version', $version);
+        $json->save();
     }
 }

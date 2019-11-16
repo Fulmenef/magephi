@@ -13,6 +13,6 @@
   "git-version": "package_version",
   "compression": "GZ",
   "replacements": {
-    "@mode@": "prod"
+    "mode": "prod"
   }
 }
