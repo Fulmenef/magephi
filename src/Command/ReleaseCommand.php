@@ -221,29 +221,16 @@ class ReleaseCommand extends Command
         $this->git->commitRelease($version);
         $this->logger->debug('Info added to manifest.json');
 
-        try {
-            $this->git->checkout();
-            $this->logger->debug('Moved back on master.');
-            $this->git->push();
-            $this->logger->debug('Master pushed.');
-        } catch (GitException $e) {
-            $this->interactive->error($e->getMessage());
-
+        $this->git->checkout();
+        if ($this->gitPush()) {
             return 1;
-        } catch (ProcessTimedOutException $e) {
-            $this->interactive->note($e->getMessage());
         }
+        $this->logger->debug('Master pushed.');
 
-        try {
-            $this->git->push(self::DOC_BRANCH);
-            $this->logger->debug('Doc pushed.');
-        } catch (GitException $e) {
-            $this->interactive->error($e->getMessage());
-
+        if ($this->gitPush(self::DOC_BRANCH)) {
             return 1;
-        } catch (ProcessTimedOutException $e) {
-            $this->interactive->note($e->getMessage());
         }
+        $this->logger->debug('Doc pushed.');
 
         $dotenv = new Dotenv();
         $dotenv->load($this->kernel->getProjectDir() . '/.env.local');
@@ -269,6 +256,18 @@ class ReleaseCommand extends Command
                 ]
             );
             $this->logger->debug('Release created.');
+
+            /** @var string $content */
+            $content = file_get_contents($buildPath);
+            $releases->assets()->create(
+                self::USER_NAME,
+                self::REPO_NAME,
+                $response['id'],
+                $filename,
+                'application/zip',
+                $content
+            );
+            $this->logger->debug('Asset created.');
         } catch (RuntimeException | MissingArgumentException $e) {
             $this->interactive->error($e->getMessage());
 
@@ -340,5 +339,25 @@ class ReleaseCommand extends Command
         }
         $json->updateSection('version', $version);
         $json->save();
+    }
+
+    /**
+     * @param string $branch
+     *
+     * @return int
+     */
+    private function gitPush(string $branch = 'master'): int
+    {
+        try {
+            $this->git->push($branch);
+        } catch (GitException $e) {
+            $this->interactive->error($e->getMessage());
+
+            return 1;
+        } catch (ProcessTimedOutException $e) {
+            $this->interactive->note($e->getMessage());
+        }
+
+        return 0;
     }
 }
