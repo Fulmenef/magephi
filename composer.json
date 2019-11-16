@@ -1,6 +1,6 @@
 {
     "name": "fulmenef/magephi",
-    "version": "0.2.0",
+    "version": "0.4.6",
     "type": "application",
     "description": "",
     "license": "MIT",
@@ -23,7 +23,7 @@
         "symfony/process": "4.3.*",
         "symfony/var-dumper": "4.3.*",
         "symfony/yaml": "4.3.*",
-      "ext-json": "*"
+        "ext-json": "*"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "3.0.x-dev",
