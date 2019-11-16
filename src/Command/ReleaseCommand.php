@@ -11,6 +11,7 @@ use Github\Exception\RuntimeException;
 use Magephi\Component\Git;
 use Magephi\Component\ProcessFactory;
 use Magephi\Exception\GitException;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -44,13 +45,17 @@ class ReleaseCommand extends Command
 	private $git;
 	/** @var SymfonyStyle */
 	private $interactive;
+	/** @var LoggerInterface */
+	private $logger;
 
 	public function __construct(
-		KernelInterface $appKernel, ProcessFactory $processFactory, Git $git, string $name = null
+		KernelInterface $appKernel, ProcessFactory $processFactory, Git $git, LoggerInterface $logger,
+		string $name = null
 	) {
 		$this->kernel = $appKernel;
 		$this->processFactory = $processFactory;
 		$this->git = $git;
+		$this->logger = $logger;
 		parent::__construct($name);
 	}
 
@@ -113,6 +118,7 @@ class ReleaseCommand extends Command
 
 			return 1;
 		}
+		$this->logger->debug('Version is OK.');
 
 		if (empty($changes = $this->git->getChangelog())
 			&& !$this->interactive->confirm(
@@ -121,12 +127,16 @@ class ReleaseCommand extends Command
 			)) {
 			return 1;
 		}
+		$this->logger->debug('Changes found.');
+
 
 		if (!$this->git->createTag($version)) {
 			$this->interactive->error("A tag for version $version already exists");
 
 			return 1;
 		}
+		$this->logger->debug('Tag created.');
+
 
 		$boxProcess = $this->processFactory->runProcess(['make', 'box'], 60);
 		if (!$boxProcess->isSuccessful()) {
@@ -134,14 +144,19 @@ class ReleaseCommand extends Command
 
 			return 1;
 		}
+		$this->logger->debug('Phar application created.');
+
 
 		$buildPath = 'build/magephi.phar';
 		$sha1 = $this->processFactory->runProcess(['openssl', 'sha1', '-r', $buildPath]);
 		$sha1 = explode(' ', $sha1->getOutput())[0];
+		$this->logger->debug("Sha1: $sha1");
+
 
 		try {
 			$this->git->checkout(self::DOC_BRANCH);
 			$this->git->pull();
+			$this->logger->debug('Pull changes and references on doc branch.');
 		} catch (GitException $e) {
 			$this->interactive->error($e->getMessage());
 
@@ -151,6 +166,8 @@ class ReleaseCommand extends Command
 		$downloadPath = "downloads/magephi-${version}.phar";
 		$this->processFactory->runProcess(['cp', $buildPath, $downloadPath], 10);
 		$this->git->add($downloadPath);
+		$this->logger->debug('Phar added to git.');
+
 
 		$data = [
 			'name'    => 'magephi.phar',
@@ -161,11 +178,15 @@ class ReleaseCommand extends Command
 		$manifest = $this->addToManifest($data);
 		$this->git->add($manifest);
 		$this->git->commitRelease($version);
+		$this->logger->debug('Info added to manifest.json');
 
 		try {
 			$this->git->checkout();
-			$this->git->push($version);
+			$this->logger->debug('Moved back on master.');
+			$this->git->push();
+			$this->logger->debug('Master pushed.');
 			$this->git->push(self::DOC_BRANCH);
+			$this->logger->debug('Doc pushed.');
 		} catch (GitException $e) {
 			$this->interactive->error($e->getMessage());
 
@@ -176,6 +197,7 @@ class ReleaseCommand extends Command
 		$dotenv->load($this->kernel->getProjectDir() . '/.env.local');
 		$client = new Client();
 		$client->authenticate($_ENV['GITHUB_SECRET'], null, $_ENV['GITHUB_AUTH_METHOD']);
+		$this->logger->debug('Authenticated on github.');
 		/** @var Repo $api */
 		$api = $client->api('repo');
 		/** @var Releases $releases */
@@ -194,6 +216,7 @@ class ReleaseCommand extends Command
 					"prerelease"       => $input->getOption('prerelease')
 				]
 			);
+			$this->logger->debug('Release created.');
 		} catch (RuntimeException|MissingArgumentException $e) {
 			dump('This is an error');
 			$this->interactive->error($e->getMessage());
