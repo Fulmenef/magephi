@@ -46,25 +46,26 @@ class BuildCommand extends AbstractMagentoCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): ?int
     {
-	    $this->interactive->section('Building environment');
+        $this->interactive->section('Building environment');
 
-	    $process = $this->installation->buildMake();
+        $process = $this->installation->buildMake();
 
-	    $this->interactive->newLine(2);
-	    $this->interactive->success('Containers have been built.');
+        $this->interactive->newLine(2);
+        $this->interactive->success('Containers have been built.');
 
-	    if (!$process->isSuccessful()) {
-		    $this->interactive->newLine(2);
-		    $this->interactive->error($process->getErrorOutput());
-		    $this->interactive->note(
-			    [
-				    "Ensure you're not using a deleted branch for package emakinafr/docker-magento2.",
-				    'This issue may came from a missing package in the PHP dockerfile after a version upgrade.',
-			    ]
-		    );
-		    return 1;
-	    }
+        if (!$process->isSuccessful()) {
+            $this->interactive->newLine(2);
+            $this->interactive->error($process->getErrorOutput());
+            $this->interactive->note(
+                [
+                    "Ensure you're not using a deleted branch for package emakinafr/docker-magento2.",
+                    'This issue may came from a missing package in the PHP dockerfile after a version upgrade.',
+                ]
+            );
 
-	    return null;
+            return 1;
+        }
+
+        return null;
     }
 }

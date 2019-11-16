@@ -8,7 +8,6 @@ use Magephi\Component\Mutagen;
 use Magephi\Component\Process;
 use Magephi\Component\ProcessFactory;
 use Magephi\Entity\Environment;
-use Magephi\Exception\FileTooBig;
 use Magephi\Helper\Installation;
 use Magephi\Kernel;
 use Nadar\PhpComposerReader\ComposerReader;
@@ -56,7 +55,7 @@ class InstallCommand extends AbstractMagentoCommand
     ) {
         parent::__construct($processFactory, $dockerCompose, $name);
         $this->installation = $installation;
-        $this->mutagen      = $mutagen;
+        $this->mutagen = $mutagen;
     }
 
     protected function configure()
@@ -70,15 +69,13 @@ class InstallCommand extends AbstractMagentoCommand
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
         $this->environment = new Environment();
-        $this->output      = $output;
+        $this->output = $output;
         $this->installation->setOutputInterface($output);
         parent::initialize($input, $output);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): ?int
     {
-        $this->environment->autoLocate();
-
         try {
             $this->checkPrerequisites();
 
@@ -186,7 +183,6 @@ class InstallCommand extends AbstractMagentoCommand
     protected function prepareEnvironment(ComposerReader $composer): string
     {
         $this->interactive->section('Configuring docker environment');
-        $this->environment->autoLocate();
         if ($this->environment->__get('distEnv') === null) {
             $this->interactive->section('Creating docker local directory');
             $composer->runCommand('exec docker-local-install');
@@ -231,7 +227,7 @@ class InstallCommand extends AbstractMagentoCommand
         preg_match_all('/FROM .* as (\w*)/m', $file, $images);
         unset($images[1][0]);
 
-        $image       = $this->interactive->choice('Select the image you want to use:', $images[1]);
+        $image = $this->interactive->choice('Select the image you want to use:', $images[1]);
         $replacement = preg_replace('/(DOCKER_PHP_IMAGE=)(\w+)/i', "$1{$image}", $this->envContent);
         if ($replacement === null) {
             throw new RegexpException('Error while configuring Docker PHP Image.');
@@ -422,15 +418,9 @@ class InstallCommand extends AbstractMagentoCommand
                 }
                 if ($file !== null) {
                     if ($database = $this->environment->getDefaultDatabase()) {
-                        try {
-                            $this->installation->databaseImport($this->environment->getDefaultDatabase(), $file);
+                        $this->installation->databaseImport($this->environment->getDefaultDatabase(), $file);
 
-                            return true;
-                        } catch (FileTooBig $e) {
-                            $this->interactive->error($e);
-
-                            return false;
-                        }
+                        return true;
                     }
                     $this->interactive->text("No database found in {$this->environment->__get('localEnv')}.");
                 }

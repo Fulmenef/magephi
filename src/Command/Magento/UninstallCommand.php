@@ -2,7 +2,6 @@
 
 namespace Magephi\Command\Magento;
 
-use Exception;
 use Magephi\Entity\Environment;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -23,14 +22,15 @@ class UninstallCommand extends AbstractMagentoCommand
     }
 
     /**
-     * @throws Exception
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     *
+     * @return null|int
      */
     protected function execute(InputInterface $input, OutputInterface $output): ?int
     {
         $environment = new Environment();
-        $environment->autoLocate();
         if ($this->interactive->confirm('Are you sure you want to uninstall this project ?', false)) {
-
             $this->processFactory->runProcessWithProgressBar(
                 ['make', 'purge'],
                 300,

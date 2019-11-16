@@ -49,7 +49,7 @@ class CheckPrerequisiteCommand extends AbstractMagentoCommand
                 $ready = false;
             }
             $info['mandatory'] = $info['mandatory'] ? 'Yes' : 'No';
-            $info['status']    = $info['status'] ? 'Installed' : 'Missing';
+            $info['status'] = $info['status'] ? 'Installed' : 'Missing';
             $table->addRow(
                 array_merge([$component], $info)
             );

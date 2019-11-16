@@ -31,7 +31,6 @@ class StopCommand extends AbstractMagentoCommand
     protected function execute(InputInterface $input, OutputInterface $output): ?int
     {
         $environment = new Environment();
-        $environment->autoLocate();
 
         $this->interactive->section('Stopping environment');
 

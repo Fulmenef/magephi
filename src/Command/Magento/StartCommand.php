@@ -32,7 +32,7 @@ class StartCommand extends AbstractMagentoCommand
     ) {
         parent::__construct($processFactory, $dockerCompose, $name);
         $this->installation = $installation;
-        $this->mutagen      = $mutagen;
+        $this->mutagen = $mutagen;
     }
 
     protected function initialize(InputInterface $input, OutputInterface $output)

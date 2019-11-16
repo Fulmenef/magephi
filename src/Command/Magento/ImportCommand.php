@@ -23,6 +23,11 @@ class ImportCommand extends AbstractMagentoCommand
 
     /**
      * ImportCommand constructor.
+     *
+     * @param ProcessFactory $processFactory
+     * @param DockerCompose  $dockerCompose
+     * @param Installation   $installation
+     * @param null|string    $name
      */
     public function __construct(
         ProcessFactory $processFactory,
@@ -57,7 +62,6 @@ class ImportCommand extends AbstractMagentoCommand
     protected function execute(InputInterface $input, OutputInterface $output): ?int
     {
         $environment = new Environment();
-        $environment->autoLocate();
 
         $file = $this->convertToString($input->getArgument('file'));
 

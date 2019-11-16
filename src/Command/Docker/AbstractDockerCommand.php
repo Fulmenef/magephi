@@ -12,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 abstract class AbstractDockerCommand extends AbstractCommand
 {
-    protected $service   = '';
+    protected $service = '';
     protected $arguments = '';
 
     protected function configure()
@@ -27,7 +27,6 @@ abstract class AbstractDockerCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $environment = new Environment();
-        $environment->autoLocate();
 
         try {
             $this->dockerCompose->openTerminal($this->service, $this->arguments, $environment);

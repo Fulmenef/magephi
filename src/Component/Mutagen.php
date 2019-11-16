@@ -17,8 +17,7 @@ class Mutagen
     public function __construct(ProcessFactory $processFactory)
     {
         $this->processFactory = $processFactory;
-        $this->environment    = new Environment();
-        $this->environment->autoLocate();
+        $this->environment = new Environment();
     }
 
     /**
@@ -135,8 +134,8 @@ class Mutagen
                 300
             );
             $progressBar = new ProgressBar($output, 100);
-            $reStatus    = '/Status: (.*)$/i';
-            $reProgress  = '/Staging files on beta: (\d+)%/i';
+            $reStatus = '/Status: (.*)$/i';
+            $reProgress = '/Staging files on beta: (\d+)%/i';
             $process->start();
             $progressBar->start();
             $process->waitUntil(

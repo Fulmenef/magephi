@@ -31,10 +31,10 @@ use Symfony\Component\Process\Exception\ProcessTimedOutException;
  */
 class ReleaseCommand extends Command
 {
-    const USER_NAME  = 'fulmenef';
-    const REPO_NAME  = 'magephi';
+    const USER_NAME = 'fulmenef';
+    const REPO_NAME = 'magephi';
     const DOC_BRANCH = 'gh-pages';
-    const MANIFEST   = 'manifest.json';
+    const MANIFEST = 'manifest.json';
 
     /** @var KernelInterface */
     private $kernel;
@@ -54,10 +54,10 @@ class ReleaseCommand extends Command
         LoggerInterface $logger,
         string $name = null
     ) {
-        $this->kernel         = $appKernel;
+        $this->kernel = $appKernel;
         $this->processFactory = $processFactory;
-        $this->git            = $git;
-        $this->logger         = $logger;
+        $this->git = $git;
+        $this->logger = $logger;
         parent::__construct($name);
     }
 
@@ -82,8 +82,8 @@ class ReleaseCommand extends Command
     {
         $fileInfo = $this->findFile(self::MANIFEST);
 
-        $content   = $fileInfo->getContents();
-        $content   = json_decode($content, true);
+        $content = $fileInfo->getContents();
+        $content = json_decode($content, true);
         $content[] = $data;
         /** @var string $content */
         $content = json_encode($content, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
@@ -172,8 +172,8 @@ class ReleaseCommand extends Command
         $this->logger->debug('Phar application created.');
 
         $buildPath = 'build/magephi.phar';
-        $sha1      = $this->processFactory->runProcess(['openssl', 'sha1', '-r', $buildPath]);
-        $sha1      = explode(' ', $sha1->getOutput())[0];
+        $sha1 = $this->processFactory->runProcess(['openssl', 'sha1', '-r', $buildPath]);
+        $sha1 = explode(' ', $sha1->getOutput())[0];
         $this->logger->debug("Sha1: {$sha1}");
 
         try {

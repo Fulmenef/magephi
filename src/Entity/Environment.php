@@ -31,6 +31,11 @@ class Environment
     /** @var string */
     private $magentoApp;
 
+    public function __construct()
+    {
+        $this->autoLocate();
+    }
+
     public function __get($name)
     {
         return $this->{$name};
@@ -157,7 +162,7 @@ class Environment
         }
 
         preg_match_all('/^( {2})\w+:$/im', $this->getDockerComposeContent(), $matches);
-        $containers       = \count($matches[0]);
+        $containers = \count($matches[0]);
         $this->containers = $containers;
 
         return $this->containers;
@@ -195,7 +200,7 @@ class Environment
         }
 
         preg_match_all('/^( {2})\w+: {}$/im', $this->getDockerComposeContent(), $matches);
-        $volumes       = \count($matches[0]);
+        $volumes = \count($matches[0]);
         $this->volumes = $volumes;
 
         return $this->volumes;
