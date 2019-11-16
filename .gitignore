@@ -1,5 +1,6 @@
 build
 downloads
+node_modules
 
 ###> symfony/framework-bundle ###
 /.env.local

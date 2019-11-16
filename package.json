@@ -1,0 +1,30 @@
+{
+  "name": "magephi",
+  "version": "0.4.3",
+  "description": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Fulmenef/magephi.git"
+  },
+  "author": "Axel Perroud",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Fulmenef/magephi/issues"
+  },
+  "homepage": "https://github.com/Fulmenef/magephi#readme",
+  "devDependencies": {
+    "husky": "^3.0.9",
+    "lint-staged": "^10.0.0-beta.3"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "src/*.php": [
+      "make php-cs-fixer",
+      "make phpstan"
+    ]
+  }
+}
