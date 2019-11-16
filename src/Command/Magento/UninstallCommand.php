@@ -9,8 +9,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Command to uninstall the environment. It simply remove volumes and destroy containers and the mutagen session.
- *
- * @package Magephi\Command\Magento
  */
 class UninstallCommand extends AbstractMagentoCommand
 {
@@ -21,8 +19,7 @@ class UninstallCommand extends AbstractMagentoCommand
         parent::configure();
         $this
             ->setDescription('Uninstall the Magento2 project in the current directory.')
-            ->setHelp('This command allows you to uninstall the Magento 2 project in the current directory.')
-        ;
+            ->setHelp('This command allows you to uninstall the Magento 2 project in the current directory.');
     }
 
     /**
@@ -35,7 +32,7 @@ class UninstallCommand extends AbstractMagentoCommand
         if ($this->interactive->confirm('Are you sure you want to uninstall this project ?', false)) {
             $content = file_get_contents($environnement->__get('dockerComposeFile'));
             if (!\is_string($content)) {
-                $this->interactive->error($environnement->__get('dockerComposeFile').' is not found.');
+                $this->interactive->error($environnement->__get('dockerComposeFile') . ' is not found.');
 
                 return 1;
             }

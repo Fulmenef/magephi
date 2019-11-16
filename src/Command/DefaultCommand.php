@@ -35,7 +35,7 @@ class DefaultCommand extends Command
         /** @var Application $application */
         $application = $this->getApplication();
 
-        $command = $application->find('list');
+        $command   = $application->find('list');
         $arguments = ['namespace' => 'magephi'];
 
         $listInput = new ArrayInput($arguments);

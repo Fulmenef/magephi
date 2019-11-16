@@ -14,8 +14,6 @@ use Symfony\Component\Process\Exception\ProcessTimedOutException;
 
 /**
  * Command to start the environment. The install command must have been executed before.
- *
- * @package Magephi\Command\Magento
  */
 class StartCommand extends AbstractMagentoCommand
 {
@@ -34,7 +32,7 @@ class StartCommand extends AbstractMagentoCommand
     ) {
         parent::__construct($processFactory, $dockerCompose, $name);
         $this->installation = $installation;
-        $this->mutagen = $mutagen;
+        $this->mutagen      = $mutagen;
     }
 
     protected function initialize(InputInterface $input, OutputInterface $output)
@@ -50,8 +48,7 @@ class StartCommand extends AbstractMagentoCommand
             ->setDescription('Start environment, equivalent to <fg=yellow>make start</>')
             ->setHelp(
                 'This command allows you to start your Magento 2 environment. It must have been installed before.'
-            )
-        ;
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): ?int

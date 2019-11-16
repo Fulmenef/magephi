@@ -12,8 +12,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Command to scan environment and determine if all prerequisites are filled to install a Magento2 project using
  * emakinafr/docker-magento2.
- *
- * @package Magephi\Command\Magento
  */
 class CheckPrerequisiteCommand extends AbstractMagentoCommand
 {
@@ -37,8 +35,7 @@ class CheckPrerequisiteCommand extends AbstractMagentoCommand
         parent::configure();
         $this
             ->setDescription('Check if all prerequisites are installed on the system to run a Magento 2 project.')
-            ->setHelp('This command allows you to know if your system is ready to handle Magento 2 projects.')
-        ;
+            ->setHelp('This command allows you to know if your system is ready to handle Magento 2 projects.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): ?int
@@ -52,7 +49,7 @@ class CheckPrerequisiteCommand extends AbstractMagentoCommand
                 $ready = false;
             }
             $info['mandatory'] = $info['mandatory'] ? 'Yes' : 'No';
-            $info['status'] = $info['status'] ? 'Installed' : 'Missing';
+            $info['status']    = $info['status'] ? 'Installed' : 'Missing';
             $table->addRow(
                 array_merge([$component], $info)
             );

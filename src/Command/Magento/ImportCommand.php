@@ -45,8 +45,7 @@ class ImportCommand extends AbstractMagentoCommand
                 "Destination database. If no database provided, the database defined in docker/local/.env will be used. If the database does not exist, it'll be created."
             )
             ->setDescription('Import a SQL file into a database inside the MySQL Container.')
-            ->setHelp('This command allow you to import a SQL file')
-        ;
+            ->setHelp('This command allow you to import a SQL file');
     }
 
     protected function initialize(InputInterface $input, OutputInterface $output)
@@ -94,13 +93,13 @@ class ImportCommand extends AbstractMagentoCommand
         return null;
     }
 
-	/**
-	 * @param mixed $string
-	 *
-	 * @return string
-	 *
-	 * @throws InvalidTypeException
-	 */
+    /**
+     * @param mixed $string
+     *
+     * @throws InvalidTypeException
+     *
+     * @return string
+     */
     private function convertToString($string): string
     {
         if (!\is_string($string)) {

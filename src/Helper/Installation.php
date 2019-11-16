@@ -26,10 +26,10 @@ class Installation
 
     public function __construct(DockerCompose $dockerCompose, ProcessFactory $processFactory, Mutagen $mutagen)
     {
-        $this->dockerCompose = $dockerCompose;
+        $this->dockerCompose  = $dockerCompose;
         $this->processFactory = $processFactory;
-        $this->mutagen = $mutagen;
-        $this->environment = new Environment();
+        $this->mutagen        = $mutagen;
+        $this->environment    = new Environment();
         $this->environment->autoLocate();
     }
 
@@ -44,32 +44,32 @@ class Installation
     public function checkSystemPrerequisites(): array
     {
         return [
-            'Docker' => ['mandatory' => true, 'status' => $this->isInstalled('docker')],
+            'Docker'         => ['mandatory' => true, 'status' => $this->isInstalled('docker')],
             'Docker-Compose' => ['mandatory' => true, 'status' => $this->isInstalled('docker-compose')],
-            'MySQL' => ['mandatory' => true, 'status' => $this->isInstalled('mysql')],
-            'Mutagen' => [
+            'MySQL'          => ['mandatory' => true, 'status' => $this->isInstalled('mysql')],
+            'Mutagen'        => [
                 'mandatory' => true,
-                'status' => $this->isInstalled('mutagen'),
-                'comment' => '<fg=yellow>https://mutagen.io/</>',
+                'status'    => $this->isInstalled('mutagen'),
+                'comment'   => '<fg=yellow>https://mutagen.io/</>',
             ],
-            'Yarn' => ['mandatory' => false, 'status' => $this->isInstalled('yarn')],
+            'Yarn'              => ['mandatory' => false, 'status' => $this->isInstalled('yarn')],
             'Magento Cloud CLI' => [
                 'mandatory' => false,
-                'status' => $this->isInstalled('magento-cloud'),
-                'comment' => 'Recommended when working on a Magento Cloud project.',
+                'status'    => $this->isInstalled('magento-cloud'),
+                'comment'   => 'Recommended when working on a Magento Cloud project.',
             ],
         ];
     }
 
-	/**
-	 * Import a database dump. Display a progress bar to visually follow the process.
-	 * In case of compression, the number of steps is not precise.
-	 *
-	 * @param string $database
-	 * @param string $filename
-	 *
-	 * @return Process
-	 */
+    /**
+     * Import a database dump. Display a progress bar to visually follow the process.
+     * In case of compression, the number of steps is not precise.
+     *
+     * @param string $database
+     * @param string $filename
+     *
+     * @return Process
+     */
     public function databaseImport(string $database, string $filename): Process
     {
         $ext = pathinfo($filename, PATHINFO_EXTENSION);
@@ -105,13 +105,13 @@ class Installation
         );
     }
 
-	/**
-	 * Run the `make start` command with a progress bar.
-	 *
-	 * @param bool $install
-	 *
-	 * @return Process
-	 */
+    /**
+     * Run the `make start` command with a progress bar.
+     *
+     * @param bool $install
+     *
+     * @return Process
+     */
     public function startMake(bool $install = false): Process
     {
         $process = $this->processFactory->runProcessWithProgressBar(
@@ -155,13 +155,13 @@ class Installation
         return true;
     }
 
-	/**
-	 * Check if the given binary is installed.
-	 *
-	 * @param string $binary
-	 *
-	 * @return bool
-	 */
+    /**
+     * Check if the given binary is installed.
+     *
+     * @param string $binary
+     *
+     * @return bool
+     */
     private function isInstalled(string $binary): bool
     {
         if (\defined('PHP_WINDOWS_VERSION_BUILD')) {
@@ -174,19 +174,19 @@ class Installation
         return $return_var === 0;
     }
 
-	/**
-	 * Count number of lines which are not empty or starting by -.
-	 *
-	 * @param string $filename
-	 *
-	 * @return int
-	 */
+    /**
+     * Count number of lines which are not empty or starting by -.
+     *
+     * @param string $filename
+     *
+     * @return int
+     */
     private function countLines(string $filename): int
     {
         $linecount = 0;
-        $handle = fopen($filename, 'r');
+        $handle    = fopen($filename, 'r');
         if ($handle === false) {
-            throw new FileNotFoundException($filename.' not found.');
+            throw new FileNotFoundException($filename . ' not found.');
         }
         while (!feof($handle)) {
             /** @var string $line */

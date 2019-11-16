@@ -56,7 +56,7 @@ class InstallCommand extends AbstractMagentoCommand
     ) {
         parent::__construct($processFactory, $dockerCompose, $name);
         $this->installation = $installation;
-        $this->mutagen = $mutagen;
+        $this->mutagen      = $mutagen;
     }
 
     protected function configure()
@@ -64,14 +64,13 @@ class InstallCommand extends AbstractMagentoCommand
         parent::configure();
         $this
             ->setDescription('Install the Magento2 project in the current directory.')
-            ->setHelp('This command allows you to install the Magento 2 project in the current directory.')
-        ;
+            ->setHelp('This command allows you to install the Magento 2 project in the current directory.');
     }
 
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
         $this->environment = new Environment();
-        $this->output = $output;
+        $this->output      = $output;
         $this->installation->setOutputInterface($output);
         parent::initialize($input, $output);
     }
@@ -129,8 +128,8 @@ class InstallCommand extends AbstractMagentoCommand
         $prerequisites = $this->installation->checkSystemPrerequisites();
         foreach ($prerequisites as $component => $info) {
             $this->check(
-                ucfirst($component).' is installed.',
-                ucfirst($component).' is missing.',
+                ucfirst($component) . ' is installed.',
+                ucfirst($component) . ' is missing.',
                 function () use ($info) {
                     return $info['status'];
                 },
@@ -177,13 +176,13 @@ class InstallCommand extends AbstractMagentoCommand
         return $composer;
     }
 
-	/**
-	 * @param ComposerReader $composer
-	 *
-	 * @return string
-	 *
-	 * @throws RegexpException
-	 */
+    /**
+     * @param ComposerReader $composer
+     *
+     * @throws RegexpException
+     *
+     * @return string
+     */
     protected function prepareEnvironment(ComposerReader $composer): string
     {
         $this->interactive->section('Configuring docker environment');
@@ -232,7 +231,7 @@ class InstallCommand extends AbstractMagentoCommand
         preg_match_all('/FROM .* as (\w*)/m', $file, $images);
         unset($images[1][0]);
 
-        $image = $this->interactive->choice('Select the image you want to use:', $images[1]);
+        $image       = $this->interactive->choice('Select the image you want to use:', $images[1]);
         $replacement = preg_replace('/(DOCKER_PHP_IMAGE=)(\w+)/i', "$1{$image}", $this->envContent);
         if ($replacement === null) {
             throw new RegexpException('Error while configuring Docker PHP Image.');
@@ -377,7 +376,7 @@ class InstallCommand extends AbstractMagentoCommand
     {
         $content = file_get_contents($this->environment->__get('nginxConf'));
         if (!\is_string($content)) {
-            throw new FileException($this->environment->__get('nginxConf').' not found.');
+            throw new FileException($this->environment->__get('nginxConf') . ' not found.');
         }
 
         $this->nginxContent = $content;

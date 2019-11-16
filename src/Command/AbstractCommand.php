@@ -23,7 +23,7 @@ abstract class AbstractCommand extends Command
     public function __construct(ProcessFactory $processFactory, DockerCompose $dockerCompose, string $name = null)
     {
         $this->processFactory = $processFactory;
-        $this->dockerCompose = $dockerCompose;
+        $this->dockerCompose  = $dockerCompose;
         parent::__construct($name);
     }
 

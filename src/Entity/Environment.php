@@ -49,11 +49,11 @@ class Environment
     {
         $files = [
             'docker-compose.yml' => ['pattern' => '*/*/*/docker-compose.yml', 'variable' => 'dockerComposeFile'],
-            'Dockerfile' => ['pattern' => '*/*/*/php/Dockerfile', 'variable' => 'phpDockerfile'],
-            '.env' => ['pattern' => '*/*/.env', 'variable' => 'localEnv'],
-            '.env.dist' => ['pattern' => '*/*/.env.dist', 'variable' => 'distEnv'],
-            'nginx' => ['pattern' => '*/*/nginx.conf', 'variable' => 'nginxConf'],
-            '.magento.app.yaml' => ['pattern' => '.magento.app.yaml', 'variable' => 'magentoApp'],
+            'Dockerfile'         => ['pattern' => '*/*/*/php/Dockerfile', 'variable' => 'phpDockerfile'],
+            '.env'               => ['pattern' => '*/*/.env', 'variable' => 'localEnv'],
+            '.env.dist'          => ['pattern' => '*/*/.env.dist', 'variable' => 'distEnv'],
+            'nginx'              => ['pattern' => '*/*/nginx.conf', 'variable' => 'nginxConf'],
+            '.magento.app.yaml'  => ['pattern' => '.magento.app.yaml', 'variable' => 'magentoApp'],
         ];
 
         foreach ($files as $file => $data) {
@@ -72,7 +72,7 @@ class Environment
         if ($this->localEnv) {
             $localEnv = file_get_contents($this->localEnv);
             if (!\is_string($localEnv)) {
-                throw new FileException($this->localEnv.' not found.');
+                throw new FileException($this->localEnv . ' not found.');
             }
 
             preg_match('/DOCKER_PHP_IMAGE=(\w+)/i', $localEnv, $match);
@@ -82,12 +82,17 @@ class Environment
 
     /**
      * Search files matching the given pattern from the current directory.
+     *
+     * @param string $pattern
+     * @param string $key
+     *
+     * @return array
      */
     public function retrieveFile(string $pattern, string $key): array
     {
         $files = glob($pattern);
         if ($files === false) {
-            throw new FileNotFoundException('Error while searching files for pattern '.$pattern);
+            throw new FileNotFoundException('Error while searching files for pattern ' . $pattern);
         }
         switch (\count($files)) {
             case 0:
@@ -113,10 +118,10 @@ class Environment
     public function getDockerRequiredVariables(): array
     {
         return [
-            'COMPOSE_FILE' => './'.$this->dockerComposeFile,
-            'COMPOSE_PROJECT_NAME' => 'magento2_'.$this->currentDir,
-            'DOCKER_PHP_IMAGE' => $this->phpImage,
-            'PROJECT_LOCATION' => getcwd(),
+            'COMPOSE_FILE'         => './' . $this->dockerComposeFile,
+            'COMPOSE_PROJECT_NAME' => 'magento2_' . $this->currentDir,
+            'DOCKER_PHP_IMAGE'     => $this->phpImage,
+            'PROJECT_LOCATION'     => getcwd(),
         ];
     }
 
@@ -129,7 +134,7 @@ class Environment
         if ($this->localEnv) {
             $content = file_get_contents($this->localEnv);
             if (!\is_string($content)) {
-                throw new FileNotFoundException($this->localEnv.' not found.');
+                throw new FileNotFoundException($this->localEnv . ' not found.');
             }
 
             preg_match('/MYSQL_DATABASE=(\w+)/', $content, $match);
@@ -140,11 +145,11 @@ class Environment
         return '';
     }
 
-	/**
-	 * Return number of containers defined in the docker-compose.yml
-	 *
-	 * @return int
-	 */
+    /**
+     * Return number of containers defined in the docker-compose.yml.
+     *
+     * @return int
+     */
     public function getContainers(): int
     {
         if (\is_int($this->containers)) {
@@ -152,17 +157,17 @@ class Environment
         }
 
         preg_match_all('/^( {2})\w+:$/im', $this->getDockerComposeContent(), $matches);
-        $containers = \count($matches[0]);
+        $containers       = \count($matches[0]);
         $this->containers = $containers;
 
         return $this->containers;
     }
 
-	/**
-	 * Return the content of the docker-compose.yml
-	 *
-	 * @return string
-	 */
+    /**
+     * Return the content of the docker-compose.yml.
+     *
+     * @return string
+     */
     public function getDockerComposeContent(): string
     {
         if (\is_string($this->dockerComposeContent)) {
@@ -178,11 +183,11 @@ class Environment
         return $this->dockerComposeContent;
     }
 
-	/**
-	 * Return the number of volumes defined in docker-compose.yml
-	 *
-	 * @return int
-	 */
+    /**
+     * Return the number of volumes defined in docker-compose.yml.
+     *
+     * @return int
+     */
     public function getVolumes(): int
     {
         if (\is_int($this->volumes)) {
@@ -190,7 +195,7 @@ class Environment
         }
 
         preg_match_all('/^( {2})\w+: {}$/im', $this->getDockerComposeContent(), $matches);
-        $volumes = \count($matches[0]);
+        $volumes       = \count($matches[0]);
         $this->volumes = $volumes;
 
         return $this->volumes;

@@ -9,32 +9,30 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Abstract class for the Docker commands. Used to connect to a container.
- *
- * @package Magephi\Command\Docker
  */
 abstract class AbstractDockerCommand extends AbstractCommand
 {
-	protected $service = '';
-	protected $arguments = '';
+    protected $service   = '';
+    protected $arguments = '';
 
-	protected function configure()
-	{
-		$this
-			->setName('magephi:docker:' . $this->service)
-			->setAliases([$this->service])
-			->setDescription("Open a terminal to the {$this->service} container.")
-			->setHelp("This command allows you to connect to the {$this->service} container.");
-	}
+    protected function configure()
+    {
+        $this
+            ->setName('magephi:docker:' . $this->service)
+            ->setAliases([$this->service])
+            ->setDescription("Open a terminal to the {$this->service} container.")
+            ->setHelp("This command allows you to connect to the {$this->service} container.");
+    }
 
-	protected function execute(InputInterface $input, OutputInterface $output)
-	{
-		$environment = new Environment();
-		$environment->autoLocate();
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $environment = new Environment();
+        $environment->autoLocate();
 
-		try {
-			$this->dockerCompose->openTerminal($this->service, $this->arguments, $environment);
-		} catch (\Exception $e) {
-			$this->interactive->error($e->getMessage());
-		}
-	}
+        try {
+            $this->dockerCompose->openTerminal($this->service, $this->arguments, $environment);
+        } catch (\Exception $e) {
+            $this->interactive->error($e->getMessage());
+        }
+    }
 }
