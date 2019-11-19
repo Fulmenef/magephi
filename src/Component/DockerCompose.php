@@ -44,4 +44,20 @@ class DockerCompose
             $environment->getDockerRequiredVariables()
         );
     }
+
+    /**
+     * Test if the given container is up or not.
+     *
+     * @param string $container
+     *
+     * @return bool
+     */
+    public function isContainerUp(string $container): bool
+    {
+        $command = "docker ps -q --no-trunc | grep $(docker-compose ps -q {$container})";
+        $commands = explode(' ', $command);
+        $process = $this->processFactory->runProcess($commands, 10, [], true);
+
+        return $process->isSuccessful() && !empty($process->getOutput());
+    }
 }

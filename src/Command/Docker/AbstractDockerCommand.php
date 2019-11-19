@@ -29,6 +29,9 @@ abstract class AbstractDockerCommand extends AbstractCommand
         $environment = new Environment();
 
         try {
+            if (!$this->dockerCompose->isContainerUp($this->service)) {
+                throw new \Exception("Container {$this->service} is not up");
+            }
             $this->dockerCompose->openTerminal($this->service, $this->arguments, $environment);
         } catch (\Exception $e) {
             $this->interactive->error($e->getMessage());

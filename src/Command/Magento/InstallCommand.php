@@ -418,9 +418,13 @@ class InstallCommand extends AbstractMagentoCommand
                 }
                 if ($file !== null) {
                     if ($database = $this->environment->getDefaultDatabase()) {
-                        $this->installation->databaseImport($this->environment->getDefaultDatabase(), $file);
+                        try {
+                            $this->installation->databaseImport($this->environment->getDefaultDatabase(), $file);
 
-                        return true;
+                            return true;
+                        } catch (\Exception $e) {
+                            $this->interactive->error($e->getMessage());
+                        }
                     }
                     $this->interactive->text("No database found in {$this->environment->__get('localEnv')}.");
                 }

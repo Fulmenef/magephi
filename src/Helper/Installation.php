@@ -66,10 +66,16 @@ class Installation
      * @param string $database
      * @param string $filename
      *
+     * @throws \Exception
+     *
      * @return Process
      */
     public function databaseImport(string $database, string $filename): Process
     {
+        if (!$this->dockerCompose->isContainerUp('mysql')) {
+            throw new \Exception('Mysql container is not up');
+        }
+
         $ext = pathinfo($filename, PATHINFO_EXTENSION);
 
         switch ($ext) {
@@ -159,6 +165,9 @@ class Installation
      */
     public function startMutagen(): bool
     {
+        if (!$this->dockerCompose->isContainerUp('synchro')) {
+            throw new \Exception('Synchro container is not started');
+        }
         if ($this->mutagen->isExistingSession()) {
             if ($this->mutagen->isPaused()) {
                 $this->mutagen->resumeSession();
