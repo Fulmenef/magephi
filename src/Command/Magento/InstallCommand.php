@@ -432,7 +432,7 @@ class InstallCommand extends AbstractMagentoCommand
                 $this->interactive->text('No compatible file found.');
             }
         }
-        $this->interactive->text('If you want to import a database later, you can use <fg=yellow>emag import</>.');
+        $this->interactive->text('If you want to import a database later, you can use the <fg=yellow>import</> command.');
 
         return false;
     }
