@@ -323,7 +323,7 @@ class ReleaseCommand extends Command
 
     /**
      * Update json files (composer.json, package.json...) with the new version.
-     * The field must be names "version".
+     * The field must be named "version".
      *
      * @param string $version
      * @param string $file
