@@ -3,6 +3,7 @@
 namespace Magephi\Command\Magento;
 
 use Exception;
+use Magephi\Command\AbstractCommand;
 use Magephi\Component\DockerCompose;
 use Magephi\Component\Mutagen;
 use Magephi\Component\Process;
@@ -74,7 +75,7 @@ class InstallCommand extends AbstractMagentoCommand
         parent::initialize($input, $output);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): ?int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         try {
             $this->checkPrerequisites();
@@ -97,7 +98,7 @@ class InstallCommand extends AbstractMagentoCommand
                 $this->interactive->error($e->getMessage());
             }
 
-            return 1;
+	        return AbstractCommand::CODE_ERROR;
         }
 
         $this->interactive->newLine(2);
@@ -111,7 +112,7 @@ class InstallCommand extends AbstractMagentoCommand
 
         $this->interactive->success($message);
 
-        return null;
+        return AbstractCommand::CODE_SUCCESS;
     }
 
     /**

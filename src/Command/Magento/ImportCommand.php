@@ -2,6 +2,7 @@
 
 namespace Magephi\Command\Magento;
 
+use Magephi\Command\AbstractCommand;
 use Magephi\Component\DockerCompose;
 use Magephi\Component\ProcessFactory;
 use Magephi\Entity\Environment;
@@ -59,7 +60,7 @@ class ImportCommand extends AbstractMagentoCommand
         parent::initialize($input, $output);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): ?int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $environment = new Environment();
 
@@ -81,20 +82,20 @@ class ImportCommand extends AbstractMagentoCommand
         } catch (\Exception $e) {
             $this->interactive->error($e->getMessage());
 
-            return 1;
+	        return AbstractCommand::CODE_ERROR;
         }
 
         if (!$process->isSuccessful()) {
             $this->interactive->error($process->getOutput());
             $this->interactive->error($process->getErrorOutput());
 
-            return 1;
+	        return AbstractCommand::CODE_ERROR;
         }
         $this->interactive->success(
             "The dump has been imported in {$database} in {$process->getDuration()} seconds"
         );
 
-        return null;
+	    return AbstractCommand::CODE_SUCCESS;
     }
 
     /**

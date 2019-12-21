@@ -2,6 +2,7 @@
 
 namespace Magephi\Command\Magento;
 
+use Magephi\Command\AbstractCommand;
 use Magephi\Entity\Environment;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -25,9 +26,9 @@ class UninstallCommand extends AbstractMagentoCommand
      * @param InputInterface  $input
      * @param OutputInterface $output
      *
-     * @return null|int
+     * @return int
      */
-    protected function execute(InputInterface $input, OutputInterface $output): ?int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $environment = new Environment();
         if ($this->interactive->confirm('Are you sure you want to uninstall this project ?', false)) {
@@ -58,6 +59,6 @@ class UninstallCommand extends AbstractMagentoCommand
             $this->interactive->success('This project has been successfully uninstalled.');
         }
 
-        return null;
+	    return AbstractCommand::CODE_SUCCESS;
     }
 }

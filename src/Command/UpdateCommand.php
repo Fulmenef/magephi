@@ -33,9 +33,9 @@ class UpdateCommand extends AbstractCommand
      * @param InputInterface  $input
      * @param OutputInterface $output
      *
-     * @return null|int
+     * @return int
      */
-    protected function execute(InputInterface $input, OutputInterface $output): ?int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $update = $this->checkNewVersionAvailable();
 
@@ -66,13 +66,13 @@ class UpdateCommand extends AbstractCommand
                         )
                     );
 
-                    return null;
+	                return AbstractCommand::CODE_SUCCESS;
                 }
             }
         }
 
         $this->interactive->note('No new version to download');
 
-        return null;
+	    return AbstractCommand::CODE_SUCCESS;
     }
 }

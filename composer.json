@@ -11,27 +11,26 @@
         }
     ],
     "require": {
-        "php": "^7.1.3",
+        "php": "^7.2",
         "ext-ctype": "*",
         "ext-iconv": "*",
         "herrera-io/phar-update": "^2.0",
         "nadar/php-composer-reader": "^1.3",
-        "symfony/console": "4.3.*",
-        "symfony/dotenv": "4.3.*",
+        "symfony/console": "^5.0",
+        "symfony/dotenv": "^5.0",
         "symfony/flex": "^1.3.1",
-        "symfony/framework-bundle": "4.3.*",
-        "symfony/process": "4.3.*",
-        "symfony/var-dumper": "4.3.*",
-        "symfony/yaml": "4.3.*",
+        "symfony/framework-bundle": "^5.0",
+        "symfony/process": "^5.0",
+        "symfony/var-dumper": "^5.0",
+        "symfony/yaml": "^5.0",
         "ext-json": "*"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "3.0.x-dev",
         "knplabs/github-api": "^2.12",
         "php-http/guzzle6-adapter": "^1.1",
-        "phpstan/phpstan": "^0.11.7",
+        "phpstan/phpstan": "^0.12",
         "roave/security-advisories": "dev-master",
-        "sebastian/phpcpd": "^4.1",
         "sensiolabs/security-checker": "^6.0"
     },
     "config": {
@@ -67,7 +66,7 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "4.3.*"
+            "require": "5.*"
         }
     }
 }

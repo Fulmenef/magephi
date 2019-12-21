@@ -9,15 +9,19 @@ class DockerCompose
 {
     /** @var ProcessFactory */
     private $processFactory;
+	/** @var Environment */
+	private $environment;
 
-    /**
-     * DockerCompose constructor.
-     *
-     * @param ProcessFactory $processFactory
-     */
-    public function __construct(ProcessFactory $processFactory)
+	/**
+	 * DockerCompose constructor.
+	 *
+	 * @param ProcessFactory $processFactory
+	 * @param Environment $environment
+	 */
+    public function __construct(ProcessFactory $processFactory, Environment $environment)
     {
         $this->processFactory = $processFactory;
+	    $this->environment = $environment;
     }
 
     /**
@@ -25,11 +29,10 @@ class DockerCompose
      *
      * @param string      $container   Container name
      * @param string      $arguments
-     * @param Environment $environment
      *
      * @throws \Exception
      */
-    public function openTerminal(string $container, string $arguments, Environment $environment)
+    public function openTerminal(string $container, string $arguments)
     {
         if (!Process::isTtySupported()) {
             throw new \Exception("TTY is not supported, ensure you're running the application from the command line.");
@@ -41,7 +44,7 @@ class DockerCompose
         $this->processFactory->runInteractiveProcess(
             array_merge($commands, [$container, 'sh', '-l']),
             null,
-            $environment->getDockerRequiredVariables()
+            $this->environment->getDockerRequiredVariables()
         );
     }
 
@@ -56,7 +59,7 @@ class DockerCompose
     {
         $command = "docker ps -q --no-trunc | grep $(docker-compose ps -q {$container})";
         $commands = explode(' ', $command);
-        $process = $this->processFactory->runProcess($commands, 10, [], true);
+        $process = $this->processFactory->runProcess($commands, 10, $this->environment->getDockerRequiredVariables(), true);
 
         return $process->isSuccessful() && !empty($process->getOutput());
     }

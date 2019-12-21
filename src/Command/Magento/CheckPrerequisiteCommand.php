@@ -2,6 +2,7 @@
 
 namespace Magephi\Command\Magento;
 
+use Magephi\Command\AbstractCommand;
 use Magephi\Component\DockerCompose;
 use Magephi\Component\ProcessFactory;
 use Magephi\Helper\Installation;
@@ -38,7 +39,7 @@ class CheckPrerequisiteCommand extends AbstractMagentoCommand
             ->setHelp('This command allows you to know if your system is ready to handle Magento 2 projects.');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): ?int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $table = new Table($output);
         $table->setHeaders(['Component', 'Mandatory', 'Status', 'Comment']);
@@ -60,10 +61,10 @@ class CheckPrerequisiteCommand extends AbstractMagentoCommand
         if ($ready) {
             $this->interactive->success('Ready perfectely.');
 
-            return null;
+	        return AbstractCommand::CODE_SUCCESS;
         }
         $this->interactive->error('Your system is not ready yet, install the missing components.');
 
-        return 1;
+	    return AbstractCommand::CODE_ERROR;
     }
 }

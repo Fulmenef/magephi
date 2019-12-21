@@ -2,6 +2,7 @@
 
 namespace Magephi\Command\Magento;
 
+use Magephi\Command\AbstractCommand;
 use Magephi\Component\DockerCompose;
 use Magephi\Component\ProcessFactory;
 use Magephi\Helper\Installation;
@@ -44,7 +45,7 @@ class BuildCommand extends AbstractMagentoCommand
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): ?int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->interactive->section('Building environment');
 
@@ -63,9 +64,9 @@ class BuildCommand extends AbstractMagentoCommand
                 ]
             );
 
-            return 1;
+	        return AbstractCommand::CODE_ERROR;
         }
 
-        return null;
+	    return AbstractCommand::CODE_SUCCESS;
     }
 }

@@ -132,9 +132,9 @@ class ReleaseCommand extends Command
      *
      * @throws Exception
      *
-     * @return null|int
+     * @return int
      */
-    protected function execute(InputInterface $input, OutputInterface $output): ?int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         /** @var string $version */
         $version = $input->getArgument('version');
@@ -169,13 +169,13 @@ class ReleaseCommand extends Command
         } catch (\Exception $e) {
             $this->interactive->error($e->getMessage());
 
-            return 1;
+            return AbstractCommand::CODE_ERROR;
         }
 
         if (!$this->git->createTag($version)) {
             $this->interactive->error("A tag for version {$version} already exists");
 
-            return 1;
+	        return AbstractCommand::CODE_ERROR;
         }
         $this->logger->debug('Tag created.');
 
@@ -183,7 +183,7 @@ class ReleaseCommand extends Command
         if (!$boxProcess->isSuccessful()) {
             $this->interactive->error($boxProcess->getErrorOutput());
 
-            return 1;
+	        return AbstractCommand::CODE_ERROR;
         }
         $this->logger->debug('Phar application created.');
 
@@ -200,7 +200,7 @@ class ReleaseCommand extends Command
         } catch (GitException $e) {
             $this->interactive->error($e->getMessage());
 
-            return 1;
+	        return AbstractCommand::CODE_ERROR;
         }
 
         $downloadPath = "downloads/magephi-{$version}.phar";
@@ -271,14 +271,14 @@ class ReleaseCommand extends Command
         } catch (RuntimeException | MissingArgumentException $e) {
             $this->interactive->error($e->getMessage());
 
-            return 1;
+	        return AbstractCommand::CODE_ERROR;
         }
 
         $this->interactive->success(
             "Version {$version} has been release ! You can see it here: {$response['html_url']}"
         );
 
-        return null;
+        return AbstractCommand::CODE_SUCCESS;
     }
 
     /**

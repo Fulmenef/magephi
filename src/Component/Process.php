@@ -5,39 +5,37 @@ namespace Magephi\Component;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class Process extends \Symfony\Component\Process\Process
+class Process extends \Symfony\Component\Process\Process implements ProcessInterface
 {
     /** @var ProgressBar */
     private $progressBar;
 
     /** @var callable */
-    private $progressCallback;
+	private $progressCallback;
 
-    /** @var float */
-    private $startTime;
+	/** @var float */
+	private $startTime;
 
-    /** @var float */
-    private $endTime;
+	/** @var float */
+	private $endTime;
 
+	/**
+	 * Process constructor.
+	 *
+	 * @param array $command
+	 * @param float|null $timeout
+	 * @param array|null $env
+	 */
     public function __construct(
         array $command,
         ?float $timeout,
-        array $env = null,
-        bool $shell = false
+        array $env = null
     ) {
         parent::__construct($command, null, $env, null, $timeout);
-        if ($shell) {
-            $this->setCommandLine(implode(' ', $command));
-        }
     }
 
     /**
-     * Create and associate a progress bar to the process.
-     *
-     * @param OutputInterface $output
-     * @param null|int        $max
-     *
-     * @return $this
+     * @inheritDoc
      */
     public function createProgressBar(OutputInterface $output, ?int $max = null): self
     {
@@ -47,9 +45,7 @@ class Process extends \Symfony\Component\Process\Process
     }
 
     /**
-     * Get the progress bar of the process. Null if none has been associated.
-     *
-     * @return null|ProgressBar
+     * @inheritDoc
      */
     public function getProgressBar(): ?ProgressBar
     {
@@ -57,9 +53,7 @@ class Process extends \Symfony\Component\Process\Process
     }
 
     /**
-     * Set the callback function used to advance the progress bar.
-     *
-     * @param callable $progressCallback
+     * @inheritDoc
      */
     public function setProgressCallback(callable $progressCallback): void
     {
@@ -67,9 +61,7 @@ class Process extends \Symfony\Component\Process\Process
     }
 
     /**
-     * Get the callback function used to advance the progress bar.
-     *
-     * @return callable
+     * @inheritDoc
      */
     public function getProgressCallback(): callable
     {
@@ -77,11 +69,8 @@ class Process extends \Symfony\Component\Process\Process
     }
 
     /**
-     * Override the default start function. If a progress bar is associated, we use the defined callback to advance it.
-     * If the return value of the callback is an int, we advance the progress from that number bar of steps.
-     *
-     * @param null|callable $callback
-     * @param array         $env
+     * @inheritDoc
+     * Override of the default start method
      */
     public function start(callable $callback = null, array $env = []): void
     {
@@ -111,8 +100,7 @@ class Process extends \Symfony\Component\Process\Process
     }
 
     /**
-     * Return the duration of the process in seconds.
-     * endTime may not have been initialized, so we set it at that time.
+     * @inheritDoc
      */
     public function getDuration(): float
     {

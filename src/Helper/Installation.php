@@ -4,8 +4,8 @@ namespace Magephi\Helper;
 
 use Magephi\Component\DockerCompose;
 use Magephi\Component\Mutagen;
-use Magephi\Component\Process;
 use Magephi\Component\ProcessFactory;
+use Magephi\Component\ProcessInterface;
 use Magephi\Entity\Environment;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -61,16 +61,15 @@ class Installation
 
     /**
      * Import a database dump. Display a progress bar to visually follow the process.
-     * In case of compression, the number of steps is not precise.
      *
      * @param string $database
      * @param string $filename
      *
      * @throws \Exception
      *
-     * @return Process
+     * @return ProcessInterface
      */
-    public function databaseImport(string $database, string $filename): Process
+    public function databaseImport(string $database, string $filename): ProcessInterface
     {
         if (!$this->dockerCompose->isContainerUp('mysql')) {
             throw new \Exception('Mysql container is not up');
@@ -114,9 +113,9 @@ class Installation
      *
      * @param bool $install
      *
-     * @return Process
+     * @return ProcessInterface
      */
-    public function startMake(bool $install = false): Process
+    public function startMake(bool $install = false): ProcessInterface
     {
         $process = $this->processFactory->runProcessWithProgressBar(
             ['make', 'start'],
@@ -141,9 +140,9 @@ class Installation
     /**
      * Run the `make build` command with a progress bar.
      *
-     * @return Process
+     * @return ProcessInterface
      */
-    public function buildMake(): Process
+    public function buildMake(): ProcessInterface
     {
         $process = $this->processFactory->runProcessWithProgressBar(
             ['make', 'build'],

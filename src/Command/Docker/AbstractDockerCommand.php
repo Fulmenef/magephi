@@ -24,17 +24,18 @@ abstract class AbstractDockerCommand extends AbstractCommand
             ->setHelp("This command allows you to connect to the {$this->service} container.");
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $environment = new Environment();
-
         try {
             if (!$this->dockerCompose->isContainerUp($this->service)) {
                 throw new \Exception("Container {$this->service} is not up");
             }
-            $this->dockerCompose->openTerminal($this->service, $this->arguments, $environment);
+            $this->dockerCompose->openTerminal($this->service, $this->arguments);
         } catch (\Exception $e) {
             $this->interactive->error($e->getMessage());
+	        return AbstractCommand::CODE_ERROR;
         }
+
+	    return AbstractCommand::CODE_SUCCESS;
     }
 }

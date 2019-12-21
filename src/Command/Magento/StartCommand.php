@@ -2,6 +2,7 @@
 
 namespace Magephi\Command\Magento;
 
+use Magephi\Command\AbstractCommand;
 use Magephi\Component\DockerCompose;
 use Magephi\Component\Mutagen;
 use Magephi\Component\Process;
@@ -51,7 +52,7 @@ class StartCommand extends AbstractMagentoCommand
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): ?int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->interactive->section('Starting environment');
 
@@ -85,7 +86,7 @@ class StartCommand extends AbstractMagentoCommand
             $this->interactive->newLine(2);
             $this->interactive->success('Environment started.');
 
-            return null;
+	        return AbstractCommand::CODE_SUCCESS;
         } catch (\Exception $e) {
             $this->interactive->error(
                 [
@@ -94,7 +95,7 @@ class StartCommand extends AbstractMagentoCommand
                 ]
             );
 
-            return 1;
+	        return AbstractCommand::CODE_ERROR;
         }
     }
 }
