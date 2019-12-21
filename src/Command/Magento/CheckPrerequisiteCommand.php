@@ -61,10 +61,10 @@ class CheckPrerequisiteCommand extends AbstractMagentoCommand
         if ($ready) {
             $this->interactive->success('Ready perfectely.');
 
-	        return AbstractCommand::CODE_SUCCESS;
+            return AbstractCommand::CODE_SUCCESS;
         }
         $this->interactive->error('Your system is not ready yet, install the missing components.');
 
-	    return AbstractCommand::CODE_ERROR;
+        return AbstractCommand::CODE_ERROR;
     }
 }

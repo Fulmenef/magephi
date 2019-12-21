@@ -59,6 +59,6 @@ class UninstallCommand extends AbstractMagentoCommand
             $this->interactive->success('This project has been successfully uninstalled.');
         }
 
-	    return AbstractCommand::CODE_SUCCESS;
+        return AbstractCommand::CODE_SUCCESS;
     }
 }

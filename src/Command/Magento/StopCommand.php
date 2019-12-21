@@ -12,53 +12,53 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class StopCommand extends AbstractMagentoCommand
 {
-	protected $command = 'stop';
+    protected $command = 'stop';
 
-	protected function initialize(InputInterface $input, OutputInterface $output)
-	{
-		parent::initialize($input, $output);
-	}
+    protected function initialize(InputInterface $input, OutputInterface $output)
+    {
+        parent::initialize($input, $output);
+    }
 
-	protected function configure()
-	{
-		parent::configure();
-		$this
-			->setDescription('Stop environment, equivalent to <fg=yellow>make stop</>')
-			->setHelp(
-				'This command allows you to stop your Magento 2 environment. It must have been installed before.'
-			);
-	}
+    protected function configure()
+    {
+        parent::configure();
+        $this
+            ->setDescription('Stop environment, equivalent to <fg=yellow>make stop</>')
+            ->setHelp(
+                'This command allows you to stop your Magento 2 environment. It must have been installed before.'
+            );
+    }
 
-	protected function execute(InputInterface $input, OutputInterface $output): int
-	{
-		$environment = new Environment();
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $environment = new Environment();
 
-		$this->interactive->section('Stopping environment');
+        $this->interactive->section('Stopping environment');
 
-		$process = $this->processFactory->runProcessWithProgressBar(
-			['make', 'stop'],
-			60,
-			function ($type, $buffer) {
-				return stripos($buffer, 'stopping') && stripos($buffer, 'done');
-			},
-			$output,
-			$environment->getContainers() + 1
-		);
-		$this->interactive->newLine(2);
+        $process = $this->processFactory->runProcessWithProgressBar(
+            ['make', 'stop'],
+            60,
+            function ($type, $buffer) {
+                return stripos($buffer, 'stopping') && stripos($buffer, 'done');
+            },
+            $output,
+            $environment->getContainers() + 1
+        );
+        $this->interactive->newLine(2);
 
-		if (!$process->isSuccessful()) {
-			$this->interactive->error(
-				[
-					"Environment couldn't be stopped: ",
-					$process->getErrorOutput(),
-				]
-			);
+        if (!$process->isSuccessful()) {
+            $this->interactive->error(
+                [
+                    "Environment couldn't be stopped: ",
+                    $process->getErrorOutput(),
+                ]
+            );
 
-			return AbstractCommand::CODE_ERROR;
-		}
+            return AbstractCommand::CODE_ERROR;
+        }
 
-		$this->interactive->success('Environment stopped.');
+        $this->interactive->success('Environment stopped.');
 
-		return AbstractCommand::CODE_SUCCESS;
-	}
+        return AbstractCommand::CODE_SUCCESS;
+    }
 }

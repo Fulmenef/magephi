@@ -11,21 +11,21 @@ class Process extends \Symfony\Component\Process\Process implements ProcessInter
     private $progressBar;
 
     /** @var callable */
-	private $progressCallback;
+    private $progressCallback;
 
-	/** @var float */
-	private $startTime;
+    /** @var float */
+    private $startTime;
 
-	/** @var float */
-	private $endTime;
+    /** @var float */
+    private $endTime;
 
-	/**
-	 * Process constructor.
-	 *
-	 * @param array $command
-	 * @param float|null $timeout
-	 * @param array|null $env
-	 */
+    /**
+     * Process constructor.
+     *
+     * @param array      $command
+     * @param null|float $timeout
+     * @param null|array $env
+     */
     public function __construct(
         array $command,
         ?float $timeout,
@@ -35,7 +35,7 @@ class Process extends \Symfony\Component\Process\Process implements ProcessInter
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function createProgressBar(OutputInterface $output, ?int $max = null): self
     {
@@ -45,7 +45,7 @@ class Process extends \Symfony\Component\Process\Process implements ProcessInter
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getProgressBar(): ?ProgressBar
     {
@@ -53,7 +53,7 @@ class Process extends \Symfony\Component\Process\Process implements ProcessInter
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function setProgressCallback(callable $progressCallback): void
     {
@@ -61,7 +61,7 @@ class Process extends \Symfony\Component\Process\Process implements ProcessInter
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getProgressCallback(): callable
     {
@@ -69,8 +69,8 @@ class Process extends \Symfony\Component\Process\Process implements ProcessInter
     }
 
     /**
-     * @inheritDoc
-     * Override of the default start method
+     * {@inheritdoc}
+     * Override of the default start method.
      */
     public function start(callable $callback = null, array $env = []): void
     {
@@ -100,7 +100,7 @@ class Process extends \Symfony\Component\Process\Process implements ProcessInter
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getDuration(): float
     {

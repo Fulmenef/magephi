@@ -86,7 +86,7 @@ class StartCommand extends AbstractMagentoCommand
             $this->interactive->newLine(2);
             $this->interactive->success('Environment started.');
 
-	        return AbstractCommand::CODE_SUCCESS;
+            return AbstractCommand::CODE_SUCCESS;
         } catch (\Exception $e) {
             $this->interactive->error(
                 [
@@ -95,7 +95,7 @@ class StartCommand extends AbstractMagentoCommand
                 ]
             );
 
-	        return AbstractCommand::CODE_ERROR;
+            return AbstractCommand::CODE_ERROR;
         }
     }
 }

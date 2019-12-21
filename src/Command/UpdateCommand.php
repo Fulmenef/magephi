@@ -66,13 +66,13 @@ class UpdateCommand extends AbstractCommand
                         )
                     );
 
-	                return AbstractCommand::CODE_SUCCESS;
+                    return AbstractCommand::CODE_SUCCESS;
                 }
             }
         }
 
         $this->interactive->note('No new version to download');
 
-	    return AbstractCommand::CODE_SUCCESS;
+        return AbstractCommand::CODE_SUCCESS;
     }
 }

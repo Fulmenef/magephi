@@ -82,20 +82,20 @@ class ImportCommand extends AbstractMagentoCommand
         } catch (\Exception $e) {
             $this->interactive->error($e->getMessage());
 
-	        return AbstractCommand::CODE_ERROR;
+            return AbstractCommand::CODE_ERROR;
         }
 
         if (!$process->isSuccessful()) {
             $this->interactive->error($process->getOutput());
             $this->interactive->error($process->getErrorOutput());
 
-	        return AbstractCommand::CODE_ERROR;
+            return AbstractCommand::CODE_ERROR;
         }
         $this->interactive->success(
             "The dump has been imported in {$database} in {$process->getDuration()} seconds"
         );
 
-	    return AbstractCommand::CODE_SUCCESS;
+        return AbstractCommand::CODE_SUCCESS;
     }
 
     /**

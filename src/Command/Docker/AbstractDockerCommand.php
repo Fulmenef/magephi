@@ -3,7 +3,6 @@
 namespace Magephi\Command\Docker;
 
 use Magephi\Command\AbstractCommand;
-use Magephi\Entity\Environment;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -33,9 +32,10 @@ abstract class AbstractDockerCommand extends AbstractCommand
             $this->dockerCompose->openTerminal($this->service, $this->arguments);
         } catch (\Exception $e) {
             $this->interactive->error($e->getMessage());
-	        return AbstractCommand::CODE_ERROR;
+
+            return AbstractCommand::CODE_ERROR;
         }
 
-	    return AbstractCommand::CODE_SUCCESS;
+        return AbstractCommand::CODE_SUCCESS;
     }
 }

@@ -9,26 +9,26 @@ class DockerCompose
 {
     /** @var ProcessFactory */
     private $processFactory;
-	/** @var Environment */
-	private $environment;
+    /** @var Environment */
+    private $environment;
 
-	/**
-	 * DockerCompose constructor.
-	 *
-	 * @param ProcessFactory $processFactory
-	 * @param Environment $environment
-	 */
+    /**
+     * DockerCompose constructor.
+     *
+     * @param ProcessFactory $processFactory
+     * @param Environment    $environment
+     */
     public function __construct(ProcessFactory $processFactory, Environment $environment)
     {
         $this->processFactory = $processFactory;
-	    $this->environment = $environment;
+        $this->environment = $environment;
     }
 
     /**
      * Open a TTY terminal to the given container.
      *
-     * @param string      $container   Container name
-     * @param string      $arguments
+     * @param string $container Container name
+     * @param string $arguments
      *
      * @throws \Exception
      */

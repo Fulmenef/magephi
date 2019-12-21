@@ -175,7 +175,7 @@ class ReleaseCommand extends Command
         if (!$this->git->createTag($version)) {
             $this->interactive->error("A tag for version {$version} already exists");
 
-	        return AbstractCommand::CODE_ERROR;
+            return AbstractCommand::CODE_ERROR;
         }
         $this->logger->debug('Tag created.');
 
@@ -183,7 +183,7 @@ class ReleaseCommand extends Command
         if (!$boxProcess->isSuccessful()) {
             $this->interactive->error($boxProcess->getErrorOutput());
 
-	        return AbstractCommand::CODE_ERROR;
+            return AbstractCommand::CODE_ERROR;
         }
         $this->logger->debug('Phar application created.');
 
@@ -200,7 +200,7 @@ class ReleaseCommand extends Command
         } catch (GitException $e) {
             $this->interactive->error($e->getMessage());
 
-	        return AbstractCommand::CODE_ERROR;
+            return AbstractCommand::CODE_ERROR;
         }
 
         $downloadPath = "downloads/magephi-{$version}.phar";
@@ -271,7 +271,7 @@ class ReleaseCommand extends Command
         } catch (RuntimeException | MissingArgumentException $e) {
             $this->interactive->error($e->getMessage());
 
-	        return AbstractCommand::CODE_ERROR;
+            return AbstractCommand::CODE_ERROR;
         }
 
         $this->interactive->success(

@@ -64,9 +64,9 @@ class BuildCommand extends AbstractMagentoCommand
                 ]
             );
 
-	        return AbstractCommand::CODE_ERROR;
+            return AbstractCommand::CODE_ERROR;
         }
 
-	    return AbstractCommand::CODE_SUCCESS;
+        return AbstractCommand::CODE_SUCCESS;
     }
 }
