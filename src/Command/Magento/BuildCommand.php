@@ -29,13 +29,13 @@ class BuildCommand extends AbstractMagentoCommand
         $this->installation = $installation;
     }
 
-    protected function initialize(InputInterface $input, OutputInterface $output)
+    protected function initialize(InputInterface $input, OutputInterface $output): void
     {
         parent::initialize($input, $output);
         $this->installation->setOutputInterface($output);
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
         $this

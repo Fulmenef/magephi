@@ -26,9 +26,9 @@ class ShellProcess implements ProcessInterface
     /**
      * ShellProcess constructor.
      *
-     * @param array|string $command
-     * @param null|float   $timeout
-     * @param null|array   $env
+     * @param string|string[] $command
+     * @param null|float      $timeout
+     * @param null|string[]   $env
      */
     public function __construct($command, ?float $timeout, ?array $env = [])
     {

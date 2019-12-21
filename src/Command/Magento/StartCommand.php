@@ -5,7 +5,6 @@ namespace Magephi\Command\Magento;
 use Magephi\Command\AbstractCommand;
 use Magephi\Component\DockerCompose;
 use Magephi\Component\Mutagen;
-use Magephi\Component\Process;
 use Magephi\Component\ProcessFactory;
 use Magephi\Helper\Installation;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -22,6 +21,8 @@ class StartCommand extends AbstractMagentoCommand
 
     /** @var Installation */
     private $installation;
+
+    /** @var Mutagen */
     private $mutagen;
 
     public function __construct(
@@ -36,13 +37,13 @@ class StartCommand extends AbstractMagentoCommand
         $this->mutagen = $mutagen;
     }
 
-    protected function initialize(InputInterface $input, OutputInterface $output)
+    protected function initialize(InputInterface $input, OutputInterface $output): void
     {
         parent::initialize($input, $output);
         $this->installation->setOutputInterface($output);
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
         $this
@@ -63,7 +64,6 @@ class StartCommand extends AbstractMagentoCommand
                     throw new \Exception($process->getErrorOutput());
                 }
             } catch (ProcessTimedOutException $e) {
-                /** @var Process $startProcess */
                 $startProcess = $e->getProcess();
                 $this->installation->startMutagen();
                 $progressBar = $startProcess->getProgressBar();

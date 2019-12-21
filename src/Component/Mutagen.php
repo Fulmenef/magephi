@@ -23,9 +23,9 @@ class Mutagen
     /**
      * Create Mutagen session for the project.
      *
-     * @return Process
+     * @return ProcessInterface
      */
-    public function createSession(): Process
+    public function createSession(): ProcessInterface
     {
         $command = [
             'mutagen',
@@ -48,9 +48,9 @@ class Mutagen
     /**
      * Try to resume the Mutagen session. Obviously, it must have been initialized first.
      *
-     * @return Process
+     * @return ProcessInterface
      */
-    public function resumeSession(): Process
+    public function resumeSession(): ProcessInterface
     {
         return $this->processFactory->runProcess(
             [

@@ -11,10 +11,12 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 abstract class AbstractDockerCommand extends AbstractCommand
 {
+    /** @var string */
     protected $service = '';
+    /** @var string */
     protected $arguments = '';
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('magephi:docker:' . $this->service)

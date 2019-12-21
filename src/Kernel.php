@@ -81,7 +81,13 @@ class Kernel extends BaseKernel
         return $this->isArchiveContext() ? $this->getCustomDir() . '/log' : parent::getLogDir();
     }
 
-    public static function getVersion()
+    /**
+     * Return the current version if the application is in prod mode
+     * Return a tag followed by -dev if in development mode.
+     *
+     * @return string
+     */
+    public static function getVersion(): string
     {
         if (is_numeric(substr(self::VERSION, 0, 1))) {
             return self::VERSION;

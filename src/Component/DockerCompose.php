@@ -32,7 +32,7 @@ class DockerCompose
      *
      * @throws \Exception
      */
-    public function openTerminal(string $container, string $arguments)
+    public function openTerminal(string $container, string $arguments): void
     {
         if (!Process::isTtySupported()) {
             throw new \Exception("TTY is not supported, ensure you're running the application from the command line.");

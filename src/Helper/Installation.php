@@ -38,6 +38,8 @@ class Installation
 
     /**
      * For each prerequisite, check if the binary is installed.
+     *
+     * @return array[]
      */
     public function checkSystemPrerequisites(): array
     {

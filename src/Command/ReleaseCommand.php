@@ -75,7 +75,7 @@ class ReleaseCommand extends Command
     /**
      * Add release content to manifest.json.
      *
-     * @param array $data
+     * @param string[] $data
      *
      * @return string
      */
@@ -95,7 +95,7 @@ class ReleaseCommand extends Command
         return $fileInfo->getRelativePathname();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('magephi:release')
@@ -120,7 +120,7 @@ class ReleaseCommand extends Command
             );
     }
 
-    protected function initialize(InputInterface $input, OutputInterface $output)
+    protected function initialize(InputInterface $input, OutputInterface $output): void
     {
         $this->interactive = new SymfonyStyle($input, $output);
         parent::initialize($input, $output);

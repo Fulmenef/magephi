@@ -4,3 +4,9 @@ parameters:
 
   fileExtensions:
       - php
+
+  excludes_analyse:
+      - src/Component/Process.php # Require lot of re-work on those files
+      - src/Component/ShellProcess.php
+      - src/Component/ProcessInterface.php
+      - src/Component/ProcessFactory.php

@@ -40,7 +40,7 @@ class ImportCommand extends AbstractMagentoCommand
         $this->installation = $installation;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
         $this
@@ -54,7 +54,7 @@ class ImportCommand extends AbstractMagentoCommand
             ->setHelp('This command allow you to import a SQL file');
     }
 
-    protected function initialize(InputInterface $input, OutputInterface $output)
+    protected function initialize(InputInterface $input, OutputInterface $output): void
     {
         $this->installation->setOutputInterface($output);
         parent::initialize($input, $output);

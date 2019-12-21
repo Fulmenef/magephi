@@ -19,7 +19,6 @@ abstract class AbstractCommand extends Command
 {
     const CODE_SUCCESS = 0;
     const CODE_ERROR = 1;
-
     const MANIFEST_FILE = 'https://fulmenef.github.io/magephi/manifest.json';
 
     /** @var SymfonyStyle */
@@ -61,7 +60,7 @@ abstract class AbstractCommand extends Command
         return $update !== null ? $this->rebuildVersion($update->getVersion()) : $update;
     }
 
-    protected function initialize(InputInterface $input, OutputInterface $output)
+    protected function initialize(InputInterface $input, OutputInterface $output): void
     {
         $this->interactive = new SymfonyStyle($input, $output);
         parent::initialize($input, $output);
@@ -82,7 +81,7 @@ abstract class AbstractCommand extends Command
      * @param callable $condition the condition to check
      * @param bool     $exit      whether to exit on failure
      */
-    protected function check($success, $failure, $condition, $exit = true)
+    protected function check($success, $failure, $condition, $exit = true): void
     {
         if ($condition()) {
             $this->interactive->writeln("<fg=green>  [*] {$success}</>");
@@ -90,7 +89,7 @@ abstract class AbstractCommand extends Command
             $this->interactive->writeln("<fg=yellow>  [!] {$failure}</>");
         } else {
             $this->interactive->writeln("<fg=red>  [X] {$failure}</>");
-            exit(1);
+            exit(self::CODE_ERROR);
         }
     }
 

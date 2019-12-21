@@ -14,12 +14,12 @@ class StopCommand extends AbstractMagentoCommand
 {
     protected $command = 'stop';
 
-    protected function initialize(InputInterface $input, OutputInterface $output)
+    protected function initialize(InputInterface $input, OutputInterface $output): void
     {
         parent::initialize($input, $output);
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
         $this

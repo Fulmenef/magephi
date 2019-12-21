@@ -16,7 +16,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class UpdateCommand extends AbstractCommand
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('magephi:update')
@@ -24,7 +24,7 @@ class UpdateCommand extends AbstractCommand
             ->setDescription('Updates Magephi to the latest version');
     }
 
-    protected function initialize(InputInterface $input, OutputInterface $output)
+    protected function initialize(InputInterface $input, OutputInterface $output): void
     {
         $this->interactive = new SymfonyStyle($input, $output);
     }

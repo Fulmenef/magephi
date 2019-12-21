@@ -14,21 +14,37 @@ interface ProcessInterface
      * If the return value of the callback is an int, we advance the progress from that number bar of steps.
      *
      * @param null|callable $callback
-     * @param array         $env
+     * @param string[]      $env
      */
     public function start(callable $callback = null, array $env = []): void;
 
     /**
+     * @param null|callable $callback
+     *
      * @see Process::wait()
      */
     public function wait(callable $callback = null);
 
     /**
+     * @param callable $callback
+     *
+     * @see Process::waitUntil()
+     */
+    public function waitUntil(callable $callback);
+
+    /**
+     * @param null|callable $callback
+     * @param string[]      $env
+     *
+     * @return int
+     *
      * @see Process::run()
      */
     public function run(callable $callback = null, array $env = []): int;
 
     /**
+     * @param bool $tty
+     *
      * @see Process::setTty()
      */
     public function setTty(bool $tty);

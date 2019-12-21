@@ -10,11 +10,11 @@ class Environment
 {
     /** @var string */
     private $dockerComposeFile;
-    /** @var string */
+    /** @var null|string */
     private $dockerComposeContent;
-    /** @var int */
+    /** @var null|int */
     private $containers;
-    /** @var int */
+    /** @var null|int */
     private $volumes;
     /** @var string */
     private $phpDockerfile;
@@ -38,12 +38,23 @@ class Environment
         $this->autoLocate();
     }
 
-    public function __get($name)
+    /**
+     * @param string $name
+     *
+     * @return null|int|string
+     */
+    public function __get(string $name)
     {
         return $this->{$name};
     }
 
-    public function __set($name, $value)
+    /**
+     * @param string $name
+     * @param mixed  $value
+     *
+     * @return mixed
+     */
+    public function __set(string $name, $value)
     {
         return $this->{$name} = $value;
     }
@@ -52,7 +63,7 @@ class Environment
      * Try to locate automatically the environment files.
      * If a file is missing or has multiple occurrence, the user will have to fill the blanks.
      */
-    public function autoLocate()
+    public function autoLocate(): void
     {
         $files = [
             'docker-compose.yml' => ['pattern' => '*/*/*/docker-compose.yml', 'variable' => 'dockerComposeFile'],
@@ -66,7 +77,7 @@ class Environment
 
         foreach ($files as $file => $data) {
             $retrievedFiles = $this->retrieveFile($data['pattern'], $file);
-            if ($retrievedFiles[$file] !== null && !\is_array($retrievedFiles[$file])) {
+            if (!empty($retrievedFiles[$file]) && !\is_array($retrievedFiles[$file])) {
                 $this->{$files[$file]['variable']} = $retrievedFiles[$file];
             }
         }
@@ -94,25 +105,22 @@ class Environment
      * @param string $pattern
      * @param string $key
      *
-     * @return array
+     * @return string[]
      */
     public function retrieveFile(string $pattern, string $key): array
     {
+        /** @var false|string[] $files */
         $files = glob($pattern);
         if ($files === false) {
             throw new FileNotFoundException('Error while searching files for pattern ' . $pattern);
         }
         switch (\count($files)) {
             case 0:
-                $val = null;
-
-                break;
-            case 1:
-                $val = $files[0];
+                $val = '';
 
                 break;
             default:
-                $val = $files;
+                $val = $files[0];
 
                 break;
         }
@@ -122,6 +130,8 @@ class Environment
 
     /**
      * Retrieves environment variables required to run processes.
+     *
+     * @return string[]
      */
     public function getDockerRequiredVariables(): array
     {
@@ -129,7 +139,7 @@ class Environment
             'COMPOSE_FILE'         => './' . $this->dockerComposeFile,
             'COMPOSE_PROJECT_NAME' => 'magento2_' . $this->currentDir,
             'DOCKER_PHP_IMAGE'     => $this->phpImage,
-            'PROJECT_LOCATION'     => getcwd(),
+            'PROJECT_LOCATION'     => getcwd() ?: '',
         ];
     }
 

@@ -14,7 +14,7 @@ class UninstallCommand extends AbstractMagentoCommand
 {
     protected $command = 'uninstall';
 
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
         $this

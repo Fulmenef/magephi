@@ -31,7 +31,7 @@ class CheckPrerequisiteCommand extends AbstractMagentoCommand
         $this->installation = $installation;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
         $this

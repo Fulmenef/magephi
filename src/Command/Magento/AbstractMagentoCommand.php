@@ -6,9 +6,10 @@ use Magephi\Command\AbstractCommand;
 
 abstract class AbstractMagentoCommand extends AbstractCommand
 {
+    /** @var string */
     protected $command = '';
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('magephi:' . $this->command)

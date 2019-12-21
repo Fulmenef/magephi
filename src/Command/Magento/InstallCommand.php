@@ -7,7 +7,6 @@ use Exception;
 use Magephi\Command\AbstractCommand;
 use Magephi\Component\DockerCompose;
 use Magephi\Component\Mutagen;
-use Magephi\Component\Process;
 use Magephi\Component\ProcessFactory;
 use Magephi\Entity\Environment;
 use Magephi\Helper\Installation;
@@ -52,14 +51,16 @@ class InstallCommand extends AbstractMagentoCommand
         DockerCompose $dockerCompose,
         Installation $installation,
         Mutagen $mutagen,
+        Environment $environment,
         string $name = null
     ) {
         parent::__construct($processFactory, $dockerCompose, $name);
         $this->installation = $installation;
         $this->mutagen = $mutagen;
+        $this->environment = $environment;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
         $this
@@ -67,9 +68,8 @@ class InstallCommand extends AbstractMagentoCommand
             ->setHelp('This command allows you to install the Magento 2 project in the current directory.');
     }
 
-    protected function initialize(InputInterface $input, OutputInterface $output)
+    protected function initialize(InputInterface $input, OutputInterface $output): void
     {
-        $this->environment = new Environment();
         $this->output = $output;
         $this->installation->setOutputInterface($output);
         parent::initialize($input, $output);
@@ -223,15 +223,27 @@ class InstallCommand extends AbstractMagentoCommand
      */
     protected function prepareDockerEnv(): void
     {
-        copy($this->environment->__get('distEnv'), self::DOCKER_LOCAL_ENV);
+        $distEnv = $this->environment->__get('distEnv');
+        if (!\is_string($distEnv)) {
+            throw new Exception(
+                'env.dist does not exist. Ensure emakinafr/docker-magento2 is present in dependencies.'
+            );
+        }
+        copy($distEnv, self::DOCKER_LOCAL_ENV);
         $this->environment->__set('localEnv', self::DOCKER_LOCAL_ENV);
-        $content = file_get_contents($this->environment->__get('localEnv'));
+        $content = file_get_contents(self::DOCKER_LOCAL_ENV);
         if ($content === false) {
             throw new FileException('Local env not found.');
         }
         $this->envContent = $content;
 
-        $file = file_get_contents($this->environment->__get('phpDockerfile'));
+        $dockerfile = $this->environment->__get('phpDockerfile');
+        if (!\is_string($dockerfile)) {
+            throw new Exception(
+                'PHP Dockerfile does not exist. Ensure emakinafr/docker-magento2 is present in dependencies.'
+            );
+        }
+        $file = file_get_contents($dockerfile);
         if ($file === false) {
             throw new FileException('PHP Dockerfile not found.');
         }
@@ -260,10 +272,10 @@ class InstallCommand extends AbstractMagentoCommand
             $this->configureEnv('mysql');
         }
 
-        file_put_contents($this->environment->__get('localEnv'), $this->envContent);
+        file_put_contents(self::DOCKER_LOCAL_ENV, $this->envContent);
     }
 
-    protected function buildContainers()
+    protected function buildContainers(): void
     {
         $this->interactive->section('Building containers');
         $process = $this->installation->buildMake();
@@ -277,7 +289,7 @@ class InstallCommand extends AbstractMagentoCommand
                     'This issue may came from a missing package in the PHP dockerfile after a version upgrade.',
                 ]
             );
-            exit(1);
+            exit(AbstractCommand::CODE_ERROR);
         }
     }
 
@@ -294,7 +306,6 @@ class InstallCommand extends AbstractMagentoCommand
                 throw new Exception($process->getErrorOutput());
             }
         } catch (ProcessTimedOutException $e) {
-            /** @var Process $startProcess */
             $startProcess = $e->getProcess();
             $this->installation->startMutagen();
             $progressBar = $startProcess->getProgressBar();
@@ -374,11 +385,18 @@ class InstallCommand extends AbstractMagentoCommand
      */
     private function chooseServerName(): string
     {
-        $content = file_get_contents($this->environment->__get('nginxConf'));
-        if (!\is_string($content)) {
-            throw new FileException($this->environment->__get('nginxConf') . ' not found.');
+        $nginx = $this->environment->__get('nginxConf');
+        if (!\is_string($nginx)) {
+            throw new Exception(
+                'nginx.conf does not exist. Ensure emakinafr/docker-magento2 is present in dependencies.'
+            );
         }
-
+        $content = file_get_contents($nginx);
+        if (!\is_string($content)) {
+            throw new Exception(
+                "Something went wrong while reading {$nginx}, ensure the file is present."
+            );
+        }
         $this->nginxContent = $content;
         preg_match_all('/server_name (\S*);/m', $this->nginxContent, $matches, PREG_SET_ORDER, 0);
         $serverName = $matches[0][1];
@@ -397,7 +415,7 @@ class InstallCommand extends AbstractMagentoCommand
             }
 
             $this->nginxContent = $content;
-            file_put_contents($this->environment->__get('nginxConf'), $this->nginxContent);
+            file_put_contents($nginx, $this->nginxContent);
         }
 
         return $serverName;
