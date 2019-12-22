@@ -4,8 +4,8 @@ namespace Magephi\Helper;
 
 use Magephi\Component\DockerCompose;
 use Magephi\Component\Mutagen;
+use Magephi\Component\Process;
 use Magephi\Component\ProcessFactory;
-use Magephi\Component\ProcessInterface;
 use Magephi\Entity\Environment;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -69,9 +69,9 @@ class Installation
      *
      * @throws \Exception
      *
-     * @return ProcessInterface
+     * @return Process
      */
-    public function databaseImport(string $database, string $filename): ProcessInterface
+    public function databaseImport(string $database, string $filename): Process
     {
         if (!$this->dockerCompose->isContainerUp('mysql')) {
             throw new \Exception('Mysql container is not up');
@@ -115,11 +115,11 @@ class Installation
      *
      * @param bool $install
      *
-     * @return ProcessInterface
+     * @return Process
      */
-    public function startMake(bool $install = false): ProcessInterface
+    public function startMake(bool $install = false): Process
     {
-        $process = $this->processFactory->runProcessWithProgressBar(
+        return $this->processFactory->runProcessWithProgressBar(
             ['make', 'start'],
             60,
             function (/* @noinspection PhpUnusedParameterInspection */ $type, $buffer) {
@@ -135,16 +135,14 @@ class Installation
             $install ? $this->environment->getContainers() + $this->environment->getVolumes()
                 + 2 : $this->environment->getContainers() + 1
         );
-
-        return $process;
     }
 
     /**
      * Run the `make build` command with a progress bar.
      *
-     * @return ProcessInterface
+     * @return Process
      */
-    public function buildMake(): ProcessInterface
+    public function buildMake(): Process
     {
         $process = $this->processFactory->runProcessWithProgressBar(
             ['make', 'build'],
@@ -175,7 +173,7 @@ class Installation
             }
         } else {
             $process = $this->mutagen->createSession();
-            if (!$process->isSuccessful()) {
+            if (!$process->getProcess()->isSuccessful()) {
                 throw new \Exception('Mutagen session could not be created');
             }
         }

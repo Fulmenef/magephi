@@ -180,8 +180,8 @@ class ReleaseCommand extends Command
         $this->logger->debug('Tag created.');
 
         $boxProcess = $this->processFactory->runProcess(['make', 'box'], 60);
-        if (!$boxProcess->isSuccessful()) {
-            $this->interactive->error($boxProcess->getErrorOutput());
+        if (!$boxProcess->getProcess()->isSuccessful()) {
+            $this->interactive->error($boxProcess->getProcess()->getErrorOutput());
 
             return AbstractCommand::CODE_ERROR;
         }
@@ -190,7 +190,7 @@ class ReleaseCommand extends Command
         $filename = 'magephi.phar';
         $buildPath = 'build/' . $filename;
         $sha1 = $this->processFactory->runProcess(['openssl', 'sha1', '-r', $buildPath]);
-        $sha1 = explode(' ', $sha1->getOutput())[0];
+        $sha1 = explode(' ', $sha1->getProcess()->getOutput())[0];
         $this->logger->debug("Sha1: {$sha1}");
 
         try {

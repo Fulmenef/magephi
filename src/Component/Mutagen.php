@@ -5,7 +5,6 @@ namespace Magephi\Component;
 use Magephi\Entity\Environment;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\Exception\ProcessTimedOutException;
 
 class Mutagen
 {
@@ -22,10 +21,9 @@ class Mutagen
 
     /**
      * Create Mutagen session for the project.
-     *
-     * @return ProcessInterface
+     * @return Process
      */
-    public function createSession(): ProcessInterface
+    public function createSession(): Process
     {
         $command = [
             'mutagen',
@@ -47,10 +45,9 @@ class Mutagen
 
     /**
      * Try to resume the Mutagen session. Obviously, it must have been initialized first.
-     *
-     * @return ProcessInterface
+     * @return Process
      */
-    public function resumeSession(): ProcessInterface
+    public function resumeSession(): Process
     {
         return $this->processFactory->runProcess(
             [
@@ -63,7 +60,6 @@ class Mutagen
 
     /**
      * Check if the mutagen session for the project exists. Return true if it does.
-     *
      * @return bool
      */
     public function isExistingSession(): bool
@@ -76,12 +72,11 @@ class Mutagen
             ]
         );
 
-        return strpos($process->getOutput(), 'No sessions found') === false;
+        return strpos($process->getProcess()->getOutput(), 'No sessions found') === false;
     }
 
     /**
      * Check if the file synchronization is done.
-     *
      * @return bool
      */
     public function isSynced(): bool
@@ -94,12 +89,11 @@ class Mutagen
             ]
         );
 
-        return stripos($process->getOutput(), 'Watching for changes') !== false;
+        return stripos($process->getProcess()->getOutput(), 'Watching for changes') !== false;
     }
 
     /**
      * Check if the mutagen session is paused.
-     *
      * @return bool
      */
     public function isPaused(): bool
@@ -112,7 +106,7 @@ class Mutagen
             ]
         );
 
-        return stripos($process->getOutput(), '[Paused]') !== false;
+        return stripos($process->getProcess()->getOutput(), '[Paused]') !== false;
     }
 
     /**
@@ -124,40 +118,36 @@ class Mutagen
      */
     public function monitorUntilSynced(OutputInterface $output): bool
     {
-        try {
-            $process = $this->processFactory->createProcess(
-                [
-                    'mutagen',
-                    'monitor',
-                    "--label-selector=name=={$this->environment->getDockerRequiredVariables()['COMPOSE_PROJECT_NAME']}",
-                ],
-                300
-            );
-            $progressBar = new ProgressBar($output, 100);
-            $reStatus = '/Status: (.*)$/i';
-            $reProgress = '/Staging files on beta: (\d+)%/i';
-            $process->start();
-            $progressBar->start();
-            $process->waitUntil(
-                function (string $type, string $buffer) use ($reStatus, $reProgress, $progressBar) {
-                    preg_match($reStatus, $buffer, $statusMatch);
-                    if (isset($statusMatch[1])) {
-                        preg_match($reProgress, $statusMatch[1], $progressMatch);
-                        if (!empty($progressMatch)) {
-                            $progressBar->setProgress($progressMatch[1]);
-                        }
-
-                        return rtrim($statusMatch[1]) === 'Watching for changes';
+        $process = $this->processFactory->createProcess(
+            [
+                'mutagen',
+                'monitor',
+                "--label-selector=name=={$this->environment->getDockerRequiredVariables()['COMPOSE_PROJECT_NAME']}",
+            ],
+            300
+        );
+        $progressBar = new ProgressBar($output, 100);
+        $reStatus = '/Status: (.*)$/i';
+        $reProgress = '/Staging files on beta: (\d+)%/i';
+        $process->start();
+        $progressBar->start();
+        $process->getProcess()->waitUntil(
+            function (string $type, string $buffer) use ($reStatus, $reProgress, $progressBar) {
+                preg_match($reStatus, $buffer, $statusMatch);
+                if (isset($statusMatch[1])) {
+                    preg_match($reProgress, $statusMatch[1], $progressMatch);
+                    if (!empty($progressMatch)) {
+                        $progressBar->setProgress($progressMatch[1]);
                     }
 
-                    return false;
+                    return rtrim($statusMatch[1]) === 'Watching for changes';
                 }
-            );
-            $progressBar->finish();
 
-            return true;
-        } catch (ProcessTimedOutException $e) {
-            return false;
-        }
+                return false;
+            }
+        );
+        $progressBar->finish();
+
+        return $process->getExitCode() !== Process::CODE_TIMEOUT;
     }
 }

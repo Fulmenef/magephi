@@ -61,6 +61,6 @@ class DockerCompose
         $commands = explode(' ', $command);
         $process = $this->processFactory->runProcess($commands, 10, $this->environment->getDockerRequiredVariables(), true);
 
-        return $process->isSuccessful() && !empty($process->getOutput());
+        return $process->getProcess()->isSuccessful() && !empty($process->getProcess()->getOutput());
     }
 }

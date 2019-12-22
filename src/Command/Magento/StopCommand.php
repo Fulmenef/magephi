@@ -46,11 +46,11 @@ class StopCommand extends AbstractMagentoCommand
         );
         $this->interactive->newLine(2);
 
-        if (!$process->isSuccessful()) {
+        if (!$process->getProcess()->isSuccessful()) {
             $this->interactive->error(
                 [
                     "Environment couldn't be stopped: ",
-                    $process->getErrorOutput(),
+                    $process->getProcess()->getErrorOutput(),
                 ]
             );
 

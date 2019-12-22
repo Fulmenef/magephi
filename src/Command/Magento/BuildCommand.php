@@ -54,9 +54,9 @@ class BuildCommand extends AbstractMagentoCommand
         $this->interactive->newLine(2);
         $this->interactive->success('Containers have been built.');
 
-        if (!$process->isSuccessful()) {
+        if (!$process->getProcess()->isSuccessful()) {
             $this->interactive->newLine(2);
-            $this->interactive->error($process->getErrorOutput());
+            $this->interactive->error($process->getProcess()->getErrorOutput());
             $this->interactive->note(
                 [
                     "Ensure you're not using a deleted branch for package emakinafr/docker-magento2.",

@@ -7,6 +7,7 @@ use Exception;
 use Magephi\Command\AbstractCommand;
 use Magephi\Component\DockerCompose;
 use Magephi\Component\Mutagen;
+use Magephi\Component\Process;
 use Magephi\Component\ProcessFactory;
 use Magephi\Entity\Environment;
 use Magephi\Helper\Installation;
@@ -16,7 +17,6 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\Process\Exception\ProcessTimedOutException;
 
 /**
  * Command to install the Magento2 project. It'll check if the prerequisites are filled before installing dependencies
@@ -189,7 +189,7 @@ class InstallCommand extends AbstractMagentoCommand
      * @param ComposerReader $composer
      *
      * @throws RegexpException
-     *
+     * @throws Exception
      * @return string
      */
     protected function prepareEnvironment(ComposerReader $composer): string
@@ -280,9 +280,9 @@ class InstallCommand extends AbstractMagentoCommand
         $this->interactive->section('Building containers');
         $process = $this->installation->buildMake();
 
-        if (!$process->isSuccessful()) {
+        if (!$process->getProcess()->isSuccessful()) {
             $this->interactive->newLine(2);
-            $this->interactive->error($process->getErrorOutput());
+            $this->interactive->error($process->getProcess()->getErrorOutput());
             $this->interactive->note(
                 [
                     "Ensure you're not using a deleted branch for package emakinafr/docker-magento2.",
@@ -300,18 +300,17 @@ class InstallCommand extends AbstractMagentoCommand
     {
         $this->interactive->section('Starting environment');
 
-        try {
-            $process = $this->installation->startMake(true);
-            if (!$process->isSuccessful()) {
-                throw new Exception($process->getErrorOutput());
-            }
-        } catch (ProcessTimedOutException $e) {
-            $startProcess = $e->getProcess();
+        $process = $this->installation->startMake(true);
+        if (!$process->getProcess()->isSuccessful() && $process->getExitCode() !== Process::CODE_TIMEOUT) {
+            throw new Exception($process->getProcess()->getErrorOutput());
+        } elseif ($process->getExitCode() === Process::CODE_TIMEOUT) {
             $this->installation->startMutagen();
-            $progressBar = $startProcess->getProgressBar();
-            if ($progressBar instanceof ProgressBar) {
-                $progressBar->setMaxSteps($progressBar->getProgress());
-                $progressBar->finish();
+            if (isset($process)) {
+                $progressBar = $process->getProgressBar();
+                if ($progressBar instanceof ProgressBar) {
+                    $progressBar->setMaxSteps($progressBar->getProgress());
+                    $progressBar->finish();
+                }
             }
             $this->interactive->newLine();
             $this->interactive->text('Containers are up.');
@@ -423,7 +422,6 @@ class InstallCommand extends AbstractMagentoCommand
 
     /**
      * Import database from a file on the project. The file must be at the root or in a direct subdirectory.
-     *
      * TODO: Import database from Magento Cloud CLI if available
      */
     private function importDatabase(): bool

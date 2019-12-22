@@ -5,12 +5,12 @@ namespace Magephi\Command\Magento;
 use Magephi\Command\AbstractCommand;
 use Magephi\Component\DockerCompose;
 use Magephi\Component\Mutagen;
+use Magephi\Component\Process;
 use Magephi\Component\ProcessFactory;
 use Magephi\Helper\Installation;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\Exception\ProcessTimedOutException;
 
 /**
  * Command to start the environment. The install command must have been executed before.
@@ -58,20 +58,19 @@ class StartCommand extends AbstractMagentoCommand
         $this->interactive->section('Starting environment');
 
         try {
-            try {
-                $process = $this->installation->startMake();
-                if (!$process->isSuccessful()) {
-                    throw new \Exception($process->getErrorOutput());
-                }
-            } catch (ProcessTimedOutException $e) {
-                $startProcess = $e->getProcess();
+            $process = $this->installation->startMake();
+            if (!$process->getProcess()->isSuccessful() && $process->getExitCode() !== Process::CODE_TIMEOUT) {
+                throw new \Exception($process->getProcess()->getErrorOutput());
+            } elseif ($process->getExitCode() === Process::CODE_TIMEOUT) {
                 $this->installation->startMutagen();
-                $progressBar = $startProcess->getProgressBar();
-                if (!$progressBar instanceof ProgressBar) {
-                    throw new \Exception('The progress bar is not defined.');
+                if (isset($process)) {
+                    $progressBar = $process->getProgressBar();
+                    if (!$progressBar instanceof ProgressBar) {
+                        throw new \Exception('The progress bar is not defined.');
+                    }
+                    $progressBar->setMaxSteps($progressBar->getProgress());
+                    $progressBar->finish();
                 }
-                $progressBar->setMaxSteps($progressBar->getProgress());
-                $progressBar->finish();
                 $this->interactive->newLine();
                 $this->interactive->text('Containers are up.');
                 $this->interactive->section('File synchronization');

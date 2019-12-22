@@ -11,22 +11,18 @@ class ProcessFactory
      *
      * @param array      $command
      * @param null|float $timeout
-     * @param null|array $env     Environment variables
-     * @param bool       $shell   Specify if the process should execute the command in shell directly
+     * @param null|array $env   Environment variables
+     * @param bool       $shell Specify if the process should execute the command in shell directly
      *
-     * @return ProcessInterface
+     * @return Process
      */
     public function createProcess(
         array $command,
         ?float $timeout = 3600.00,
         ?array $env = null,
         bool $shell = false
-    ): ProcessInterface {
-        if ($shell) {
-            return new ShellProcess($command, $timeout, $env);
-        }
-
-        return new Process($command, $timeout, $env);
+    ): Process {
+        return new Process($command, $timeout, $env, $shell);
     }
 
     /**
@@ -34,17 +30,17 @@ class ProcessFactory
      *
      * @param array $command
      * @param float $timeout
-     * @param array $env     Environment variables
-     * @param bool  $shell   Should the process be executed as shell command directly
+     * @param array $env   Environment variables
+     * @param bool  $shell Should the process be executed as shell command directly
      *
-     * @return ProcessInterface
+     * @return Process
      */
     public function runProcess(
         array $command,
         float $timeout = 3600.00,
         array $env = [],
         bool $shell = false
-    ): ProcessInterface {
+    ): Process {
         if ($_ENV['SHELL_VERBOSITY'] >= 1) {
             return $this->runProcessWithOutput($command, $timeout, $env, $shell);
         }
@@ -61,12 +57,13 @@ class ProcessFactory
      *
      * @param array           $command
      * @param float           $timeout
-     * @param callable        $progressFunction Used to update the progress bar. Return true to advance by 1, return an int to advance the bar with the number of steps.
+     * @param callable        $progressFunction Used to update the progress bar. Return true to advance by 1, return an
+     *                                          int to advance the bar with the number of steps.
      * @param OutputInterface $output
      * @param null|int        $maxSteps
      * @param bool            $shell            Specify if the process should execute the command in shell directly
      *
-     * @return ProcessInterface
+     * @return Process
      */
     public function runProcessWithProgressBar(
         array $command,
@@ -75,7 +72,7 @@ class ProcessFactory
         OutputInterface $output,
         int $maxSteps = null,
         bool $shell = false
-    ): ProcessInterface {
+    ): Process {
         if ($output->isVerbose()) {
             return $this->runProcessWithOutput($command, $timeout, [], $shell);
         }
@@ -92,17 +89,17 @@ class ProcessFactory
      *
      * @param array      $command
      * @param null|float $timeout
-     * @param null|array $env     Environment variables
+     * @param null|array $env Environment variables
      * @param bool       $shell
      *
-     * @return ProcessInterface
+     * @return Process
      */
     public function runProcessWithOutput(
         array $command,
         ?float $timeout = null,
         array $env = null,
         bool $shell = false
-    ): ProcessInterface {
+    ): Process {
         return $this->runOutputProcess($command, $timeout, $env, $shell);
     }
 
@@ -111,13 +108,12 @@ class ProcessFactory
      *
      * @param array      $command
      * @param null|float $timeout
-     * @param null|array $env     Environment variables
+     * @param null|array $env Environment variables
      *
      * @return Process
      */
     public function runInteractiveProcess(array $command, ?float $timeout = null, array $env = null): Process
     {
-        /** @var Process $process */
         return $this->runOutputProcess($command, $timeout, $env, false, true);
     }
 
@@ -130,7 +126,7 @@ class ProcessFactory
      * @param bool       $shell
      * @param bool       $tty
      *
-     * @return ProcessInterface
+     * @return Process
      */
     private function runOutputProcess(
         array $command,
@@ -138,11 +134,11 @@ class ProcessFactory
         array $env = null,
         bool $shell = false,
         bool $tty = false
-    ): ProcessInterface {
+    ): Process {
         $process = $this->createProcess($command, $timeout, $env, $shell);
 
-        $process->setTty($tty ? Process::isTtySupported() : $tty);
-        $process->run(
+        $process->getProcess()->setTty($tty ? \Symfony\Component\Process\Process::isTtySupported() : $tty);
+        $process->getProcess()->run(
             static function (string $type, string $buffer) {
                 echo $buffer;
             }

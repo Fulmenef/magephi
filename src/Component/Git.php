@@ -27,7 +27,7 @@ class Git
         $command = ['git', 'tag', $version, $branch];
         $process = $this->processFactory->runProcess($command, 10, []);
 
-        return $process->isSuccessful();
+        return $process->getProcess()->isSuccessful();
     }
 
     /**
@@ -46,7 +46,7 @@ class Git
             true
         );
 
-        return $process->getOutput();
+        return $process->getProcess()->getOutput();
     }
 
     /**
@@ -63,8 +63,8 @@ class Git
         $command = ['git', 'checkout', $branch];
         $process = $this->processFactory->runProcess($command, 10, []);
 
-        if (!$process->isSuccessful()) {
-            throw new GitException("Unable to checkout on branch {$branch}. Cause:\n {$process->getErrorOutput()}");
+        if (!$process->getProcess()->isSuccessful()) {
+            throw new GitException("Unable to checkout on branch {$branch}. Cause:\n {$process->getProcess()->getErrorOutput()}");
         }
 
         return true;
@@ -82,7 +82,7 @@ class Git
         $command = ['git', 'add', $file];
         $process = $this->processFactory->runProcess($command, 10, []);
 
-        return $process->isSuccessful();
+        return $process->getProcess()->isSuccessful();
     }
 
     /**
@@ -109,8 +109,8 @@ class Git
         $command = ['git', 'pull'];
         $process = $this->processFactory->runProcess($command, 10);
 
-        if (!$process->isSuccessful()) {
-            throw new GitException("Unable to update branch. Cause:\n {$process->getErrorOutput()}");
+        if (!$process->getProcess()->isSuccessful()) {
+            throw new GitException("Unable to update branch. Cause:\n {$process->getProcess()->getErrorOutput()}");
         }
 
         return true;
@@ -131,8 +131,8 @@ class Git
         $command = ['git', 'push', $remote, $branch];
         $process = $this->processFactory->runProcess($command, 60);
 
-        if (!$process->isSuccessful()) {
-            throw new GitException("Unable to push branch {$branch} to {$remote}. Cause:\n {$process->getErrorOutput()}");
+        if (!$process->getProcess()->isSuccessful()) {
+            throw new GitException("Unable to push branch {$branch} to {$remote}. Cause:\n {$process->getProcess()->getErrorOutput()}");
         }
 
         return true;
@@ -150,6 +150,6 @@ class Git
         $command = ['git', 'commit', '-m', $message];
         $process = $this->processFactory->runProcess($command, 10, []);
 
-        return $process->isSuccessful();
+        return $process->getProcess()->isSuccessful();
     }
 }

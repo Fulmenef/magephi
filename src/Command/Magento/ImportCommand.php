@@ -85,9 +85,9 @@ class ImportCommand extends AbstractMagentoCommand
             return AbstractCommand::CODE_ERROR;
         }
 
-        if (!$process->isSuccessful()) {
-            $this->interactive->error($process->getOutput());
-            $this->interactive->error($process->getErrorOutput());
+        if (!$process->getProcess()->isSuccessful()) {
+            $this->interactive->error($process->getProcess()->getOutput());
+            $this->interactive->error($process->getProcess()->getErrorOutput());
 
             return AbstractCommand::CODE_ERROR;
         }
