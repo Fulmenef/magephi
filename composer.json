@@ -30,6 +30,7 @@
         "knplabs/github-api": "^2.12",
         "nyholm/psr7": "^1.2",
         "phpstan/phpstan": "^0.12",
+        "phpstan/phpstan-symfony": "^0.12.1",
         "roave/security-advisories": "dev-master",
         "sensiolabs/security-checker": "^6.0"
     },

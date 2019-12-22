@@ -1,3 +1,6 @@
+includes:
+  - vendor/phpstan/phpstan-symfony/extension.neon
+
 parameters:
   paths:
       - src
@@ -5,8 +8,6 @@ parameters:
   fileExtensions:
       - php
 
-  excludes_analyse:
-      - src/Component/Process.php # Require lot of re-work on those files
-      - src/Component/ShellProcess.php
-      - src/Component/ProcessInterface.php
-      - src/Component/ProcessFactory.php
+  ignoreErrors:
+      - '#Property [a-zA-Z0-9\\_]+::\$[a-zA-Z0-9\\_]+ type has no value type specified in iterable type Symfony\\Component\\Process\\Process#'
+      - '#Method [a-zA-Z0-9\\_]+::[a-zA-Z\\_]+\(\) return type has no value type specified in iterable type Symfony\\Component\\Process\\Process#'

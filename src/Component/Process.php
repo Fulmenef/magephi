@@ -25,23 +25,21 @@ class Process
     /** @var float */
     private $endTime;
 
-    /** @var int|null */
+    /** @var null|int */
     private $exitCode;
 
     /**
      * ShellProcess constructor.
      *
-     * @param string|string[] $command
-     * @param null|float      $timeout
-     * @param null|string[]   $env
-     * @param bool            $shell
+     * @param string[]      $command
+     * @param null|float    $timeout
+     * @param null|string[] $env
+     * @param bool          $shell
      */
     public function __construct($command, ?float $timeout, ?array $env = [], bool $shell = false)
     {
         if ($shell) {
-            if (\is_array($command)) {
-                $command = implode(' ', $command);
-            }
+            $command = implode(' ', $command);
             $this->process =
                 \Symfony\Component\Process\Process::fromShellCommandline($command, null, $env, null, $timeout);
         } else {
@@ -66,6 +64,7 @@ class Process
 
     /**
      * Return the progress bar if defined.
+     *
      * @return null|ProgressBar
      */
     public function getProgressBar(): ?ProgressBar
@@ -85,6 +84,7 @@ class Process
 
     /**
      * Return the callback used by the progress bar.
+     *
      * @return callable
      */
     public function getProgressCallback(): callable
@@ -95,6 +95,7 @@ class Process
     /**
      * Return the duration of the process. Start time is initialized in the start function
      * If endtime is not defined we define it now.
+     *
      * @return float
      */
     public function getDuration(): float
@@ -111,7 +112,7 @@ class Process
      * process.
      *
      * @param null|callable $callback
-     * @param array         $env
+     * @param string[]      $env
      */
     public function start(callable $callback = null, array $env = []): void
     {
@@ -125,6 +126,7 @@ class Process
                 $this->progressBar->start();
             }
             $progressFunction = $this->progressCallback;
+
             try {
                 $this->process->wait(
                     function ($type, $buffer) use ($progressFunction) {
@@ -150,7 +152,7 @@ class Process
     /**
      * Call the wait function on the process.
      *
-     * @param callable|null $callback Function used to determined until when the process must wait.
+     * @param null|callable $callback function used to determined until when the process must wait
      *
      * @return int Exit code
      */
@@ -168,7 +170,7 @@ class Process
     }
 
     /**
-     * @return int|null
+     * @return null|int
      */
     public function getExitCode()
     {

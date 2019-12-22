@@ -9,10 +9,10 @@ class ProcessFactory
     /**
      * Create an instance of Process with the given command and return it.
      *
-     * @param array      $command
-     * @param null|float $timeout
-     * @param null|array $env   Environment variables
-     * @param bool       $shell Specify if the process should execute the command in shell directly
+     * @param string[]      $command
+     * @param null|float    $timeout
+     * @param null|string[] $env     Environment variables
+     * @param bool          $shell   Specify if the process should execute the command in shell directly
      *
      * @return Process
      */
@@ -28,10 +28,10 @@ class ProcessFactory
     /**
      * Run a process directly without any customization.
      *
-     * @param array $command
-     * @param float $timeout
-     * @param array $env   Environment variables
-     * @param bool  $shell Should the process be executed as shell command directly
+     * @param string[] $command
+     * @param float    $timeout
+     * @param string[] $env     Environment variables
+     * @param bool     $shell   Should the process be executed as shell command directly
      *
      * @return Process
      */
@@ -55,7 +55,7 @@ class ProcessFactory
     /**
      * Create and start a process with an associated progress bar.
      *
-     * @param array           $command
+     * @param string[]        $command
      * @param float           $timeout
      * @param callable        $progressFunction Used to update the progress bar. Return true to advance by 1, return an
      *                                          int to advance the bar with the number of steps.
@@ -87,10 +87,10 @@ class ProcessFactory
     /**
      * Run a process with output.
      *
-     * @param array      $command
-     * @param null|float $timeout
-     * @param null|array $env Environment variables
-     * @param bool       $shell
+     * @param string[]      $command
+     * @param null|float    $timeout
+     * @param null|string[] $env     Environment variables
+     * @param bool          $shell
      *
      * @return Process
      */
@@ -106,9 +106,9 @@ class ProcessFactory
     /**
      * Run a process and provide an interactive interface.
      *
-     * @param array      $command
-     * @param null|float $timeout
-     * @param null|array $env Environment variables
+     * @param string[]      $command
+     * @param null|float    $timeout
+     * @param null|string[] $env     Environment variables
      *
      * @return Process
      */
@@ -120,11 +120,11 @@ class ProcessFactory
     /**
      * Run a command with its output.
      *
-     * @param array      $command
-     * @param null|float $timeout
-     * @param null|array $env
-     * @param bool       $shell
-     * @param bool       $tty
+     * @param string[]      $command
+     * @param null|float    $timeout
+     * @param null|string[] $env
+     * @param bool          $shell
+     * @param bool          $tty
      *
      * @return Process
      */

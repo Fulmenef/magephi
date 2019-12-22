@@ -21,6 +21,7 @@ class Mutagen
 
     /**
      * Create Mutagen session for the project.
+     *
      * @return Process
      */
     public function createSession(): Process
@@ -34,7 +35,7 @@ class Mutagen
             '--ignore-vcs',
             '--symlink-mode=posix-raw',
             "--label=name={$this->environment->getDockerRequiredVariables()['COMPOSE_PROJECT_NAME']}",
-            getcwd(),
+            getcwd() ?: '',
             $this->environment->getDockerRequiredVariables()['COMPOSE_PROJECT_NAME']
                 ? "docker://magento2_{$this->environment->__get('currentDir')}_synchro/var/www/html/"
                 : '',
@@ -45,6 +46,7 @@ class Mutagen
 
     /**
      * Try to resume the Mutagen session. Obviously, it must have been initialized first.
+     *
      * @return Process
      */
     public function resumeSession(): Process
@@ -60,6 +62,7 @@ class Mutagen
 
     /**
      * Check if the mutagen session for the project exists. Return true if it does.
+     *
      * @return bool
      */
     public function isExistingSession(): bool
@@ -77,6 +80,7 @@ class Mutagen
 
     /**
      * Check if the file synchronization is done.
+     *
      * @return bool
      */
     public function isSynced(): bool
@@ -94,6 +98,7 @@ class Mutagen
 
     /**
      * Check if the mutagen session is paused.
+     *
      * @return bool
      */
     public function isPaused(): bool

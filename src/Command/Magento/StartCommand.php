@@ -8,7 +8,6 @@ use Magephi\Component\Mutagen;
 use Magephi\Component\Process;
 use Magephi\Component\ProcessFactory;
 use Magephi\Helper\Installation;
-use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -61,16 +60,9 @@ class StartCommand extends AbstractMagentoCommand
             $process = $this->installation->startMake();
             if (!$process->getProcess()->isSuccessful() && $process->getExitCode() !== Process::CODE_TIMEOUT) {
                 throw new \Exception($process->getProcess()->getErrorOutput());
-            } elseif ($process->getExitCode() === Process::CODE_TIMEOUT) {
+            }
+            if ($process->getExitCode() === Process::CODE_TIMEOUT) {
                 $this->installation->startMutagen();
-                if (isset($process)) {
-                    $progressBar = $process->getProgressBar();
-                    if (!$progressBar instanceof ProgressBar) {
-                        throw new \Exception('The progress bar is not defined.');
-                    }
-                    $progressBar->setMaxSteps($progressBar->getProgress());
-                    $progressBar->finish();
-                }
                 $this->interactive->newLine();
                 $this->interactive->text('Containers are up.');
                 $this->interactive->section('File synchronization');

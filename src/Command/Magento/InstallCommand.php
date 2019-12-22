@@ -13,7 +13,6 @@ use Magephi\Entity\Environment;
 use Magephi\Helper\Installation;
 use Magephi\Kernel;
 use Nadar\PhpComposerReader\ComposerReader;
-use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -190,6 +189,7 @@ class InstallCommand extends AbstractMagentoCommand
      *
      * @throws RegexpException
      * @throws Exception
+     *
      * @return string
      */
     protected function prepareEnvironment(ComposerReader $composer): string
@@ -303,15 +303,9 @@ class InstallCommand extends AbstractMagentoCommand
         $process = $this->installation->startMake(true);
         if (!$process->getProcess()->isSuccessful() && $process->getExitCode() !== Process::CODE_TIMEOUT) {
             throw new Exception($process->getProcess()->getErrorOutput());
-        } elseif ($process->getExitCode() === Process::CODE_TIMEOUT) {
+        }
+        if ($process->getExitCode() === Process::CODE_TIMEOUT) {
             $this->installation->startMutagen();
-            if (isset($process)) {
-                $progressBar = $process->getProgressBar();
-                if ($progressBar instanceof ProgressBar) {
-                    $progressBar->setMaxSteps($progressBar->getProgress());
-                    $progressBar->finish();
-                }
-            }
             $this->interactive->newLine();
             $this->interactive->text('Containers are up.');
             $this->interactive->section('File synchronization');
@@ -422,7 +416,7 @@ class InstallCommand extends AbstractMagentoCommand
 
     /**
      * Import database from a file on the project. The file must be at the root or in a direct subdirectory.
-     * TODO: Import database from Magento Cloud CLI if available
+     * TODO: Import database from Magento Cloud CLI if available.
      */
     private function importDatabase(): bool
     {
