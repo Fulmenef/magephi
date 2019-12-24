@@ -111,7 +111,7 @@ class InstallCommand extends AbstractMagentoCommand
         } else {
             if (!$this->environment->hasMagentoEnv()) {
                 $this->interactive->warning(
-                    'The file app/etc/env.php is missing. Retrieve from another project or install Magento.'
+                    'The file app/etc/env.php is missing. Install Magento or retrieve it from another project.'
                 );
             }
             if (!$imported) {
