@@ -93,7 +93,7 @@ class Kernel extends BaseKernel
             return self::VERSION;
         }
 
-        return exec('git describe --tags') . '-dev';
+        return exec('git -C ' . \dirname(__DIR__) . ' describe --tags') . '-dev';
     }
 
     protected function configureContainer(ContainerBuilder $container, LoaderInterface $loader): void
