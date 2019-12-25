@@ -34,6 +34,10 @@ class CreateCommand extends AbstractMagentoCommand
     {
         parent::configure();
         $this
+            ->setDescription('Create a project for Magento 2 community or enterprise.')
+            ->setHelp(
+                'If the current directory is empty, the project will be installed inside. If not, a name will be asked and the project will be installed in a directory named after it.'
+            )
             ->addOption(
                 'enterprise',
                 null,
@@ -54,34 +58,12 @@ class CreateCommand extends AbstractMagentoCommand
             throw new DirectoryNotFoundException('Your current directory is not readable', AbstractCommand::CODE_ERROR);
         }
 
-        $projectName = basename($currentDir);
-        if (\count($scan) > 2) {
-            $question = new Question('Enter your project name');
-            $question->setValidator(
-                function ($answer) {
-                    if (empty($answer)) {
-                        throw new \RuntimeException(
-                            'The name cannot be empty'
-                        );
-                    }
+        try {
+            $this->initProjectDirectory($currentDir, $scan);
+        } catch (\ErrorException $e) {
+            $this->interactive->error($e->getMessage());
 
-                    return $answer;
-                }
-            );
-            $question->setMaxAttempts(2);
-
-            $projectName = $this->interactive->askQuestion($question);
-
-            try {
-                mkdir($currentDir . '/' . $projectName);
-                chdir($projectName);
-            } catch (\ErrorException $e) {
-                $this->interactive->error(
-                    'A directory with that name already exist, try again with another name or try somewhere else.'
-                );
-
-                return AbstractCommand::CODE_ERROR;
-            }
+            return AbstractCommand::CODE_ERROR;
         }
 
         $package = $input->getOption(
@@ -106,30 +88,28 @@ class CreateCommand extends AbstractMagentoCommand
         );
         $this->logger->info('Based project created');
 
-        $composer = new ComposerReader('composer.json');
-        if (!$composer->canRead()) {
-            $this->logger->error('The composer.json cannot be read.');
+        try {
+            $this->initComposerDev();
+        } catch (\ErrorException $e) {
+            $this->interactive->error($e->getMessage());
 
             return AbstractCommand::CODE_ERROR;
         }
 
-        $requireDev = [
-            'bitexpert/phpstan-magento'   => 'dev-master',
-            'emakinafr/docker-magento2'   => '^3.0',
-            'friendsofphp/php-cs-fixer'   => '3.0.x-dev',
-            'roave/security-advisories'   => 'dev-master',
-            'sensiolabs/security-checker' => '^5.0',
-        ];
-        $composer->updateSection('require-dev', $requireDev);
-        $composer->save();
+        $this->initGitignore();
 
-        $this->processFactory->runProcess(
-            ['composer', 'update', '--ignore-platform-reqs', '--optimize-autoloader'],
-            90
-        );
+        $this->initGitkeep();
 
-        $this->processFactory->runProcess(['composer', 'exec', 'docker-local-install']);
+        $this->interactive->success('Your project has been created, you can now use the install command.');
 
+        return AbstractCommand::CODE_SUCCESS;
+    }
+
+    /**
+     * Setup custom content for .gitignore.
+     */
+    protected function initGitignore(): void
+    {
         $gitignore = <<<'EOD'
 /app/*
 !/app/code/
@@ -188,14 +168,85 @@ class CreateCommand extends AbstractMagentoCommand
 EOD;
 
         file_put_contents('.gitignore', $gitignore);
+    }
 
+    /**
+     * Add .gitkeep file to usefule directories.
+     */
+    protected function initGitkeep(): void
+    {
         mkdir('app/code');
         fopen('app/code/.gitkeep', 'w');
         fopen('app/design/.gitkeep', 'w');
         fopen('app/etc/.gitkeep', 'w');
+    }
 
-        $this->interactive->success('Your project has been created, you can now use the install command.');
+    /**
+     * Check if the current directory is empty, if not, ask the name of the project to create the directory where the
+     * Magento 2 project will be installed.
+     *
+     * @param string   $currentDir
+     * @param string[] $scan
+     *
+     * @throws \ErrorException
+     */
+    protected function initProjectDirectory(string $currentDir, array $scan): void
+    {
+        if (\count($scan) > 2) {
+            $question = new Question('Enter your project name');
+            $question->setValidator(
+                function ($answer) {
+                    if (empty($answer)) {
+                        throw new \RuntimeException(
+                            'The name cannot be empty'
+                        );
+                    }
 
-        return AbstractCommand::CODE_SUCCESS;
+                    return $answer;
+                }
+            );
+            $question->setMaxAttempts(2);
+
+            $projectName = $this->interactive->askQuestion($question);
+
+            try {
+                mkdir($currentDir . '/' . $projectName);
+                chdir($projectName);
+            } catch (\ErrorException $e) {
+                throw new \ErrorException(
+                    'A directory with that name already exist, try again with another name or try somewhere else.'
+                );
+            }
+        }
+    }
+
+    /**
+     * Use specific dependencies for dev.
+     *
+     * @throws \ErrorException
+     */
+    protected function initComposerDev(): void
+    {
+        $composer = new ComposerReader('composer.json');
+        if (!$composer->canRead()) {
+            throw new \ErrorException('The composer.json cannot be read.');
+        }
+
+        $requireDev = [
+            'bitexpert/phpstan-magento'   => 'dev-master',
+            'emakinafr/docker-magento2'   => '^3.0',
+            'friendsofphp/php-cs-fixer'   => '3.0.x-dev',
+            'roave/security-advisories'   => 'dev-master',
+            'sensiolabs/security-checker' => '^5.0',
+        ];
+        $composer->updateSection('require-dev', $requireDev);
+        $composer->save();
+
+        $this->processFactory->runProcess(
+            ['composer', 'update', '--ignore-platform-reqs', '--optimize-autoloader'],
+            90
+        );
+
+        $this->processFactory->runProcess(['composer', 'exec', 'docker-local-install']);
     }
 }
