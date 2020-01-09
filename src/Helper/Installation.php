@@ -111,6 +111,51 @@ class Installation
     }
 
     /**
+     * @param string $database
+     *
+     * @throws \Exception
+     *
+     * @return Process
+     */
+    public function updateUrls(string $database)
+    {
+        if (!$this->dockerCompose->isContainerUp('mysql')) {
+            throw new \Exception('Mysql container is not up');
+        }
+
+        $nginx = $this->environment->__get('nginxConf');
+        if (!\is_string($nginx)) {
+            throw new \Exception(
+                'nginx.conf does not exist. Ensure emakinafr/docker-magento2 is present in dependencies.'
+            );
+        }
+        $content = file_get_contents($nginx);
+        if (!\is_string($content)) {
+            throw new \Exception(
+                "Something went wrong while reading {$nginx}, ensure the file is present."
+            );
+        }
+        preg_match_all('/server_name (\S*);/m', $content, $matches, PREG_SET_ORDER, 0);
+        $serverName = $matches[0][1];
+
+        return $this->processFactory->runProcess(
+            [
+                'mysql',
+                '-h',
+                '127.0.0.1',
+                '-u',
+                'root',
+                $database,
+                '-e',
+                '"UPDATE core_config_data SET value=\"https://ww.' . $serverName . '/\" WHERE path LIKE \"web%base_url\""',
+            ],
+            30,
+            [],
+            true
+        );
+    }
+
+    /**
      * Run the `make start` command with a progress bar.
      *
      * @param bool $install

@@ -92,8 +92,28 @@ class ImportCommand extends AbstractMagentoCommand
             return AbstractCommand::CODE_ERROR;
         }
         $this->interactive->success(
-            "The dump has been imported in {$database} in {$process->getDuration()} seconds"
+            "The dump has been imported in {$database} in {$process->getDuration()} seconds."
         );
+
+        if ($this->interactive->confirm('Do you want to update the urls ?', true)) {
+            try {
+                $process = $this->installation->updateUrls($database);
+            } catch (\Exception $e) {
+                $this->interactive->error($e->getMessage());
+
+                return AbstractCommand::CODE_ERROR;
+            }
+
+            if (!$process->getProcess()->isSuccessful()) {
+                $this->interactive->error($process->getProcess()->getOutput());
+                $this->interactive->error($process->getProcess()->getErrorOutput());
+
+                return AbstractCommand::CODE_ERROR;
+            }
+            $this->interactive->success(
+                'The urls has been updated.'
+            );
+        }
 
         return AbstractCommand::CODE_SUCCESS;
     }
