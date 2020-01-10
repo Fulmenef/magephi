@@ -91,7 +91,9 @@ class InstallCommand extends AbstractMagentoCommand
 
             $this->startContainers();
 
-            $imported = $this->importDatabase();
+            if ($imported = $this->importDatabase()) {
+                $this->updateDatabase();
+            }
         } catch (Exception $e) {
             if ($e->getMessage() !== '') {
                 $this->interactive->error($e->getMessage());
@@ -457,6 +459,35 @@ class InstallCommand extends AbstractMagentoCommand
         $this->interactive->text(
             'If you want to import a database later, you can use the <fg=yellow>import</> command.'
         );
+
+        return false;
+    }
+
+    /**
+     * Update database url with chosen server name.
+     *
+     * @return bool
+     */
+    private function updateDatabase(): bool
+    {
+        if ($this->interactive->confirm('Do you want to update the urls ?', true)) {
+            try {
+                $process = $this->installation->updateUrls($this->environment->getDefaultDatabase());
+            } catch (\Exception $e) {
+                $this->interactive->error($e->getMessage());
+
+                return false;
+            }
+
+            if (!$process->getProcess()->isSuccessful()) {
+                $this->interactive->error($process->getProcess()->getOutput());
+                $this->interactive->error($process->getProcess()->getErrorOutput());
+
+                return false;
+            }
+
+            return true;
+        }
 
         return false;
     }
