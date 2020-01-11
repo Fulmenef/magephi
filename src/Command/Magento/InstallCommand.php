@@ -129,6 +129,8 @@ class InstallCommand extends AbstractMagentoCommand
 
     /**
      * Ensure environment is ready.
+     *
+     * @throws \Exception
      */
     protected function checkPrerequisites(): void
     {
@@ -251,9 +253,11 @@ class InstallCommand extends AbstractMagentoCommand
         }
 
         preg_match_all('/FROM .* as (\w*)/m', $file, $images);
-        unset($images[1][0]);
+        $images = $images[1];
+        array_unshift($images, 'phoney');
+        unset($images[0]);
 
-        $image = $this->interactive->choice('Select the image you want to use:', $images[1]);
+        $image = $this->interactive->choice('Select the image you want to use:', $images);
         $replacement = preg_replace('/(DOCKER_PHP_IMAGE=)(\w+)/i', "$1{$image}", $this->envContent);
         if ($replacement === null) {
             throw new RegexpException('Error while configuring Docker PHP Image.');
@@ -262,14 +266,17 @@ class InstallCommand extends AbstractMagentoCommand
         $this->environment->__set('phpImage', $image);
 
         $imageType = explode('_', $image);
-        $imageType = array_pop($imageType);
-        if (!\is_string($imageType)) {
-            throw new Exception('Image type is undefined.');
+        if (\count($imageType) > 2) {
+            $imageType = array_pop($imageType);
+            if (!\is_string($imageType)) {
+                throw new Exception('Image type is undefined.');
+            }
+
+            if ($this->interactive->confirm("Do you want to configure <fg=yellow>{$imageType}</> ?")) {
+                $this->configureEnv($imageType);
+            }
         }
 
-        if ($this->interactive->confirm("Do you want to configure <fg=yellow>{$imageType}</> ?")) {
-            $this->configureEnv($imageType);
-        }
         if ($this->interactive->confirm('Do you want to configure <fg=yellow>MySQL</> ?')) {
             $this->configureEnv('mysql');
         }
@@ -277,6 +284,9 @@ class InstallCommand extends AbstractMagentoCommand
         file_put_contents(self::DOCKER_LOCAL_ENV, $this->envContent);
     }
 
+    /**
+     * @throws Exception
+     */
     protected function buildContainers(): void
     {
         $this->interactive->section('Building containers');
@@ -284,14 +294,14 @@ class InstallCommand extends AbstractMagentoCommand
 
         if (!$process->getProcess()->isSuccessful()) {
             $this->interactive->newLine(2);
-            $this->interactive->error($process->getProcess()->getErrorOutput());
             $this->interactive->note(
                 [
                     "Ensure you're not using a deleted branch for package emakinafr/docker-magento2.",
                     'This issue may came from a missing package in the PHP dockerfile after a version upgrade.',
                 ]
             );
-            exit(AbstractCommand::CODE_ERROR);
+
+            throw new Exception($process->getProcess()->getErrorOutput());
         }
     }
 
