@@ -193,7 +193,7 @@ EOD;
     protected function initProjectDirectory(string $currentDir, array $scan): void
     {
         if (\count($scan) > 2) {
-            $question = new Question('Enter your project name');
+            $question = new Question('Enter your project name', 'magento2');
             $question->setValidator(
                 function ($answer) {
                     if (empty($answer)) {
