@@ -6,10 +6,12 @@ use Exception;
 use Github\Api\Repo;
 use Github\Api\Repository\Releases;
 use Github\Client;
+use Github\Exception\ErrorException;
 use Github\Exception\MissingArgumentException;
 use Github\Exception\RuntimeException;
 use Magephi\Component\Git;
 use Magephi\Component\ProcessFactory;
+use Magephi\Exception\ComposerException;
 use Magephi\Exception\GitException;
 use Nadar\PhpComposerReader\ComposerReader;
 use Psr\Log\LoggerInterface;
@@ -32,10 +34,10 @@ use Symfony\Component\Process\Exception\ProcessTimedOutException;
  */
 class ReleaseCommand extends Command
 {
-    const USER_NAME = 'fulmenef';
-    const REPO_NAME = 'magephi';
-    const DOC_BRANCH = 'gh-pages';
-    const MANIFEST = 'manifest.json';
+    public const USER_NAME = 'fulmenef';
+    public const REPO_NAME = 'magephi';
+    public const DOC_BRANCH = 'gh-pages';
+    public const MANIFEST = 'manifest.json';
 
     /** @var KernelInterface */
     private $kernel;
@@ -130,8 +132,6 @@ class ReleaseCommand extends Command
      * @param InputInterface  $input
      * @param OutputInterface $output
      *
-     * @throws Exception
-     *
      * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -166,7 +166,7 @@ class ReleaseCommand extends Command
             }
 
             $this->git->commitRelease($version);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->interactive->error($e->getMessage());
 
             return AbstractCommand::CODE_ERROR;
@@ -221,14 +221,20 @@ class ReleaseCommand extends Command
         $this->git->commitRelease($version);
         $this->logger->debug('Info added to manifest.json');
 
-        $this->git->checkout();
+        try {
+            $this->git->checkout();
+        } catch (GitException $e) {
+            $this->interactive->error($e->getMessage());
+
+            return AbstractCommand::CODE_ERROR;
+        }
         if ($this->gitPush()) {
-            return 1;
+            return AbstractCommand::CODE_ERROR;
         }
         $this->logger->debug('Master pushed.');
 
         if ($this->gitPush(self::DOC_BRANCH)) {
-            return 1;
+            return AbstractCommand::CODE_ERROR;
         }
         $this->logger->debug('Doc pushed.');
 
@@ -268,7 +274,7 @@ class ReleaseCommand extends Command
                 $content
             );
             $this->logger->debug('Asset created.');
-        } catch (RuntimeException | MissingArgumentException $e) {
+        } catch (RuntimeException | MissingArgumentException | ErrorException $e) {
             $this->interactive->error($e->getMessage());
 
             return AbstractCommand::CODE_ERROR;
@@ -285,15 +291,13 @@ class ReleaseCommand extends Command
      * Run a regex against the given version to ensure the format is correct.
      *
      * @param string $tag
-     *
-     * @throws Exception
      */
     private function validateVersion(string $tag): void
     {
         $re = '/(\d+\.\d+\.\d+)/m';
         preg_match($re, $tag, $match);
         if (empty($match) || $match[0] !== $tag) {
-            throw new Exception("Version {$tag} is not correct, format is MAJOR.MINOR.PATCH. eg: 1.2.3");
+            throw new ComposerException("Version {$tag} is not correct, format is MAJOR.MINOR.PATCH. eg: 1.2.3");
         }
     }
 
@@ -327,15 +331,13 @@ class ReleaseCommand extends Command
      *
      * @param string $version
      * @param string $file
-     *
-     * @throws Exception
      */
     private function updateJsonFile(string $version, string $file): void
     {
         /** @var ComposerReader $json */
         $json = new ComposerReader($file);
         if (!$json->canRead()) {
-            throw new Exception('Unable to read json.');
+            throw new ComposerException('Unable to read json.');
         }
         $json->updateSection('version', $version);
         $json->save();
@@ -353,11 +355,11 @@ class ReleaseCommand extends Command
         } catch (GitException $e) {
             $this->interactive->error($e->getMessage());
 
-            return 1;
+            return AbstractCommand::CODE_ERROR;
         } catch (ProcessTimedOutException $e) {
             $this->interactive->note($e->getMessage());
         }
 
-        return 0;
+        return AbstractCommand::CODE_SUCCESS;
     }
 }

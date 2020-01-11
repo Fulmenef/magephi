@@ -2,6 +2,8 @@
 
 namespace Magephi\Command\Magento;
 
+use Exception;
+use InvalidArgumentException;
 use Magephi\Command\AbstractCommand;
 use Magephi\Component\DockerCompose;
 use Magephi\Component\ProcessFactory;
@@ -72,14 +74,14 @@ class ImportCommand extends AbstractMagentoCommand
         }
 
         if ($database === '') {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 "The database is not defined. Ensure a database is defined in {$environment->__get('localEnv')} or provide one in the command."
             );
         }
 
         try {
             $process = $this->installation->databaseImport($database, $file);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->interactive->error($e->getMessage());
 
             return AbstractCommand::CODE_ERROR;
@@ -98,7 +100,7 @@ class ImportCommand extends AbstractMagentoCommand
         if ($this->interactive->confirm('Do you want to update the urls ?', true)) {
             try {
                 $process = $this->installation->updateUrls($database);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $this->interactive->error($e->getMessage());
 
                 return AbstractCommand::CODE_ERROR;

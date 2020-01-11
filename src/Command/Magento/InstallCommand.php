@@ -2,7 +2,6 @@
 
 namespace Magephi\Command\Magento;
 
-use _HumbugBoxb49a3c9618cf\Nette\Utils\RegexpException;
 use Exception;
 use Magephi\Command\AbstractCommand;
 use Magephi\Component\DockerCompose;
@@ -10,6 +9,9 @@ use Magephi\Component\Mutagen;
 use Magephi\Component\Process;
 use Magephi\Component\ProcessFactory;
 use Magephi\Entity\Environment;
+use Magephi\Exception\ComposerException;
+use Magephi\Exception\EnvironmentException;
+use Magephi\Exception\ProcessException;
 use Magephi\Helper\Installation;
 use Magephi\Kernel;
 use Nadar\PhpComposerReader\ComposerReader;
@@ -23,7 +25,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
  */
 class InstallCommand extends AbstractMagentoCommand
 {
-    const DOCKER_LOCAL_ENV = 'docker/local/.env';
+    public const DOCKER_LOCAL_ENV = 'docker/local/.env';
 
     protected $command = 'install';
 
@@ -129,8 +131,6 @@ class InstallCommand extends AbstractMagentoCommand
 
     /**
      * Ensure environment is ready.
-     *
-     * @throws \Exception
      */
     protected function checkPrerequisites(): void
     {
@@ -173,7 +173,7 @@ class InstallCommand extends AbstractMagentoCommand
     }
 
     /**
-     * @throws Exception
+     * @return ComposerReader
      */
     protected function installDependencies(): ComposerReader
     {
@@ -181,7 +181,7 @@ class InstallCommand extends AbstractMagentoCommand
         /** @var ComposerReader $composer */
         $composer = new ComposerReader('composer.json');
         if (!$composer->canRead()) {
-            throw new Exception('Unable to read json.');
+            throw new ComposerException('Unable to read json.');
         }
         $composer->runCommand('install --ignore-platform-reqs -o');
 
@@ -190,9 +190,6 @@ class InstallCommand extends AbstractMagentoCommand
 
     /**
      * @param ComposerReader $composer
-     *
-     * @throws RegexpException
-     * @throws Exception
      *
      * @return string
      */
@@ -222,14 +219,13 @@ class InstallCommand extends AbstractMagentoCommand
     }
 
     /**
-     * @throws RegexpException
-     * @throws Exception
+     * @throws EnvironmentException
      */
     protected function prepareDockerEnv(): void
     {
         $distEnv = $this->environment->__get('distEnv');
         if (!\is_string($distEnv)) {
-            throw new Exception(
+            throw new EnvironmentException(
                 'env.dist does not exist. Ensure emakinafr/docker-magento2 is present in dependencies.'
             );
         }
@@ -243,7 +239,7 @@ class InstallCommand extends AbstractMagentoCommand
 
         $dockerfile = $this->environment->__get('phpDockerfile');
         if (!\is_string($dockerfile)) {
-            throw new Exception(
+            throw new EnvironmentException(
                 'PHP Dockerfile does not exist. Ensure emakinafr/docker-magento2 is present in dependencies.'
             );
         }
@@ -260,7 +256,7 @@ class InstallCommand extends AbstractMagentoCommand
         $image = $this->interactive->choice('Select the image you want to use:', $images);
         $replacement = preg_replace('/(DOCKER_PHP_IMAGE=)(\w+)/i', "$1{$image}", $this->envContent);
         if ($replacement === null) {
-            throw new RegexpException('Error while configuring Docker PHP Image.');
+            throw new EnvironmentException('Error while configuring Docker PHP Image.');
         }
         $this->envContent = $replacement;
         $this->environment->__set('phpImage', $image);
@@ -269,7 +265,7 @@ class InstallCommand extends AbstractMagentoCommand
         if (\count($imageType) > 2) {
             $imageType = array_pop($imageType);
             if (!\is_string($imageType)) {
-                throw new Exception('Image type is undefined.');
+                throw new EnvironmentException('Image type is undefined.');
             }
 
             if ($this->interactive->confirm("Do you want to configure <fg=yellow>{$imageType}</> ?")) {
@@ -284,9 +280,6 @@ class InstallCommand extends AbstractMagentoCommand
         file_put_contents(self::DOCKER_LOCAL_ENV, $this->envContent);
     }
 
-    /**
-     * @throws Exception
-     */
     protected function buildContainers(): void
     {
         $this->interactive->section('Building containers');
@@ -301,12 +294,12 @@ class InstallCommand extends AbstractMagentoCommand
                 ]
             );
 
-            throw new Exception($process->getProcess()->getErrorOutput());
+            throw new ProcessException($process->getProcess()->getErrorOutput());
         }
     }
 
     /**
-     * @throws Exception
+     * @throws ProcessException
      */
     protected function startContainers(): void
     {
@@ -314,7 +307,7 @@ class InstallCommand extends AbstractMagentoCommand
 
         $process = $this->installation->startMake(true);
         if (!$process->getProcess()->isSuccessful() && $process->getExitCode() !== Process::CODE_TIMEOUT) {
-            throw new Exception($process->getProcess()->getErrorOutput());
+            throw new ProcessException($process->getProcess()->getErrorOutput());
         }
         if ($process->getExitCode() === Process::CODE_TIMEOUT) {
             $this->installation->startMutagen();
@@ -323,7 +316,7 @@ class InstallCommand extends AbstractMagentoCommand
             $this->interactive->section('File synchronization');
             $synced = $this->mutagen->monitorUntilSynced($this->output);
             if (!$synced) {
-                throw new Exception(
+                throw new ProcessException(
                     'Something happened during the sync, check the situation with <fg=yellow>mutagen monitor</>.'
                 );
             }
@@ -334,8 +327,6 @@ class InstallCommand extends AbstractMagentoCommand
      * Configure environment variables in the .env file for a specific type.
      *
      * @param string $type Section to configure
-     *
-     * @throws Exception
      */
     private function configureEnv(string $type): void
     {
@@ -351,7 +342,7 @@ class InstallCommand extends AbstractMagentoCommand
                     $pattern = "/({$match[1]}=)(\\w*)/i";
                     $content = preg_replace($pattern, "$1{$conf}", $this->envContent);
                     if (!\is_string($content)) {
-                        throw new Exception('Error while configuring environment.');
+                        throw new EnvironmentException('Error while configuring environment.');
                     }
 
                     $this->envContent = $content;
@@ -364,6 +355,9 @@ class InstallCommand extends AbstractMagentoCommand
         }
     }
 
+    /**
+     * @param string $serverName
+     */
     private function setupHost(string $serverName): void
     {
         $hosts = file_get_contents('/etc/hosts');
@@ -386,19 +380,19 @@ class InstallCommand extends AbstractMagentoCommand
     }
 
     /**
-     * @throws Exception
+     * @return string
      */
     private function chooseServerName(): string
     {
         $nginx = $this->environment->__get('nginxConf');
         if (!\is_string($nginx)) {
-            throw new Exception(
+            throw new EnvironmentException(
                 'nginx.conf does not exist. Ensure emakinafr/docker-magento2 is present in dependencies.'
             );
         }
         $content = file_get_contents($nginx);
         if (!\is_string($content)) {
-            throw new Exception(
+            throw new EnvironmentException(
                 "Something went wrong while reading {$nginx}, ensure the file is present."
             );
         }
@@ -416,7 +410,7 @@ class InstallCommand extends AbstractMagentoCommand
             $pattern = '/(server_name )(\\S+)/i';
             $content = preg_replace($pattern, "$1{$serverName};", $this->nginxContent);
             if (!\is_string($content)) {
-                throw new Exception('Error while preparing the nginx conf.');
+                throw new EnvironmentException('Error while preparing the nginx conf.');
             }
 
             $this->nginxContent = $content;
@@ -456,7 +450,7 @@ class InstallCommand extends AbstractMagentoCommand
                             $this->installation->databaseImport($this->environment->getDefaultDatabase(), $file);
 
                             return true;
-                        } catch (\Exception $e) {
+                        } catch (Exception $e) {
                             $this->interactive->error($e->getMessage());
                         }
                     }
@@ -483,7 +477,7 @@ class InstallCommand extends AbstractMagentoCommand
         if ($this->interactive->confirm('Do you want to update the urls ?', true)) {
             try {
                 $process = $this->installation->updateUrls($this->environment->getDefaultDatabase());
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $this->interactive->error($e->getMessage());
 
                 return false;

@@ -7,6 +7,7 @@ use Magephi\Component\Mutagen;
 use Magephi\Component\Process;
 use Magephi\Component\ProcessFactory;
 use Magephi\Entity\Environment;
+use Magephi\Exception\ProcessException;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Installation
@@ -204,13 +205,11 @@ class Installation
 
     /**
      * Start or resume the mutagen session.
-     *
-     * @throws \Exception
      */
     public function startMutagen(): bool
     {
         if (!$this->dockerCompose->isContainerUp('synchro')) {
-            throw new \Exception('Synchro container is not started');
+            throw new ProcessException('Synchro container is not started');
         }
         if ($this->mutagen->isExistingSession()) {
             if ($this->mutagen->isPaused()) {
@@ -219,7 +218,7 @@ class Installation
         } else {
             $process = $this->mutagen->createSession();
             if (!$process->getProcess()->isSuccessful()) {
-                throw new \Exception('Mutagen session could not be created');
+                throw new ProcessException('Mutagen session could not be created');
             }
         }
 

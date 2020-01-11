@@ -10,6 +10,7 @@ use Herrera\Version\Version;
 use Magephi\Application;
 use Magephi\Component\DockerCompose;
 use Magephi\Component\ProcessFactory;
+use Magephi\Exception\EnvironmentException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -17,9 +18,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 abstract class AbstractCommand extends Command
 {
-    const CODE_SUCCESS = 0;
-    const CODE_ERROR = 1;
-    const MANIFEST_FILE = 'https://fulmenef.github.io/magephi/manifest.json';
+    public const CODE_SUCCESS = 0;
+    public const CODE_ERROR = 1;
+    public const MANIFEST_FILE = 'https://fulmenef.github.io/magephi/manifest.json';
 
     /** @var SymfonyStyle */
     protected $interactive;
@@ -81,7 +82,7 @@ abstract class AbstractCommand extends Command
      * @param callable $condition the condition to check
      * @param bool     $exit      whether to exit on failure
      *
-     * @throws \Exception
+     * @throws EnvironmentException
      */
     protected function check($success, $failure, $condition, $exit = true): void
     {
@@ -90,7 +91,7 @@ abstract class AbstractCommand extends Command
         } elseif (!$exit) {
             $this->interactive->writeln("<fg=yellow>  [!] {$failure}</>");
         } else {
-            throw new \Exception($failure);
+            throw new EnvironmentException($failure);
         }
     }
 

@@ -2,6 +2,7 @@
 
 namespace Magephi\Command\Magento;
 
+use Exception;
 use Magephi\Command\AbstractCommand;
 use Magephi\Component\DockerCompose;
 use Magephi\Component\Mutagen;
@@ -59,7 +60,7 @@ class StartCommand extends AbstractMagentoCommand
         try {
             $process = $this->installation->startMake();
             if (!$process->getProcess()->isSuccessful() && $process->getExitCode() !== Process::CODE_TIMEOUT) {
-                throw new \Exception($process->getProcess()->getErrorOutput());
+                throw new Exception($process->getProcess()->getErrorOutput());
             }
             if ($process->getExitCode() === Process::CODE_TIMEOUT) {
                 $this->installation->startMutagen();
@@ -68,7 +69,7 @@ class StartCommand extends AbstractMagentoCommand
                 $this->interactive->section('File synchronization');
                 $synced = $this->mutagen->monitorUntilSynced($output);
                 if (!$synced) {
-                    throw new \Exception(
+                    throw new Exception(
                         'Something happened during the sync, check the situation with <fg=yellow>mutagen monitor</>.'
                     );
                 }
@@ -78,7 +79,7 @@ class StartCommand extends AbstractMagentoCommand
             $this->interactive->success('Environment started.');
 
             return AbstractCommand::CODE_SUCCESS;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->interactive->error(
                 [
                     "Environment couldn't been started:",
