@@ -1,6 +1,6 @@
 <?php
 
-namespace Magephi\Command\Magento;
+namespace Magephi\Command\Environment;
 
 use Exception;
 use Magephi\Command\AbstractCommand;
@@ -15,7 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Command to start the environment. The install command must have been executed before.
  */
-class StartCommand extends AbstractMagentoCommand
+class StartCommand extends AbstractEnvironmentCommand
 {
     protected $command = 'start';
 

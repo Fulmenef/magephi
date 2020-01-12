@@ -1,6 +1,6 @@
 <?php
 
-namespace Magephi\Command\Magento;
+namespace Magephi\Command\Environment;
 
 use Exception;
 use InvalidArgumentException;
@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Command to import a database dump. The MySQL container must be started.
  */
-class ImportCommand extends AbstractMagentoCommand
+class ImportCommand extends AbstractEnvironmentCommand
 {
     protected $command = 'import';
 
@@ -70,7 +70,7 @@ class ImportCommand extends AbstractMagentoCommand
 
         $database = $this->convertToString($input->getArgument('database'));
         if (empty($database)) {
-            $database = $environment->getDefaultDatabase();
+            $database = $environment->getDatabase();
         }
 
         if ($database === '') {

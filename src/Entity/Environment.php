@@ -2,6 +2,7 @@
 
 namespace Magephi\Entity;
 
+use Magephi\Exception\EnvironmentException;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -10,26 +11,40 @@ class Environment
 {
     /** @var string */
     private $dockerComposeFile;
+
     /** @var null|string */
     private $dockerComposeContent;
+
     /** @var null|int */
     private $containers;
+
     /** @var null|int */
     private $volumes;
+
     /** @var string */
     private $phpDockerfile;
+
     /** @var string */
     private $phpImage;
+
     /** @var string */
     private $localEnv;
+
+    /** @var string */
+    private $localEnvContent;
+
     /** @var string */
     private $distEnv;
+
     /** @var string */
     private $nginxConf;
+
     /** @var string */
     private $currentDir;
+
     /** @var string */
     private $magentoApp;
+
     /** @var string */
     private $magentoEnv;
 
@@ -95,6 +110,9 @@ class Environment
             }
 
             preg_match('/DOCKER_PHP_IMAGE=(\w+)/i', $localEnv, $match);
+            if (empty($match)) {
+                throw new EnvironmentException('PHP image is undefined, ensure .env is correctly filled');
+            }
             $this->phpImage = $match[1];
         }
     }
@@ -144,23 +162,37 @@ class Environment
     }
 
     /**
+     * Get parameter in the .env file.
+     *
+     * @param string $name Parameter name to get
+     *
+     * @return string
+     */
+    public function getEnvData(string $name): string
+    {
+        if (!\is_string($this->localEnvContent)) {
+            if ($this->localEnv) {
+                $content = file_get_contents($this->localEnv);
+                if (!\is_string($content)) {
+                    throw new FileNotFoundException($this->localEnv . ' empty.');
+                }
+                $this->localEnvContent = $content;
+            }
+        }
+
+        $name = strtoupper($name);
+        preg_match("/{$name}=(\\w+)/", $this->localEnvContent, $match);
+
+        return isset($match[1]) ? $match[1] : '';
+    }
+
+    /**
      * Retrieve default database defined in the local .env file.
      * Return an empty string if database not found or undefined.
      */
-    public function getDefaultDatabase(): string
+    public function getDatabase(): string
     {
-        if ($this->localEnv) {
-            $content = file_get_contents($this->localEnv);
-            if (!\is_string($content)) {
-                throw new FileNotFoundException($this->localEnv . ' not found.');
-            }
-
-            preg_match('/MYSQL_DATABASE=(\w+)/', $content, $match);
-
-            return isset($match[1]) ? $match[1] : '';
-        }
-
-        return '';
+        return $this->getEnvData('mysql_database');
     }
 
     /**
@@ -227,5 +259,35 @@ class Environment
     public function hasMagentoEnv(): bool
     {
         return null !== $this->magentoEnv;
+    }
+
+    /**
+     * Get configured server name.
+     *
+     * @param bool $complete Whether or not we want the prefix with the protocol
+     *
+     * @return string
+     */
+    public function getServerName($complete = false): string
+    {
+        if (!\is_string($this->nginxConf)) {
+            throw new EnvironmentException(
+                'nginx.conf does not exist. Ensure emakinafr/docker-magento2 is present in dependencies.'
+            );
+        }
+        $content = file_get_contents($this->nginxConf);
+        if (!\is_string($content)) {
+            throw new EnvironmentException(
+                "Something went wrong while reading {$this->nginxConf}, ensure the file is present."
+            );
+        }
+        preg_match_all('/server_name (\S*);/m', $content, $matches, PREG_SET_ORDER, 0);
+
+        $prefix = '';
+        if ($complete) {
+            $prefix = 'https://www.';
+        }
+
+        return $prefix . $matches[0][1];
     }
 }

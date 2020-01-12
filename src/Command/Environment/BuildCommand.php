@@ -1,6 +1,6 @@
 <?php
 
-namespace Magephi\Command\Magento;
+namespace Magephi\Command\Environment;
 
 use Magephi\Command\AbstractCommand;
 use Magephi\Component\DockerCompose;
@@ -12,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Command to build containers for the environment.
  */
-class BuildCommand extends AbstractMagentoCommand
+class BuildCommand extends AbstractEnvironmentCommand
 {
     protected $command = 'build';
 

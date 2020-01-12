@@ -3,7 +3,8 @@
 namespace Magephi\Component;
 
 use Magephi\Entity\Environment;
-use Symfony\Component\Process\Process;
+use Magephi\Exception\EnvironmentException;
+use Magephi\Exception\ProcessException;
 
 class DockerCompose
 {
@@ -30,12 +31,18 @@ class DockerCompose
      * @param string $container Container name
      * @param string $arguments
      *
-     * @throws \Exception
+     * @throws EnvironmentException
+     * @throws ProcessException
      */
     public function openTerminal(string $container, string $arguments): void
     {
-        if (!Process::isTtySupported()) {
-            throw new \Exception("TTY is not supported, ensure you're running the application from the command line.");
+        if (!$this->isContainerUp($container)) {
+            throw new EnvironmentException(sprintf('The container %s is not started.', $container));
+        }
+        if (!\Symfony\Component\Process\Process::isTtySupported()) {
+            throw new ProcessException(
+                "TTY is not supported, ensure you're running the application from the command line."
+            );
         }
         $commands = ['docker-compose', 'exec'];
         if ($arguments !== '') {
@@ -59,8 +66,60 @@ class DockerCompose
     {
         $command = "docker ps -q --no-trunc | grep $(docker-compose ps -q {$container})";
         $commands = explode(' ', $command);
-        $process = $this->processFactory->runProcess($commands, 10, $this->environment->getDockerRequiredVariables(), true);
+        $process =
+            $this->processFactory->runProcess($commands, 10, $this->environment->getDockerRequiredVariables(), true);
 
         return $process->getProcess()->isSuccessful() && !empty($process->getProcess()->getOutput());
+    }
+
+    /**
+     * Execute a command in the specified container.
+     *
+     * @param string $container
+     * @param string $command
+     * @param bool   $progressBar If provided, return an instance of Process without execution
+     *
+     * @return Process
+     */
+    public function executeCommand(
+        string $container,
+        string $command,
+        bool $progressBar = false
+    ): Process {
+        if (!$this->isContainerUp($container)) {
+            throw new EnvironmentException(sprintf('The container %s is not started.', $container));
+        }
+
+        $finalCommand =
+            [
+                'docker-compose',
+                'exec',
+                '-u',
+                'www-data:www-data',
+                '-T',
+                $container,
+                'sh',
+                '-c',
+                sprintf('"%s"', escapeshellcmd($command)),
+            ];
+
+        if ($progressBar) {
+            /** @var Process $process */
+            $process = $this->processFactory->createProcess(
+                $finalCommand,
+                600,
+                $this->environment->getDockerRequiredVariables(),
+                true
+            );
+        } else {
+            $process = $this->processFactory->runProcess(
+                $finalCommand,
+                600,
+                $this->environment->getDockerRequiredVariables(),
+                true
+            );
+        }
+
+        return $process;
     }
 }

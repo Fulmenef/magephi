@@ -1,6 +1,6 @@
 <?php
 
-namespace Magephi\Command\Magento;
+namespace Magephi\Command\Environment;
 
 use Magephi\Command\AbstractCommand;
 use Magephi\Entity\Environment;
@@ -10,7 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Command to uninstall the environment. It simply remove volumes and destroy containers and the mutagen session.
  */
-class UninstallCommand extends AbstractMagentoCommand
+class UninstallCommand extends AbstractEnvironmentCommand
 {
     protected $command = 'uninstall';
 

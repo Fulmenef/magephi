@@ -3,6 +3,8 @@
 namespace Magephi\Command\Docker;
 
 use Magephi\Command\AbstractCommand;
+use Magephi\Exception\EnvironmentException;
+use Magephi\Exception\ProcessException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -28,11 +30,8 @@ abstract class AbstractDockerCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         try {
-            if (!$this->dockerCompose->isContainerUp($this->service)) {
-                throw new \Exception("Container {$this->service} is not up");
-            }
             $this->dockerCompose->openTerminal($this->service, $this->arguments);
-        } catch (\Exception $e) {
+        } catch (EnvironmentException | ProcessException $e) {
             $this->interactive->error($e->getMessage());
 
             return AbstractCommand::CODE_ERROR;

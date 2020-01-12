@@ -1,6 +1,6 @@
 <?php
 
-namespace Magephi\Command\Magento;
+namespace Magephi\Command\Environment;
 
 use ErrorException;
 use Magephi\Command\AbstractCommand;
@@ -14,7 +14,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 
-class CreateCommand extends AbstractMagentoCommand
+class CreateCommand extends AbstractEnvironmentCommand
 {
     protected $command = 'create';
 

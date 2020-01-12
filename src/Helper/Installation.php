@@ -7,6 +7,7 @@ use Magephi\Component\Mutagen;
 use Magephi\Component\Process;
 use Magephi\Component\ProcessFactory;
 use Magephi\Entity\Environment;
+use Magephi\Exception\EnvironmentException;
 use Magephi\Exception\ProcessException;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -68,14 +69,14 @@ class Installation
      * @param string $database
      * @param string $filename
      *
-     * @throws \Exception
+     * @throws EnvironmentException
      *
      * @return Process
      */
     public function databaseImport(string $database, string $filename): Process
     {
         if (!$this->dockerCompose->isContainerUp('mysql')) {
-            throw new \Exception('Mysql container is not up');
+            throw new EnvironmentException('Mysql container is not up');
         }
 
         $ext = pathinfo($filename, PATHINFO_EXTENSION);
@@ -112,32 +113,21 @@ class Installation
     }
 
     /**
+     * Update URLs in the database with the configured server name.
+     *
      * @param string $database
      *
-     * @throws \Exception
+     * @throws EnvironmentException
      *
      * @return Process
      */
     public function updateUrls(string $database)
     {
         if (!$this->dockerCompose->isContainerUp('mysql')) {
-            throw new \Exception('Mysql container is not up');
+            throw new EnvironmentException('Mysql container is not up');
         }
 
-        $nginx = $this->environment->__get('nginxConf');
-        if (!\is_string($nginx)) {
-            throw new \Exception(
-                'nginx.conf does not exist. Ensure emakinafr/docker-magento2 is present in dependencies.'
-            );
-        }
-        $content = file_get_contents($nginx);
-        if (!\is_string($content)) {
-            throw new \Exception(
-                "Something went wrong while reading {$nginx}, ensure the file is present."
-            );
-        }
-        preg_match_all('/server_name (\S*);/m', $content, $matches, PREG_SET_ORDER, 0);
-        $serverName = $matches[0][1];
+        $serverName = $this->environment->getServerName(true);
 
         return $this->processFactory->runProcess(
             [
@@ -148,7 +138,7 @@ class Installation
                 'root',
                 $database,
                 '-e',
-                '"UPDATE core_config_data SET value=\"https://ww.' . $serverName . '/\" WHERE path LIKE \"web%base_url\""',
+                '"UPDATE core_config_data SET value=\"' . $serverName . '/\" WHERE path LIKE \"web%base_url\""',
             ],
             30,
             [],

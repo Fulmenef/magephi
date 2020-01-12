@@ -1,6 +1,6 @@
 <?php
 
-namespace Magephi\Command\Magento;
+namespace Magephi\Command\Environment;
 
 use Magephi\Command\AbstractCommand;
 use Magephi\Component\DockerCompose;
@@ -14,7 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Command to scan environment and determine if all prerequisites are filled to install a Magento2 project using
  * emakinafr/docker-magento2.
  */
-class CheckPrerequisiteCommand extends AbstractMagentoCommand
+class CheckPrerequisiteCommand extends AbstractEnvironmentCommand
 {
     protected $command = 'prerequisites';
 

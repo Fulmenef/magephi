@@ -1,6 +1,6 @@
 <?php
 
-namespace Magephi\Command\Magento;
+namespace Magephi\Command\Environment;
 
 use Magephi\Command\AbstractCommand;
 use Magephi\Entity\Environment;
@@ -10,7 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Command to stop the environment. The install command must have been executed before.
  */
-class StopCommand extends AbstractMagentoCommand
+class StopCommand extends AbstractEnvironmentCommand
 {
     protected $command = 'stop';
 
