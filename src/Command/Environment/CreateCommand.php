@@ -31,6 +31,11 @@ class CreateCommand extends AbstractEnvironmentCommand
         $this->logger = $logger;
     }
 
+    public function getPrerequisites(): array
+    {
+        return [];
+    }
+
     protected function configure(): void
     {
         parent::configure();

@@ -5,7 +5,7 @@ namespace Magephi\Command\Environment;
 use Magephi\Command\AbstractCommand;
 use Magephi\Component\DockerCompose;
 use Magephi\Component\ProcessFactory;
-use Magephi\Helper\Installation;
+use Magephi\Entity\System;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -18,17 +18,22 @@ class CheckPrerequisiteCommand extends AbstractEnvironmentCommand
 {
     protected $command = 'prerequisites';
 
-    /** @var Installation */
-    private $installation;
+    /** @var System */
+    private $prerequisite;
 
     public function __construct(
         ProcessFactory $processFactory,
         DockerCompose $dockerCompose,
-        Installation $installation,
+        System $prerequisite,
         string $name = null
     ) {
         parent::__construct($processFactory, $dockerCompose, $name);
-        $this->installation = $installation;
+        $this->prerequisite = $prerequisite;
+    }
+
+    public function getPrerequisites(): array
+    {
+        return [];
     }
 
     protected function configure(): void
@@ -45,14 +50,19 @@ class CheckPrerequisiteCommand extends AbstractEnvironmentCommand
         $table->setHeaders(['Component', 'Mandatory', 'Status', 'Comment']);
 
         $ready = true;
-        foreach ($this->installation->checkSystemPrerequisites() as $component => $info) {
+        foreach ($this->prerequisite->getBinaryPrerequisites() as $component => $info) {
             if (!$info['status']) {
                 $ready = false;
             }
             $info['mandatory'] = $info['mandatory'] ? 'Yes' : 'No';
             $info['status'] = $info['status'] ? 'Installed' : 'Missing';
             $table->addRow(
-                array_merge([$component], $info)
+                array_merge(
+                    [$component],
+                    [$info['mandatory']],
+                    [$info['status']],
+                    isset($info['comment']) ? [$info['comment']] : []
+                )
             );
         }
 

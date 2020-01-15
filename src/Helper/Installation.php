@@ -7,6 +7,7 @@ use Magephi\Component\Mutagen;
 use Magephi\Component\Process;
 use Magephi\Component\ProcessFactory;
 use Magephi\Entity\Environment;
+use Magephi\Entity\System;
 use Magephi\Exception\EnvironmentException;
 use Magephi\Exception\ProcessException;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -15,52 +16,39 @@ class Installation
 {
     /** @var ProcessFactory */
     private $processFactory;
+
     /** @var DockerCompose */
     private $dockerCompose;
+
     /** @var Mutagen */
     private $mutagen;
+
     /** @var Environment */
     private $environment;
 
     /** @var OutputInterface */
     private $outputInterface;
 
-    public function __construct(DockerCompose $dockerCompose, ProcessFactory $processFactory, Mutagen $mutagen)
-    {
+    /** @var System */
+    private $system;
+
+    public function __construct(
+        DockerCompose $dockerCompose,
+        ProcessFactory $processFactory,
+        Mutagen $mutagen,
+        Environment $environment,
+        System $system
+    ) {
         $this->dockerCompose = $dockerCompose;
         $this->processFactory = $processFactory;
         $this->mutagen = $mutagen;
-        $this->environment = new Environment();
+        $this->environment = $environment;
+        $this->system = $system;
     }
 
     public function setOutputInterface(OutputInterface $outputInterface): void
     {
         $this->outputInterface = $outputInterface;
-    }
-
-    /**
-     * For each prerequisite, check if the binary is installed.
-     *
-     * @return array[]
-     */
-    public function checkSystemPrerequisites(): array
-    {
-        return [
-            'Docker'            => ['mandatory' => true, 'status' => $this->isInstalled('docker')],
-            'Docker-Compose'    => ['mandatory' => true, 'status' => $this->isInstalled('docker-compose')],
-            'MySQL'             => ['mandatory' => true, 'status' => $this->isInstalled('mysql')],
-            'Mutagen'           => [
-                'mandatory' => true,
-                'status'    => $this->isInstalled('mutagen'),
-                'comment'   => '<fg=yellow>https://mutagen.io/</>',
-            ],
-            'Yarn'              => ['mandatory' => false, 'status' => $this->isInstalled('yarn')],
-            'Magento Cloud CLI' => [
-                'mandatory' => false,
-                'status'    => $this->isInstalled('magento-cloud'),
-                'comment'   => 'Recommended when working on a Magento Cloud project.',
-            ],
-        ];
     }
 
     /**
@@ -98,11 +86,22 @@ class Installation
                 break;
         }
 
+        $readCommand = ['pv', '-ptefab'];
+        if (!$this->system->getBinaryPrerequisites()['Pipe Viewer']['status']) {
+            $this->outputInterface->writeln('<comment>Pipe Viewer is not installed, it is necessary to have a progress bar.</comment>');
+            $readCommand = ['cat'];
+        }
+
         $command = array_merge(
-            ['pv', '-ptefab', $filename, '|'],
+            array_merge($readCommand, [$filename, '|']),
             !empty($command) ? array_merge($command, ['|']) : $command,
             ['mysql', '-h', '127.0.0.1', '-u', 'root', '-D', $database]
         );
+
+        $this->outputInterface->writeln('');
+        $this->outputInterface->writeln('<fg=yellow>Import started');
+        $this->outputInterface->writeln('<fg=yellow>--------------');
+        $this->outputInterface->writeln('');
 
         return $this->processFactory->runProcessWithOutput(
             $command,
@@ -213,24 +212,5 @@ class Installation
         }
 
         return true;
-    }
-
-    /**
-     * Check if the given binary is installed.
-     *
-     * @param string $binary
-     *
-     * @return bool
-     */
-    private function isInstalled(string $binary): bool
-    {
-        if (\defined('PHP_WINDOWS_VERSION_BUILD')) {
-            $command = "where {$binary}";
-        } else {
-            $command = "command -v {$binary}";
-        }
-        exec($command, $output, $return_var);
-
-        return $return_var === 0;
     }
 }

@@ -12,7 +12,6 @@ use Magephi\Exception\ProcessException;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\Question;
 
 class InstallCommand extends AbstractMagentoCommand
 {
@@ -141,33 +140,5 @@ class InstallCommand extends AbstractMagentoCommand
         );
 
         return AbstractCommand::CODE_SUCCESS;
-    }
-
-    /**
-     * Ask a question twice and cannot be empty.
-     *
-     * @param string      $question
-     * @param null|string $default
-     *
-     * @return string
-     */
-    private function askQuestionTwice(string $question, string $default = null): string
-    {
-        $question = new Question($question, $default);
-        $question
-            ->setMaxAttempts(2)
-            ->setValidator(
-                function ($answer) {
-                    if (empty($answer)) {
-                        throw new \RuntimeException(
-                            'The answer cannot be empty.'
-                        );
-                    }
-
-                    return $answer;
-                }
-            );
-
-        return $this->interactive->askQuestion($question);
     }
 }

@@ -14,6 +14,14 @@ class StopCommand extends AbstractEnvironmentCommand
 {
     protected $command = 'stop';
 
+    public function getPrerequisites(): array
+    {
+        $prerequisites = parent::getPrerequisites();
+        $prerequisites['binary'] = array_merge($prerequisites['binary'], ['Mutagen']);
+
+        return $prerequisites;
+    }
+
     protected function initialize(InputInterface $input, OutputInterface $output): void
     {
         parent::initialize($input, $output);

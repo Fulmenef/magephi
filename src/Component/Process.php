@@ -117,6 +117,7 @@ class Process
     public function start(callable $callback = null, array $env = []): void
     {
         $this->startTime = microtime(true);
+
         $this->process->start($callback, $env);
         if ($this->progressBar instanceof ProgressBar) {
             // Resume progress bar if current step is defined.
@@ -175,5 +176,24 @@ class Process
     public function getExitCode()
     {
         return $this->exitCode ?? $this->process->getExitCode();
+    }
+
+    /**
+     * Execute the run command of the process.
+     *
+     * @param null|callable $callback
+     * @param string[]      $env
+     *
+     * @return int
+     */
+    public function run(callable $callback = null, array $env = []): int
+    {
+        $this->startTime = microtime(true);
+
+        $var = $this->process->run($callback, $env);
+
+        $this->endTime = microtime(true);
+
+        return $var;
     }
 }

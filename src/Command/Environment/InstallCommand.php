@@ -9,6 +9,7 @@ use Magephi\Component\Mutagen;
 use Magephi\Component\Process;
 use Magephi\Component\ProcessFactory;
 use Magephi\Entity\Environment;
+use Magephi\Entity\System;
 use Magephi\Exception\ComposerException;
 use Magephi\Exception\EnvironmentException;
 use Magephi\Exception\ProcessException;
@@ -47,18 +48,28 @@ class InstallCommand extends AbstractEnvironmentCommand
     /** @var Mutagen */
     private $mutagen;
 
+    /** @var System */
+    private $prerequisite;
+
     public function __construct(
         ProcessFactory $processFactory,
         DockerCompose $dockerCompose,
         Installation $installation,
         Mutagen $mutagen,
         Environment $environment,
+        System $system,
         string $name = null
     ) {
         parent::__construct($processFactory, $dockerCompose, $name);
         $this->installation = $installation;
         $this->mutagen = $mutagen;
         $this->environment = $environment;
+        $this->prerequisite = $system;
+    }
+
+    public function getPrerequisites(): array
+    {
+        return [];
     }
 
     protected function configure(): void
@@ -137,39 +148,29 @@ class InstallCommand extends AbstractEnvironmentCommand
         // Run environment checks.
         $this->interactive->section('Environment check');
 
-        $prerequisites = $this->installation->checkSystemPrerequisites();
+        $prerequisites = $this->prerequisite->getBinaryPrerequisites();
         foreach ($prerequisites as $component => $info) {
             $this->check(
-                ucfirst($component) . ' is installed.',
-                ucfirst($component) . ' is missing.',
+                $component . ' is installed.',
+                $component . ' is missing.',
                 function () use ($info) {
                     return $info['status'];
                 },
                 $info['mandatory']
             );
         }
-        // Check that Docker is running.
-        $this->check(
-            'Docker is running.',
-            'Docker must be running.',
-            function () {
-                $command = 'docker version >/dev/null 2>&1';
-                exec($command, $output, $return_var);
 
-                return $return_var === 0;
-            },
-            true
-        );
-
-        // Check that vendors are not installed
-        //		$this->check(
-        //			'Composer can install vendors.',
-        //			'Vendor directory must be deleted.',
-        //			function () {
-        //				return !is_dir('vendor');
-        //			},
-        //			true
-        //		);
+        $prerequisites = $this->prerequisite->getServicesPrerequisites();
+        foreach ($prerequisites as $component => $info) {
+            $this->check(
+                $component . ' is running.',
+                $component . ' must be started.',
+                function () use ($info) {
+                    return $info['status'];
+                },
+                $info['mandatory']
+            );
+        }
     }
 
     /**

@@ -14,6 +14,14 @@ class UninstallCommand extends AbstractEnvironmentCommand
 {
     protected $command = 'uninstall';
 
+    public function getPrerequisites(): array
+    {
+        $prerequisites = parent::getPrerequisites();
+        $prerequisites['binary'] = array_merge($prerequisites['binary'], ['Mutagen']);
+
+        return $prerequisites;
+    }
+
     protected function configure(): void
     {
         parent::configure();

@@ -37,6 +37,15 @@ class StartCommand extends AbstractEnvironmentCommand
         $this->mutagen = $mutagen;
     }
 
+    public function getPrerequisites(): array
+    {
+        $prerequisites = parent::getPrerequisites();
+        $prerequisites['binary'] = array_merge($prerequisites['binary'], ['Mutagen']);
+        $prerequisites['service'] = array_merge($prerequisites['service'], ['Mutagen']);
+
+        return $prerequisites;
+    }
+
     protected function initialize(InputInterface $input, OutputInterface $output): void
     {
         parent::initialize($input, $output);

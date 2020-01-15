@@ -45,9 +45,7 @@ class ProcessFactory
             return $this->runProcessWithOutput($command, $timeout, $env, $shell);
         }
         $process = $this->createProcess($command, $timeout, $env, $shell);
-
-        $process->start();
-        $process->wait();
+        $process->run();
 
         return $process;
     }
@@ -138,7 +136,7 @@ class ProcessFactory
         $process = $this->createProcess($command, $timeout, $env, $shell);
 
         $process->getProcess()->setTty($tty ? \Symfony\Component\Process\Process::isTtySupported() : $tty);
-        $process->getProcess()->run(
+        $process->run(
             static function (string $type, string $buffer) {
                 echo $buffer;
             }

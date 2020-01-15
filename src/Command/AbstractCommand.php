@@ -10,6 +10,8 @@ use Herrera\Version\Version;
 use Magephi\Application;
 use Magephi\Component\DockerCompose;
 use Magephi\Component\ProcessFactory;
+use Magephi\Entity\System;
+use Magephi\EventListener\CommandListener;
 use Magephi\Exception\EnvironmentException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -61,19 +63,6 @@ abstract class AbstractCommand extends Command
         return $update !== null ? $this->rebuildVersion($update->getVersion()) : $update;
     }
 
-    protected function initialize(InputInterface $input, OutputInterface $output): void
-    {
-        $this->interactive = new SymfonyStyle($input, $output);
-        parent::initialize($input, $output);
-
-        $update = $this->checkNewVersionAvailable();
-        if ($update !== null) {
-            $this->interactive->warning(
-                "A new version is available, use the update command to update to version {$update}"
-            );
-        }
-    }
-
     /**
      * Checks a condition, outputs a message, and exits if failed.
      *
@@ -84,7 +73,7 @@ abstract class AbstractCommand extends Command
      *
      * @throws EnvironmentException
      */
-    protected function check($success, $failure, $condition, $exit = true): void
+    public function check($success, $failure, $condition, $exit = true): void
     {
         if ($condition()) {
             $this->interactive->writeln("<fg=green>  [*] {$success}</>");
@@ -92,6 +81,33 @@ abstract class AbstractCommand extends Command
             $this->interactive->writeln("<fg=yellow>  [!] {$failure}</>");
         } else {
             throw new EnvironmentException($failure);
+        }
+    }
+
+    /**
+     * Contain system prerequisite for the command. Must always follow the same structure.
+     * Must contains the exact name of prerequisites defined in the System class.
+     *
+     * @return array[]
+     *
+     * @see CommandListener Listener using the variable to check the prerequisites
+     * @see System Class containing known prerequisites.
+     */
+    public function getPrerequisites(): array
+    {
+        return ['binary' => ['Docker', 'Docker-Compose'], 'service' => ['Docker']];
+    }
+
+    protected function initialize(InputInterface $input, OutputInterface $output): void
+    {
+        $this->interactive = new SymfonyStyle($input, $output);
+        parent::initialize($input, $output);
+
+        $update = $this->checkNewVersionAvailable();
+        if ($update !== null) {
+            $this->interactive->warning(
+                "A new version is available, use the update command to update to version {$update}"
+            );
         }
     }
 

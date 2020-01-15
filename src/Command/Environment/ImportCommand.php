@@ -42,6 +42,17 @@ class ImportCommand extends AbstractEnvironmentCommand
         $this->installation = $installation;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getPrerequisites(): array
+    {
+        $prerequisites = parent::getPrerequisites();
+        $prerequisites['binary'] = array_merge($prerequisites['binary'], ['Mysql']);
+
+        return $prerequisites;
+    }
+
     protected function configure(): void
     {
         parent::configure();
@@ -93,8 +104,16 @@ class ImportCommand extends AbstractEnvironmentCommand
 
             return AbstractCommand::CODE_ERROR;
         }
+
+        $seconds = round($process->getDuration());
+
         $this->interactive->success(
-            "The dump has been imported in {$database} in {$process->getDuration()} seconds."
+            sprintf(
+                'The dump has been imported in %s in %d minutes and %d seconds ',
+                $database,
+                $seconds / 60,
+                $seconds % 60
+            )
         );
 
         if ($this->interactive->confirm('Do you want to update the urls ?', true)) {
