@@ -14,9 +14,9 @@ class Kernel extends BaseKernel
 {
     use MicroKernelTrait;
 
-    const NAME = 'Magephi';
-    const VERSION = '@package_version@';
-    const MODE = '@mode@';
+    public const NAME = 'Magephi';
+    public const VERSION = '@package_version@';
+    public const MODE = '@mode@';
 
     private const CONFIG_EXTS = '.{php,xml,yaml,yml}';
 
@@ -48,6 +48,14 @@ class Kernel extends BaseKernel
         return "{$home}/.magephi";
     }
 
+    /**
+     * Retrieves the custom directory for the current version.
+     */
+    public function getVersionDir(): string
+    {
+        return $this->getCustomDir() . '/' . self::VERSION;
+    }
+
     public function getProjectDir(): string
     {
         return \dirname(__DIR__);
@@ -68,7 +76,7 @@ class Kernel extends BaseKernel
      */
     public function getCacheDir()
     {
-        return $this->isArchiveContext() ? $this->getCustomDir() . '/cache' : parent::getCacheDir();
+        return $this->isArchiveContext() ? $this->getVersionDir() . '/cache' : parent::getCacheDir();
     }
 
     /**
@@ -78,7 +86,7 @@ class Kernel extends BaseKernel
      */
     public function getLogDir()
     {
-        return $this->isArchiveContext() ? $this->getCustomDir() . '/log' : parent::getLogDir();
+        return $this->isArchiveContext() ? $this->getVersionDir() . '/log' : parent::getLogDir();
     }
 
     /**

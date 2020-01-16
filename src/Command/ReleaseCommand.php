@@ -158,7 +158,7 @@ class ReleaseCommand extends Command
         $this->logger->debug('Changes found.');
 
         try {
-            $files = ['composer.json', 'package.json'];
+            $files = ['composer.json', 'package.json', 'package-lock.json'];
 
             foreach ($files as $file) {
                 $this->updateJsonFile($version, $file);
