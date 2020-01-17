@@ -8,7 +8,7 @@ use Symfony\Component\Process\Exception\ProcessTimedOutException;
 
 class Process
 {
-    const CODE_TIMEOUT = 2;
+    public const CODE_TIMEOUT = 5;
 
     /** @var \Symfony\Component\Process\Process */
     private $process;

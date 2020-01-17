@@ -308,7 +308,11 @@ class InstallCommand extends AbstractEnvironmentCommand
 
         $process = $this->installation->startMake(true);
         if (!$process->getProcess()->isSuccessful() && $process->getExitCode() !== Process::CODE_TIMEOUT) {
-            throw new ProcessException($process->getProcess()->getErrorOutput());
+            $this->interactive->newLine(2);
+
+            throw new ProcessException(
+                'An error occured during the start, ensure there is no other containers running. To have more detail, run the command with verbosity.'
+            );
         }
         if ($process->getExitCode() === Process::CODE_TIMEOUT) {
             $this->installation->startMutagen();
