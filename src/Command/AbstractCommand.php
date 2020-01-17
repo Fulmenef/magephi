@@ -2,17 +2,16 @@
 
 namespace Magephi\Command;
 
-use Herrera\Phar\Update\Manager;
-use Herrera\Phar\Update\Manifest;
-use Herrera\Phar\Update\Update;
-use Herrera\Version\Parser;
 use Herrera\Version\Version;
+use Humbug\SelfUpdate\Strategy\GithubStrategy;
+use Humbug\SelfUpdate\Updater;
 use Magephi\Application;
 use Magephi\Component\DockerCompose;
 use Magephi\Component\ProcessFactory;
 use Magephi\Entity\System;
 use Magephi\EventListener\CommandListener;
 use Magephi\Exception\EnvironmentException;
+use Magephi\Kernel;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -22,7 +21,9 @@ abstract class AbstractCommand extends Command
 {
     public const CODE_SUCCESS = 0;
     public const CODE_ERROR = 1;
-    public const MANIFEST_FILE = 'https://fulmenef.github.io/magephi/manifest.json';
+
+    public const FILE_NAME = 'magephi.phar';
+    public const PACKAGE_NAME = 'fulmenef/magephi';
 
     /** @var SymfonyStyle */
     protected $interactive;
@@ -51,16 +52,18 @@ abstract class AbstractCommand extends Command
         $app = $this->getApplication();
         $version = $app->getVersion();
 
-        if (substr($version, -3, 3) === 'dev') {
+        if (Kernel::getMode() === 'dev') {
             return null;
         }
 
-        $version = Parser::toVersion($version);
-        $manager = new Manager(Manifest::loadFile(self::MANIFEST_FILE));
-        /** @var null|Update $update */
-        $update = $manager->getManifest()->findRecent($version, true, true);
+        $updater = new Updater(null, false);
+        $strategy = new GithubStrategy();
+        $strategy->setPackageName(self::PACKAGE_NAME);
+        $strategy->setPharName(self::FILE_NAME);
+        $strategy->setCurrentLocalVersion($version);
+        $updater->setStrategyObject($strategy);
 
-        return $update !== null ? $this->rebuildVersion($update->getVersion()) : $update;
+        return $updater->hasUpdate() ? $updater->getNewVersion() : null;
     }
 
     /**
@@ -109,17 +112,5 @@ abstract class AbstractCommand extends Command
                 "A new version is available, use the update command to update to version {$update}"
             );
         }
-    }
-
-    /**
-     * Rebuild version into one piece.
-     *
-     * @param Version $version
-     *
-     * @return string Version in 1.2.3 form.
-     */
-    protected function rebuildVersion(Version $version): string
-    {
-        return sprintf('%d.%d.%d', $version->getMajor(), $version->getMinor(), $version->getPatch());
     }
 }

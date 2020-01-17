@@ -97,11 +97,26 @@ class Kernel extends BaseKernel
      */
     public static function getVersion(): string
     {
-        if (is_numeric(substr(self::VERSION, 0, 1))) {
-            return self::VERSION;
+        if (self::getMode() === 'dev') {
+            return exec('git -C ' . \dirname(__DIR__) . ' describe --tags') . '-dev';
         }
 
-        return exec('git -C ' . \dirname(__DIR__) . ' describe --tags') . '-dev';
+        return self::VERSION;
+    }
+
+    /**
+     * Return current mode of the application.
+     *
+     * @return string
+     */
+    public static function getMode(): string
+    {
+        $mode = self::MODE;
+        if ($mode !== 'prod') {
+            $mode = 'dev';
+        }
+
+        return $mode;
     }
 
     protected function configureContainer(ContainerBuilder $container, LoaderInterface $loader): void

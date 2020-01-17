@@ -187,56 +187,13 @@ class ReleaseCommand extends Command
         }
         $this->logger->debug('Phar application created.');
 
-        $filename = 'magephi.phar';
+        $filename = AbstractCommand::FILE_NAME;
         $buildPath = 'build/' . $filename;
-        $sha1 = $this->processFactory->runProcess(['openssl', 'sha1', '-r', $buildPath]);
-        $sha1 = explode(' ', $sha1->getProcess()->getOutput())[0];
-        $this->logger->debug("Sha1: {$sha1}");
 
-        try {
-            $this->git->checkout(self::DOC_BRANCH);
-            $this->git->pull();
-            $this->logger->debug('Pull changes and references on doc branch.');
-        } catch (GitException $e) {
-            $this->interactive->error($e->getMessage());
-
-            return AbstractCommand::CODE_ERROR;
-        }
-
-        $downloadPath = "downloads/magephi-{$version}.phar";
-        $this->processFactory->runProcess(['cp', $buildPath, $downloadPath], 10);
-        $this->processFactory->runProcess(['cp', '-f', $buildPath, $filename], 10);
-        $this->git->add($downloadPath);
-        $this->git->add($filename);
-        $this->logger->debug('Phar added to git.');
-
-        $data = [
-            'name'    => $filename,
-            'sha1'    => $sha1,
-            'url'     => "https://fulmenef.github.io/magephi/{$downloadPath}",
-            'version' => $version,
-        ];
-        $manifest = $this->addToManifest($data);
-        $this->git->add($manifest);
-        $this->git->commitRelease($version);
-        $this->logger->debug('Info added to manifest.json');
-
-        try {
-            $this->git->checkout();
-        } catch (GitException $e) {
-            $this->interactive->error($e->getMessage());
-
-            return AbstractCommand::CODE_ERROR;
-        }
         if ($this->gitPush()) {
             return AbstractCommand::CODE_ERROR;
         }
         $this->logger->debug('Master pushed.');
-
-        if ($this->gitPush(self::DOC_BRANCH)) {
-            return AbstractCommand::CODE_ERROR;
-        }
-        $this->logger->debug('Doc pushed.');
 
         $dotenv = new Dotenv();
         $dotenv->load($this->kernel->getProjectDir() . '/.env.local');

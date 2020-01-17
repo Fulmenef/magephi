@@ -2,9 +2,8 @@
 
 namespace Magephi\Command;
 
-use Herrera\Phar\Update\Manager;
-use Herrera\Phar\Update\Manifest;
-use Herrera\Version\Parser;
+use Humbug\SelfUpdate\Strategy\GithubStrategy;
+use Humbug\SelfUpdate\Updater;
 use Magephi\Application;
 use Magephi\Kernel;
 use Symfony\Component\Console\Input\InputInterface;
@@ -39,36 +38,36 @@ class UpdateCommand extends AbstractCommand
     {
         $update = $this->checkNewVersionAvailable();
 
-        if ($update !== null) {
+        if ($update !== null && Kernel::getMode() !== 'dev') {
             /** @var Application $app */
             $app = $this->getApplication();
-            $newVersion = Parser::toVersion($update);
             $version = $app->getVersion();
-            $parsedVersion = Parser::toVersion($version);
-            if ($newVersion->getMajor() <= $parsedVersion->getMajor()
-                || $this->interactive->confirm(
+
+            $updater = new Updater(null, false);
+            $strategy = new GithubStrategy();
+            $strategy->setPackageName(self::PACKAGE_NAME);
+            $strategy->setPharName(self::FILE_NAME);
+            $strategy->setCurrentLocalVersion($version);
+            $updater->setStrategyObject($strategy);
+
+            $result = $updater->update();
+
+            if ($result) {
+                $this->interactive->success(
                     sprintf(
-                        'You are going to update from version %s to %s, huge changes has been made, are you sure you want to upgrade ?',
-                        $version,
-                        $update
-                    ),
-                    false
-                )) {
-                $manager = new Manager(Manifest::loadFile(self::MANIFEST_FILE));
-                $result = $manager->update($version, true, true);
+                        '%s has been upgraded to %s.',
+                        Kernel::NAME,
+                        $updater->getNewVersion()
+                    )
+                );
 
-                if ($result) {
-                    $this->interactive->success(
-                        sprintf(
-                            '%s has been upgraded to %s. You will have to clear your caches with the cache:clear command.',
-                            Kernel::NAME,
-                            $update
-                        )
-                    );
-
-                    return AbstractCommand::CODE_SUCCESS;
-                }
+                return AbstractCommand::CODE_SUCCESS;
             }
+
+            $updater->rollback();
+            $this->interactive->error('Update canceled, something happened.');
+
+            return AbstractCommand::CODE_ERROR;
         }
 
         $this->interactive->note('No new version to download');
