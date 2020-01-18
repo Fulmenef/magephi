@@ -26,11 +26,11 @@ class Installation
     /** @var Environment */
     private $environment;
 
-    /** @var OutputInterface */
-    private $outputInterface;
-
     /** @var System */
     private $system;
+
+    /** @var OutputInterface */
+    private $outputInterface;
 
     public function __construct(
         DockerCompose $dockerCompose,
@@ -88,14 +88,29 @@ class Installation
 
         $readCommand = ['pv', '-ptefab'];
         if (!$this->system->getBinaryPrerequisites()['Pipe Viewer']['status']) {
-            $this->outputInterface->writeln('<comment>Pipe Viewer is not installed, it is necessary to have a progress bar.</comment>');
+            $this->outputInterface->writeln(
+                '<comment>Pipe Viewer is not installed, it is necessary to have a progress bar.</comment>'
+            );
             $readCommand = ['cat'];
         }
+
+        $username = $this->environment->getEnvData('mysql_user') ?: 'root';
+        $password = $username === 'root' ? $this->environment->getEnvData(
+            'mysql_root_password'
+        ) : $this->environment->getEnvData('mysql_password');
 
         $command = array_merge(
             array_merge($readCommand, [$filename, '|']),
             !empty($command) ? array_merge($command, ['|']) : $command,
-            ['mysql', '-h', '127.0.0.1', '-u', 'root', '-D', $database]
+            [
+                'mysql',
+                '-h',
+                '127.0.0.1',
+                '-u',
+                $username,
+                '-D',
+                $database,
+            ]
         );
 
         $this->outputInterface->writeln('');
@@ -106,7 +121,7 @@ class Installation
         return $this->processFactory->runProcessWithOutput(
             $command,
             3600,
-            null,
+            ['MYSQL_PWD' => $password],
             true
         );
     }
@@ -127,6 +142,10 @@ class Installation
         }
 
         $serverName = $this->environment->getServerName(true);
+        $username = $this->environment->getEnvData('mysql_user') ?: 'root';
+        $password = $username === 'root' ? $this->environment->getEnvData(
+            'mysql_root_password'
+        ) : $this->environment->getEnvData('mysql_password');
 
         return $this->processFactory->runProcess(
             [
@@ -134,13 +153,13 @@ class Installation
                 '-h',
                 '127.0.0.1',
                 '-u',
-                'root',
+                $username,
                 $database,
                 '-e',
                 '"UPDATE core_config_data SET value=\"' . $serverName . '/\" WHERE path LIKE \"web%base_url\""',
             ],
             30,
-            [],
+            ['MYSQL_PWD' => $password],
             true
         );
     }

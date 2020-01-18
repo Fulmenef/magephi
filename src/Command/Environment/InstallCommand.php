@@ -452,7 +452,11 @@ class InstallCommand extends AbstractEnvironmentCommand
                 if ($file !== null) {
                     if ($database = $this->environment->getDatabase()) {
                         try {
-                            $this->installation->databaseImport($this->environment->getDatabase(), $file);
+                            $process = $this->installation->databaseImport($this->environment->getDatabase(), $file);
+
+                            if (!$process->getProcess()->isSuccessful()) {
+                                throw new ProcessException($process->getProcess()->getErrorOutput());
+                            }
 
                             return true;
                         } catch (Exception $e) {
@@ -489,7 +493,6 @@ class InstallCommand extends AbstractEnvironmentCommand
             }
 
             if (!$process->getProcess()->isSuccessful()) {
-                $this->interactive->error($process->getProcess()->getOutput());
                 $this->interactive->error($process->getProcess()->getErrorOutput());
 
                 return false;

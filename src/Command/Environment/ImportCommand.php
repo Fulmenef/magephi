@@ -99,7 +99,6 @@ class ImportCommand extends AbstractEnvironmentCommand
         }
 
         if (!$process->getProcess()->isSuccessful()) {
-            $this->interactive->error($process->getProcess()->getOutput());
             $this->interactive->error($process->getProcess()->getErrorOutput());
 
             return AbstractCommand::CODE_ERROR;
