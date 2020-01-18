@@ -2,7 +2,6 @@
 
 namespace Magephi\Command;
 
-use Herrera\Version\Version;
 use Humbug\SelfUpdate\Strategy\GithubStrategy;
 use Humbug\SelfUpdate\Updater;
 use Magephi\Application;
