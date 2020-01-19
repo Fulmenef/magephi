@@ -5,7 +5,7 @@ namespace Magephi\Entity;
 class System
 {
     /** @var array[] */
-    private $binaries = [
+    private array $binaries = [
         'Docker'            => ['mandatory' => true, 'check' => 'docker'],
         'Docker-Compose'    => ['mandatory' => true, 'check' => 'docker-compose'],
         'Mysql'             => ['mandatory' => true, 'check' => 'mysql'],
@@ -28,7 +28,7 @@ class System
     ];
 
     /** @var array[] */
-    private $services = [
+    private array $services = [
         'Docker'  => ['mandatory' => true, 'check' => 'docker info > /dev/null 2>&1'],
         'Mutagen' => ['mandatory' => true, 'check' => 'pgrep -f "mutagen"'],
     ];

@@ -4,8 +4,9 @@ namespace Magephi\Command\Environment;
 
 use Magephi\Command\AbstractCommand;
 use Magephi\Component\DockerCompose;
+use Magephi\Component\Process;
 use Magephi\Component\ProcessFactory;
-use Magephi\Helper\Installation;
+use Magephi\Helper\Make;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -14,25 +15,23 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class BuildCommand extends AbstractEnvironmentCommand
 {
-    protected $command = 'build';
+    protected string $command = 'build';
 
-    /** @var Installation */
-    private $installation;
+    private Make $make;
 
     public function __construct(
         ProcessFactory $processFactory,
         DockerCompose $dockerCompose,
-        Installation $installation,
+        Make $make,
         string $name = null
     ) {
         parent::__construct($processFactory, $dockerCompose, $name);
-        $this->installation = $installation;
+        $this->make = $make;
     }
 
     protected function initialize(InputInterface $input, OutputInterface $output): void
     {
         parent::initialize($input, $output);
-        $this->installation->setOutputInterface($output);
     }
 
     protected function configure(): void
@@ -49,23 +48,27 @@ class BuildCommand extends AbstractEnvironmentCommand
     {
         $this->interactive->section('Building environment');
 
-        $process = $this->installation->buildMake();
+        $process = $this->make->build();
 
         $this->interactive->newLine(2);
-        $this->interactive->success('Containers have been built.');
 
         if (!$process->getProcess()->isSuccessful()) {
-            $this->interactive->newLine(2);
-            $this->interactive->error($process->getProcess()->getErrorOutput());
-            $this->interactive->note(
-                [
-                    "Ensure you're not using a deleted branch for package emakinafr/docker-magento2.",
-                    'This issue may came from a missing package in the PHP dockerfile after a version upgrade.',
-                ]
-            );
+            if ($process->getExitCode() === Process::CODE_TIMEOUT) {
+                $this->interactive->error('Build timeout, run directly `make build` to build the environment.');
+            } else {
+                $this->interactive->error($process->getProcess()->getErrorOutput());
+                $this->interactive->note(
+                    [
+                        "Ensure you're not using a deleted branch for package emakinafr/docker-magento2.",
+                        'This issue may came from a missing package in the PHP dockerfile after a version upgrade.',
+                    ]
+                );
+            }
 
             return AbstractCommand::CODE_ERROR;
         }
+
+        $this->interactive->success('Containers have been built.');
 
         return AbstractCommand::CODE_SUCCESS;
     }

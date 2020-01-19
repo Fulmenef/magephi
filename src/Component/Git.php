@@ -6,8 +6,7 @@ use Magephi\Exception\GitException;
 
 class Git
 {
-    /** @var ProcessFactory */
-    private $processFactory;
+    private ProcessFactory $processFactory;
 
     public function __construct(ProcessFactory $processFactory)
     {

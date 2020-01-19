@@ -17,8 +17,7 @@ class InstallCommand extends AbstractMagentoCommand
 {
     protected $command = 'install';
 
-    /** @var Environment */
-    private $environment;
+    private Environment $environment;
 
     public function __construct(
         ProcessFactory $processFactory,
@@ -113,6 +112,9 @@ class InstallCommand extends AbstractMagentoCommand
             $progressBar->start();
             $install->getProcess()->waitUntil(
                 function (string $type, string $buffer) use ($regex, $progressBar) {
+                    if ($_ENV['SHELL_VERBOSITY'] >= 1) {
+                        echo $buffer;
+                    }
                     preg_match($regex, $buffer, $match);
                     if (isset($match[1])) {
                         if ($progressBar->getMaxSteps() !== $match[2]) {

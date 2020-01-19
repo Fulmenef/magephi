@@ -8,7 +8,7 @@ use Magephi\Component\DockerCompose;
 use Magephi\Component\Mutagen;
 use Magephi\Component\Process;
 use Magephi\Component\ProcessFactory;
-use Magephi\Helper\Installation;
+use Magephi\Helper\Make;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -17,23 +17,21 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class StartCommand extends AbstractEnvironmentCommand
 {
-    protected $command = 'start';
+    protected string $command = 'start';
 
-    /** @var Installation */
-    private $installation;
+    private Make $make;
 
-    /** @var Mutagen */
-    private $mutagen;
+    private Mutagen $mutagen;
 
     public function __construct(
         ProcessFactory $processFactory,
         DockerCompose $dockerCompose,
-        Installation $installation,
+        Make $make,
         Mutagen $mutagen,
         string $name = null
     ) {
         parent::__construct($processFactory, $dockerCompose, $name);
-        $this->installation = $installation;
+        $this->make = $make;
         $this->mutagen = $mutagen;
     }
 
@@ -49,7 +47,6 @@ class StartCommand extends AbstractEnvironmentCommand
     protected function initialize(InputInterface $input, OutputInterface $output): void
     {
         parent::initialize($input, $output);
-        $this->installation->setOutputInterface($output);
     }
 
     protected function configure(): void
@@ -67,12 +64,12 @@ class StartCommand extends AbstractEnvironmentCommand
         $this->interactive->section('Starting environment');
 
         try {
-            $process = $this->installation->startMake();
+            $process = $this->make->start();
             if (!$process->getProcess()->isSuccessful() && $process->getExitCode() !== Process::CODE_TIMEOUT) {
                 throw new Exception($process->getProcess()->getErrorOutput());
             }
             if ($process->getExitCode() === Process::CODE_TIMEOUT) {
-                $this->installation->startMutagen();
+                $this->make->startMutagen();
                 $this->interactive->newLine();
                 $this->interactive->text('Containers are up.');
                 $this->interactive->section('File synchronization');

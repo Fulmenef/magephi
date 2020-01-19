@@ -4,18 +4,21 @@ namespace Magephi\EventListener;
 
 use ArgumentCountError;
 use Magephi\Command\AbstractCommand;
+use Magephi\Entity\Environment;
 use Magephi\Entity\System;
 use Magephi\Exception\EnvironmentException;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 
 class CommandListener
 {
-    /** @var System */
-    private $system;
+    private System $system;
 
-    public function __construct(System $system)
+    private Environment $environment;
+
+    public function __construct(System $system, Environment $environment)
     {
         $this->system = $system;
+        $this->environment = $environment;
     }
 
     /**
@@ -31,6 +34,13 @@ class CommandListener
         $command = $event->getCommand();
         /** @var AbstractCommand $command */
         if ($command instanceof AbstractCommand) {
+            if ($command->getName() !== 'magephi:environment:create') {
+                if ($this->environment->__get('dockerComposeFile') === null) {
+                    throw new EnvironmentException(
+                        'This command cannot be used here, install the environment with the `install` command or go inside a configured project directory.'
+                    );
+                }
+            }
             $commandPrerequisites = $command->getPrerequisites();
             if (!empty($commandPrerequisites['binary'])) {
                 $systemPrerequisites = $this->system->getBinaryPrerequisites();

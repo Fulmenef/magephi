@@ -2,10 +2,17 @@
 
 namespace Magephi\Component;
 
-use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
 class ProcessFactory
 {
+    private ConsoleOutput $ouputInterface;
+
+    public function __construct()
+    {
+        $this->ouputInterface = new ConsoleOutput();
+    }
+
     /**
      * Create an instance of Process with the given command and return it.
      *
@@ -53,13 +60,12 @@ class ProcessFactory
     /**
      * Create and start a process with an associated progress bar.
      *
-     * @param string[]        $command
-     * @param float           $timeout
-     * @param callable        $progressFunction Used to update the progress bar. Return true to advance by 1, return an
-     *                                          int to advance the bar with the number of steps.
-     * @param OutputInterface $output
-     * @param null|int        $maxSteps
-     * @param bool            $shell            Specify if the process should execute the command in shell directly
+     * @param string[] $command
+     * @param float    $timeout
+     * @param callable $progressFunction Used to update the progress bar. Return true to advance by 1, return an
+     *                                   int to advance the bar with the number of steps.
+     * @param null|int $maxSteps
+     * @param bool     $shell            Specify if the process should execute the command in shell directly
      *
      * @return Process
      */
@@ -67,15 +73,14 @@ class ProcessFactory
         array $command,
         float $timeout,
         callable $progressFunction,
-        OutputInterface $output,
         int $maxSteps = null,
         bool $shell = false
     ): Process {
-        if ($output->isVerbose()) {
+        if ($this->ouputInterface->isVerbose()) {
             return $this->runProcessWithOutput($command, $timeout, [], $shell);
         }
         $process = $this->createProcess($command, $timeout, null, $shell);
-        $process->createProgressBar($output, $maxSteps);
+        $process->createProgressBar($this->ouputInterface, $maxSteps);
         $process->setProgressCallback($progressFunction);
         $process->start();
 

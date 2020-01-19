@@ -6,9 +6,6 @@ use Magephi\Kernel;
 
 class ReleaseHandler
 {
-    /**
-     * @var Kernel
-     */
     private Kernel $kernel;
 
     public function __construct(Kernel $kernel)

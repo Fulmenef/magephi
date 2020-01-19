@@ -8,10 +8,9 @@ use Magephi\Exception\ProcessException;
 
 class DockerCompose
 {
-    /** @var ProcessFactory */
-    private $processFactory;
-    /** @var Environment */
-    private $environment;
+    private ProcessFactory $processFactory;
+
+    private Environment $environment;
 
     /**
      * DockerCompose constructor.
@@ -77,14 +76,14 @@ class DockerCompose
      *
      * @param string $container
      * @param string $command
-     * @param bool   $progressBar If provided, return an instance of Process without execution
+     * @param bool   $createOnly If provided, return an instance of Process without execution
      *
      * @return Process
      */
     public function executeCommand(
         string $container,
         string $command,
-        bool $progressBar = false
+        bool $createOnly = false
     ): Process {
         if (!$this->isContainerUp($container)) {
             throw new EnvironmentException(sprintf('The container %s is not started.', $container));
@@ -103,7 +102,7 @@ class DockerCompose
                 sprintf('"%s"', escapeshellcmd($command)),
             ];
 
-        if ($progressBar) {
+        if ($createOnly) {
             /** @var Process $process */
             $process = $this->processFactory->createProcess(
                 $finalCommand,

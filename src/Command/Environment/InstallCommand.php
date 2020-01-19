@@ -13,7 +13,8 @@ use Magephi\Entity\System;
 use Magephi\Exception\ComposerException;
 use Magephi\Exception\EnvironmentException;
 use Magephi\Exception\ProcessException;
-use Magephi\Helper\Installation;
+use Magephi\Helper\Database;
+use Magephi\Helper\Make;
 use Magephi\Kernel;
 use Nadar\PhpComposerReader\ComposerReader;
 use Symfony\Component\Console\Input\InputInterface;
@@ -28,43 +29,40 @@ class InstallCommand extends AbstractEnvironmentCommand
 {
     public const DOCKER_LOCAL_ENV = 'docker/local/.env';
 
-    protected $command = 'install';
+    protected string $command = 'install';
 
-    /** @var string */
-    private $envContent;
+    private string $envContent;
 
-    /** @var string */
-    private $nginxContent;
+    private string $nginxContent;
 
-    /** @var Environment */
-    private $environment;
+    private Environment $environment;
 
-    /** @var OutputInterface */
-    private $output;
+    private OutputInterface $output;
 
-    /** @var Installation */
-    private $installation;
+    private Make $make;
 
-    /** @var Mutagen */
-    private $mutagen;
+    private Mutagen $mutagen;
 
-    /** @var System */
-    private $prerequisite;
+    private System $prerequisite;
+
+    private Database $database;
 
     public function __construct(
         ProcessFactory $processFactory,
         DockerCompose $dockerCompose,
-        Installation $installation,
+        Make $make,
+        Database $database,
         Mutagen $mutagen,
         Environment $environment,
         System $system,
         string $name = null
     ) {
         parent::__construct($processFactory, $dockerCompose, $name);
-        $this->installation = $installation;
+        $this->make = $make;
         $this->mutagen = $mutagen;
         $this->environment = $environment;
         $this->prerequisite = $system;
+        $this->database = $database;
     }
 
     public function getPrerequisites(): array
@@ -83,7 +81,6 @@ class InstallCommand extends AbstractEnvironmentCommand
     protected function initialize(InputInterface $input, OutputInterface $output): void
     {
         $this->output = $output;
-        $this->installation->setOutputInterface($output);
         parent::initialize($input, $output);
     }
 
@@ -284,18 +281,23 @@ class InstallCommand extends AbstractEnvironmentCommand
     protected function buildContainers(): void
     {
         $this->interactive->section('Building containers');
-        $process = $this->installation->buildMake();
+        $process = $this->make->build();
 
         if (!$process->getProcess()->isSuccessful()) {
             $this->interactive->newLine(2);
-            $this->interactive->note(
-                [
-                    "Ensure you're not using a deleted branch for package emakinafr/docker-magento2.",
-                    'This issue may came from a missing package in the PHP dockerfile after a version upgrade.',
-                ]
-            );
+            if ($process->getExitCode() === Process::CODE_TIMEOUT) {
+                $errorMessage = 'Build timeout, run directly `make build` to build the environment.';
+            } else {
+                $this->interactive->note(
+                    [
+                        "Ensure you're not using a deleted branch for package emakinafr/docker-magento2.",
+                        'This issue may came from a missing package in the PHP dockerfile after a version upgrade.',
+                    ]
+                );
+                $errorMessage = $process->getProcess()->getErrorOutput();
+            }
 
-            throw new ProcessException($process->getProcess()->getErrorOutput());
+            throw new ProcessException($errorMessage);
         }
     }
 
@@ -306,7 +308,7 @@ class InstallCommand extends AbstractEnvironmentCommand
     {
         $this->interactive->section('Starting environment');
 
-        $process = $this->installation->startMake(true);
+        $process = $this->make->start(true);
         if (!$process->getProcess()->isSuccessful() && $process->getExitCode() !== Process::CODE_TIMEOUT) {
             $this->interactive->newLine(2);
 
@@ -315,7 +317,7 @@ class InstallCommand extends AbstractEnvironmentCommand
             );
         }
         if ($process->getExitCode() === Process::CODE_TIMEOUT) {
-            $this->installation->startMutagen();
+            $this->make->startMutagen();
             $this->interactive->newLine();
             $this->interactive->text('Containers are up.');
             $this->interactive->section('File synchronization');
@@ -452,7 +454,7 @@ class InstallCommand extends AbstractEnvironmentCommand
                 if ($file !== null) {
                     if ($database = $this->environment->getDatabase()) {
                         try {
-                            $process = $this->installation->databaseImport($this->environment->getDatabase(), $file);
+                            $process = $this->database->import($this->environment->getDatabase(), $file);
 
                             if (!$process->getProcess()->isSuccessful()) {
                                 throw new ProcessException($process->getProcess()->getErrorOutput());
@@ -485,7 +487,7 @@ class InstallCommand extends AbstractEnvironmentCommand
     {
         if ($this->interactive->confirm('Do you want to update the urls ?', true)) {
             try {
-                $process = $this->installation->updateUrls($this->environment->getDatabase());
+                $process = $this->database->updateUrls($this->environment->getDatabase());
             } catch (Exception $e) {
                 $this->interactive->error($e->getMessage());
 

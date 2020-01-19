@@ -22,10 +22,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Dotenv\Dotenv;
-use Symfony\Component\Filesystem\Exception\FileNotFoundException;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 
@@ -36,19 +32,16 @@ class ReleaseCommand extends Command
 {
     public const USER_NAME = 'fulmenef';
     public const REPO_NAME = 'magephi';
-    public const DOC_BRANCH = 'gh-pages';
-    public const MANIFEST = 'manifest.json';
 
-    /** @var KernelInterface */
-    private $kernel;
-    /** @var ProcessFactory */
-    private $processFactory;
-    /** @var Git */
-    private $git;
-    /** @var SymfonyStyle */
-    private $interactive;
-    /** @var LoggerInterface */
-    private $logger;
+    private KernelInterface $kernel;
+
+    private ProcessFactory $processFactory;
+
+    private Git $git;
+
+    private SymfonyStyle $interactive;
+
+    private LoggerInterface $logger;
 
     public function __construct(
         KernelInterface $appKernel,
@@ -72,29 +65,6 @@ class ReleaseCommand extends Command
     public function isEnabled()
     {
         return $this->kernel->getEnvironment() === 'dev';
-    }
-
-    /**
-     * Add release content to manifest.json.
-     *
-     * @param string[] $data
-     *
-     * @return string
-     */
-    public function addToManifest(array $data): string
-    {
-        $fileInfo = $this->findFile(self::MANIFEST);
-
-        $content = $fileInfo->getContents();
-        $content = json_decode($content, true);
-        $content[] = $data;
-        /** @var string $content */
-        $content = json_encode($content, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-
-        $fs = new Filesystem();
-        $fs->dumpFile($fileInfo->getRelativePathname(), $content);
-
-        return $fileInfo->getRelativePathname();
     }
 
     protected function configure(): void
@@ -256,30 +226,6 @@ class ReleaseCommand extends Command
         if (empty($match) || $match[0] !== $tag) {
             throw new ComposerException("Version {$tag} is not correct, format is MAJOR.MINOR.PATCH. eg: 1.2.3");
         }
-    }
-
-    /**
-     * @param string $filename
-     * @param string $directory
-     *
-     * @throws FileNotFoundException
-     *
-     * @return SplFileInfo
-     */
-    private function findFile(string $filename, string $directory = ''): SplFileInfo
-    {
-        if ($directory === '') {
-            $directory = $this->kernel->getProjectDir();
-        }
-        $finder = new Finder();
-        $finder->files()->ignoreDotFiles(false)->in($directory)->name($filename);
-        if (!$finder->hasResults()) {
-            throw new FileNotFoundException("File {$filename} is missing");
-        }
-        $iterator = $finder->getIterator();
-        $iterator->rewind();
-
-        return $iterator->current();
     }
 
     /**

@@ -8,7 +8,7 @@ use Magephi\Command\AbstractCommand;
 use Magephi\Component\DockerCompose;
 use Magephi\Component\ProcessFactory;
 use Magephi\Entity\Environment;
-use Magephi\Helper\Installation;
+use Magephi\Helper\Database;
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -19,27 +19,22 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ImportCommand extends AbstractEnvironmentCommand
 {
-    protected $command = 'import';
+    protected string $command = 'import';
 
-    /** @var Installation */
-    protected $installation;
+    protected Database $database;
 
-    /**
-     * ImportCommand constructor.
-     *
-     * @param ProcessFactory $processFactory
-     * @param DockerCompose  $dockerCompose
-     * @param Installation   $installation
-     * @param null|string    $name
-     */
+    private Environment $environment;
+
     public function __construct(
         ProcessFactory $processFactory,
         DockerCompose $dockerCompose,
-        Installation $installation,
+        Database $database,
+        Environment $environment,
         string $name = null
     ) {
         parent::__construct($processFactory, $dockerCompose, $name);
-        $this->installation = $installation;
+        $this->database = $database;
+        $this->environment = $environment;
     }
 
     /**
@@ -67,31 +62,23 @@ class ImportCommand extends AbstractEnvironmentCommand
             ->setHelp('This command allow you to import a SQL file');
     }
 
-    protected function initialize(InputInterface $input, OutputInterface $output): void
-    {
-        $this->installation->setOutputInterface($output);
-        parent::initialize($input, $output);
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $environment = new Environment();
-
         $file = $this->convertToString($input->getArgument('file'));
 
         $database = $this->convertToString($input->getArgument('database'));
         if (empty($database)) {
-            $database = $environment->getDatabase();
+            $database = $this->environment->getDatabase();
         }
 
         if ($database === '') {
             throw new InvalidArgumentException(
-                "The database is not defined. Ensure a database is defined in {$environment->__get('localEnv')} or provide one in the command."
+                "The database is not defined. Ensure a database is defined in {$this->environment->__get('localEnv')} or provide one in the command."
             );
         }
 
         try {
-            $process = $this->installation->databaseImport($database, $file);
+            $process = $this->database->import($database, $file);
         } catch (Exception $e) {
             $this->interactive->error($e->getMessage());
 
@@ -117,7 +104,7 @@ class ImportCommand extends AbstractEnvironmentCommand
 
         if ($this->interactive->confirm('Do you want to update the urls ?', true)) {
             try {
-                $process = $this->installation->updateUrls($database);
+                $process = $this->database->updateUrls($database);
             } catch (Exception $e) {
                 $this->interactive->error($e->getMessage());
 

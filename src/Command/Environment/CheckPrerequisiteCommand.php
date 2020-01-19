@@ -16,10 +16,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class CheckPrerequisiteCommand extends AbstractEnvironmentCommand
 {
-    protected $command = 'prerequisites';
+    protected string $command = 'prerequisites';
 
-    /** @var System */
-    private $prerequisite;
+    private System $prerequisite;
 
     public function __construct(
         ProcessFactory $processFactory,

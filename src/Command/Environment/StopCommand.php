@@ -3,7 +3,9 @@
 namespace Magephi\Command\Environment;
 
 use Magephi\Command\AbstractCommand;
-use Magephi\Entity\Environment;
+use Magephi\Component\DockerCompose;
+use Magephi\Component\ProcessFactory;
+use Magephi\Helper\Make;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -12,7 +14,19 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class StopCommand extends AbstractEnvironmentCommand
 {
-    protected $command = 'stop';
+    protected string $command = 'stop';
+
+    private Make $make;
+
+    public function __construct(
+        ProcessFactory $processFactory,
+        DockerCompose $dockerCompose,
+        Make $make,
+        string $name = null
+    ) {
+        parent::__construct($processFactory, $dockerCompose, $name);
+        $this->make = $make;
+    }
 
     public function getPrerequisites(): array
     {
@@ -39,19 +53,10 @@ class StopCommand extends AbstractEnvironmentCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $environment = new Environment();
-
         $this->interactive->section('Stopping environment');
 
-        $process = $this->processFactory->runProcessWithProgressBar(
-            ['make', 'stop'],
-            60,
-            function ($type, $buffer) {
-                return stripos($buffer, 'stopping') && stripos($buffer, 'done');
-            },
-            $output,
-            $environment->getContainers() + 1
-        );
+        $process = $this->make->stop();
+
         $this->interactive->newLine(2);
 
         if (!$process->getProcess()->isSuccessful()) {

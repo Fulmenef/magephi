@@ -4,5 +4,5 @@ namespace Magephi\Command\Docker;
 
 class NginxCommand extends AbstractDockerCommand
 {
-    protected $service = 'nginx';
+    protected string $service = 'nginx';
 }

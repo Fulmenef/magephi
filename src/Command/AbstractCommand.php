@@ -24,14 +24,11 @@ abstract class AbstractCommand extends Command
     public const FILE_NAME = 'magephi.phar';
     public const PACKAGE_NAME = 'fulmenef/magephi';
 
-    /** @var SymfonyStyle */
-    protected $interactive;
+    protected SymfonyStyle $interactive;
 
-    /** @var ProcessFactory */
-    protected $processFactory;
+    protected ProcessFactory $processFactory;
 
-    /** @var DockerCompose */
-    protected $dockerCompose;
+    protected DockerCompose $dockerCompose;
 
     public function __construct(ProcessFactory $processFactory, DockerCompose $dockerCompose, string $name = null)
     {

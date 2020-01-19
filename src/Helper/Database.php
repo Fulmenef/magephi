@@ -3,52 +3,41 @@
 namespace Magephi\Helper;
 
 use Magephi\Component\DockerCompose;
-use Magephi\Component\Mutagen;
 use Magephi\Component\Process;
 use Magephi\Component\ProcessFactory;
 use Magephi\Entity\Environment;
 use Magephi\Entity\System;
 use Magephi\Exception\EnvironmentException;
-use Magephi\Exception\ProcessException;
-use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
-class Installation
+class Database
 {
-    /** @var ProcessFactory */
-    private $processFactory;
+    private ProcessFactory $processFactory;
 
-    /** @var DockerCompose */
-    private $dockerCompose;
+    private DockerCompose $dockerCompose;
 
-    /** @var Mutagen */
-    private $mutagen;
+    private Environment $environment;
 
-    /** @var Environment */
-    private $environment;
+    private System $system;
 
-    /** @var System */
-    private $system;
+    private SymfonyStyle $interactive;
 
-    /** @var OutputInterface */
-    private $outputInterface;
+    private ConsoleOutput $outputInterface;
 
     public function __construct(
         DockerCompose $dockerCompose,
         ProcessFactory $processFactory,
-        Mutagen $mutagen,
         Environment $environment,
         System $system
     ) {
         $this->dockerCompose = $dockerCompose;
         $this->processFactory = $processFactory;
-        $this->mutagen = $mutagen;
         $this->environment = $environment;
         $this->system = $system;
-    }
-
-    public function setOutputInterface(OutputInterface $outputInterface): void
-    {
-        $this->outputInterface = $outputInterface;
+        $this->outputInterface = new ConsoleOutput();
+        $this->interactive = new SymfonyStyle(new ArgvInput(), $this->outputInterface);
     }
 
     /**
@@ -61,7 +50,7 @@ class Installation
      *
      * @return Process
      */
-    public function databaseImport(string $database, string $filename): Process
+    public function import(string $database, string $filename): Process
     {
         if (!$this->dockerCompose->isContainerUp('mysql')) {
             throw new EnvironmentException('Mysql container is not up');
@@ -88,9 +77,7 @@ class Installation
 
         $readCommand = ['pv', '-ptefab'];
         if (!$this->system->getBinaryPrerequisites()['Pipe Viewer']['status']) {
-            $this->outputInterface->writeln(
-                '<comment>Pipe Viewer is not installed, it is necessary to have a progress bar.</comment>'
-            );
+            $this->interactive->comment('Pipe Viewer is not installed, it is necessary to have a progress bar.');
             $readCommand = ['cat'];
         }
 
@@ -113,10 +100,7 @@ class Installation
             ]
         );
 
-        $this->outputInterface->writeln('');
-        $this->outputInterface->writeln('<fg=yellow>Import started');
-        $this->outputInterface->writeln('<fg=yellow>--------------');
-        $this->outputInterface->writeln('');
+        $this->interactive->section('Import started');
 
         return $this->processFactory->runProcessWithOutput(
             $command,
@@ -162,74 +146,5 @@ class Installation
             ['MYSQL_PWD' => $password],
             true
         );
-    }
-
-    /**
-     * Run the `make start` command with a progress bar.
-     *
-     * @param bool $install
-     *
-     * @return Process
-     */
-    public function startMake(bool $install = false): Process
-    {
-        return $this->processFactory->runProcessWithProgressBar(
-            ['make', 'start'],
-            60,
-            function (/* @noinspection PhpUnusedParameterInspection */ $type, $buffer) {
-                return (strpos($buffer, 'Creating') !== false
-                        && (
-                            strpos($buffer, 'network')
-                            || strpos($buffer, 'volume')
-                            || strpos($buffer, 'done')
-                        ))
-                    || (strpos($buffer, 'Starting') && strpos($buffer, 'done'));
-            },
-            $this->outputInterface,
-            $install ? $this->environment->getContainers() + $this->environment->getVolumes()
-                + 2 : $this->environment->getContainers() + 1
-        );
-    }
-
-    /**
-     * Run the `make build` command with a progress bar.
-     *
-     * @return Process
-     */
-    public function buildMake(): Process
-    {
-        $process = $this->processFactory->runProcessWithProgressBar(
-            ['make', 'build'],
-            600,
-            function (/* @noinspection PhpUnusedParameterInspection */ $type, $buffer) {
-                return strpos($buffer, 'skipping') || strpos($buffer, 'tagged');
-            },
-            $this->outputInterface,
-            $this->environment->getContainers()
-        );
-
-        return $process;
-    }
-
-    /**
-     * Start or resume the mutagen session.
-     */
-    public function startMutagen(): bool
-    {
-        if (!$this->dockerCompose->isContainerUp('synchro')) {
-            throw new ProcessException('Synchro container is not started');
-        }
-        if ($this->mutagen->isExistingSession()) {
-            if ($this->mutagen->isPaused()) {
-                $this->mutagen->resumeSession();
-            }
-        } else {
-            $process = $this->mutagen->createSession();
-            if (!$process->getProcess()->isSuccessful()) {
-                throw new ProcessException('Mutagen session could not be created');
-            }
-        }
-
-        return true;
     }
 }

@@ -10,23 +10,18 @@ class Process
 {
     public const CODE_TIMEOUT = 5;
 
-    /** @var \Symfony\Component\Process\Process */
-    private $process;
+    private \Symfony\Component\Process\Process $process;
 
-    /** @var ProgressBar */
-    private $progressBar;
+    private ?ProgressBar $progressBar = null;
 
     /** @var callable */
     private $progressCallback;
 
-    /** @var float */
-    private $startTime;
+    private float $startTime;
 
-    /** @var float */
-    private $endTime;
+    private ?float $endTime = null;
 
-    /** @var null|int */
-    private $exitCode;
+    private ?int $exitCode;
 
     /**
      * ShellProcess constructor.
@@ -120,31 +115,34 @@ class Process
 
         $this->process->start($callback, $env);
         if ($this->progressBar instanceof ProgressBar) {
+            /** @var ProgressBar $progressBar */
+            $progressBar = $this->progressBar;
+
             // Resume progress bar if current step is defined.
-            if ($this->progressBar->getProgress()) {
-                $this->progressBar->display();
+            if ($progressBar->getProgress()) {
+                $progressBar->display();
             } else {
-                $this->progressBar->start();
+                $progressBar->start();
             }
             $progressFunction = $this->progressCallback;
 
             try {
                 $this->process->wait(
-                    function ($type, $buffer) use ($progressFunction) {
+                    function ($type, $buffer) use ($progressFunction, $progressBar) {
                         if ($steps = $progressFunction($type, $buffer)) {
-                            $this->progressBar->advance(\is_int($steps) ? $steps : 1);
+                            $progressBar->advance(\is_int($steps) ? $steps : 1);
                         }
                     }
                 );
             } catch (ProcessTimedOutException $e) {
-                $this->progressBar->setMaxSteps($this->progressBar->getProgress());
+                $progressBar->setMaxSteps($progressBar->getProgress());
                 $this->process->addErrorOutput($e->getMessage());
-                $this->progressBar->finish();
+                $progressBar->finish();
                 $this->exitCode = self::CODE_TIMEOUT;
             }
 
             if ($this->process->isSuccessful()) {
-                $this->progressBar->finish();
+                $progressBar->finish();
             }
             $this->endTime = microtime(true);
         }
@@ -173,7 +171,7 @@ class Process
     /**
      * @return null|int
      */
-    public function getExitCode()
+    public function getExitCode(): ?int
     {
         return $this->exitCode ?? $this->process->getExitCode();
     }

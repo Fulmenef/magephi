@@ -16,10 +16,9 @@ use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 
 class CreateCommand extends AbstractEnvironmentCommand
 {
-    protected $command = 'create';
+    protected string $command = 'create';
 
-    /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
     public function __construct(
         ProcessFactory $processFactory,

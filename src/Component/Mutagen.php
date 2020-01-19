@@ -8,15 +8,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Mutagen
 {
-    /** @var ProcessFactory */
-    private $processFactory;
-    /** @var Environment */
-    private $environment;
+    private ProcessFactory $processFactory;
 
-    public function __construct(ProcessFactory $processFactory)
+    private Environment $environment;
+
+    public function __construct(ProcessFactory $processFactory, Environment $environment)
     {
         $this->processFactory = $processFactory;
-        $this->environment = new Environment();
+        $this->environment = $environment;
     }
 
     /**

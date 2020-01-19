@@ -5,48 +5,34 @@ namespace Magephi\Entity;
 use Magephi\Exception\EnvironmentException;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 class Environment
 {
-    /** @var string */
-    private $dockerComposeFile;
+    private ?string $dockerComposeFile = null;
 
-    /** @var null|string */
-    private $dockerComposeContent;
+    private ?string $dockerComposeContent = null;
 
-    /** @var null|int */
-    private $containers;
+    private ?int $containers = null;
 
-    /** @var null|int */
-    private $volumes;
+    private ?int $volumes = null;
 
-    /** @var string */
-    private $phpDockerfile;
+    private string $phpDockerfile;
 
-    /** @var string */
-    private $phpImage;
+    private string $phpImage;
 
-    /** @var string */
-    private $localEnv;
+    private ?string $localEnv = null;
 
-    /** @var string */
-    private $localEnvContent;
+    private ?string $localEnvContent = null;
 
-    /** @var string */
-    private $distEnv;
+    private string $distEnv;
 
-    /** @var string */
-    private $nginxConf;
+    private string $nginxConf;
 
-    /** @var string */
-    private $currentDir;
+    private string $currentDir;
 
-    /** @var string */
-    private $magentoApp;
+    private string $magentoApp;
 
-    /** @var string */
-    private $magentoEnv;
+    private ?string $magentoEnv = null;
 
     public function __construct()
     {
@@ -67,11 +53,13 @@ class Environment
      * @param string $name
      * @param mixed  $value
      *
-     * @return mixed
+     * @return Environment
      */
-    public function __set(string $name, $value)
+    public function __set(string $name, $value): self
     {
-        return $this->{$name} = $value;
+        $this->{$name} = $value;
+
+        return $this;
     }
 
     /**
@@ -106,7 +94,7 @@ class Environment
         if ($this->localEnv) {
             $localEnv = file_get_contents($this->localEnv);
             if (!\is_string($localEnv)) {
-                throw new FileException($this->localEnv . ' not found.');
+                throw new FileNotFoundException($this->localEnv . ' not found.');
             }
 
             preg_match('/DOCKER_PHP_IMAGE=(\w+)/i', $localEnv, $match);
@@ -162,13 +150,14 @@ class Environment
     }
 
     /**
-     * Get parameter in the .env file.
+     * Return the local .env content if defined.
      *
-     * @param string $name Parameter name to get
+     * @throws FileNotFoundException
+     * @throws EnvironmentException
      *
      * @return string
      */
-    public function getEnvData(string $name): string
+    public function getLocalEnvData(): string
     {
         if (!\is_string($this->localEnvContent)) {
             if ($this->localEnv) {
@@ -177,11 +166,25 @@ class Environment
                     throw new FileNotFoundException($this->localEnv . ' empty.');
                 }
                 $this->localEnvContent = $content;
+            } else {
+                new EnvironmentException('Local .env is not defined, please install the environment first.');
             }
         }
 
+        return $this->localEnvContent ?: '';
+    }
+
+    /**
+     * Get parameter in the .env file.
+     *
+     * @param string $name Parameter name to get
+     *
+     * @return string
+     */
+    public function getEnvData(string $name): string
+    {
         $name = strtoupper($name);
-        preg_match("/{$name}=(\\w+)/", $this->localEnvContent, $match);
+        preg_match("/{$name}=(\\w+)/", $this->getLocalEnvData(), $match);
 
         return isset($match[1]) ? $match[1] : '';
     }
@@ -224,9 +227,9 @@ class Environment
             return $this->dockerComposeContent;
         }
 
-        $content = file_get_contents($this->dockerComposeFile);
+        $content = file_get_contents($this->dockerComposeFile ?: '');
         if ($content === false) {
-            throw new FileException('docker-compose.yml is not found.');
+            throw new FileNotFoundException('docker-compose.yml is not found.');
         }
         $this->dockerComposeContent = $content;
 
