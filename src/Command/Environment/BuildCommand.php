@@ -38,7 +38,7 @@ class BuildCommand extends AbstractEnvironmentCommand
     {
         parent::configure();
         $this
-            ->setDescription('Build environment, equivalent to <fg=yellow>make build</>')
+            ->setDescription('Build docker containers, equivalent to <fg=yellow>make build</>')
             ->setHelp(
                 'This command allows you to build container for your Magento 2 environment.'
             );

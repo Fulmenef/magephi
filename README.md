@@ -21,7 +21,13 @@ curl https://github.com/Fulmenef/magephi/raw/gh-pages/magephi.phar
 mv magephi.phar /usr/local/bin/magephi
 ```
 
-You can update the application directly with the command `magephi update`
+## Update
+
+THe application will display a notice when an update is available. To download it, just use the `update` command:
+
+```
+magephi update
+```
 
 ## Usage
 
@@ -46,6 +52,25 @@ magephi list
     width="900" alt="demo"/>
 </p>
 
+## Functionality
+
+#### General
+- `magephi prerequisites` to check if your system match the prerequisites to use the environment.
+- `magephi import` to import a database and update the urls.
+- `magephi update` to update Magephi.
+
+#### Environment
+- `magephi start` to start the environment.
+- `magephi stop` to stop the environment.
+- `magephi install` to install the environment.
+- `magephi uninstall` to fully uninstall the environment. This will remove volumes and container but not the files on your local system..
+
+#### Docker
+- `magephi php|mysql|nginx|redis` to connect to containers.
+- `magephi build` to build the containers. The docker/local/.env file must have been filled before.
+
+#### Magento
+- `magephi magento:install` to install Magento after you have installed the environment.
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
