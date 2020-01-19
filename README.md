@@ -17,13 +17,14 @@ For now Magephi has been only tested on Mac with the environment [docker-magento
 ## Installation
 
 ```
-curl https://github.com/Fulmenef/magephi/raw/gh-pages/magephi.phar
+curl -sL https://github.com/Fulmenef/magephi/releases/latest/download/magephi.phar --output magephi.phar
+chmod +x magephi.phar
 mv magephi.phar /usr/local/bin/magephi
 ```
 
 ## Update
 
-THe application will display a notice when an update is available. To download it, just use the `update` command:
+The application will display a notice when an update is available. To download it, just use the `update` command:
 
 ```
 magephi update
