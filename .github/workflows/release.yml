@@ -1,0 +1,38 @@
+name: Release version
+
+on:
+  push:
+    tags:
+      - '*.*.*'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Validate composer.json and composer.lock
+        run: composer validate
+
+      - name: Install dependencies
+        run: composer install --ignore-platform-reqs --prefer-dist --no-progress --no-dev --no-suggest --optimize-autoloader --classmap-authoritative
+
+      - name: Compilation
+        run: |
+          mkdir ~/.magephi
+          composer dump-env prod
+          docker run --interactive --volume=$(pwd):/app ajardin/humbug-box compile
+
+      - name: Prepare release
+        run: git log --pretty=format:'* %s (%h)' $(git tag | sort -r | head -2 | tail -1)...$(git tag | sort -r | head -1) | sed '1d' >> body.md
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          body_path: body.md
+          files: ./build/magephi.phar

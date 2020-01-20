@@ -47,7 +47,9 @@ class ReleaseHandler
                 $this->deleteFiles($file);
             }
 
-            rmdir($target);
+            if (is_dir($target)) {
+                rmdir($target);
+            }
         } elseif (is_file($target)) {
             unlink($target);
         }

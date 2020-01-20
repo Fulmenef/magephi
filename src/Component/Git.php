@@ -63,7 +63,9 @@ class Git
         $process = $this->processFactory->runProcess($command, 10, []);
 
         if (!$process->getProcess()->isSuccessful()) {
-            throw new GitException("Unable to checkout on branch {$branch}. Cause:\n {$process->getProcess()->getErrorOutput()}");
+            throw new GitException(
+                "Unable to checkout on branch {$branch}. Cause:\n {$process->getProcess()->getErrorOutput()}"
+            );
         }
 
         return true;
@@ -131,7 +133,9 @@ class Git
         $process = $this->processFactory->runProcess($command, 60);
 
         if (!$process->getProcess()->isSuccessful()) {
-            throw new GitException("Unable to push branch {$branch} to {$remote}. Cause:\n {$process->getProcess()->getErrorOutput()}");
+            throw new GitException(
+                "Unable to push branch {$branch} to {$remote}. Cause:\n {$process->getProcess()->getErrorOutput()}"
+            );
         }
 
         return true;
