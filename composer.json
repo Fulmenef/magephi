@@ -1,6 +1,6 @@
 {
     "name": "fulmenef/magephi",
-    "version": "0.7.1",
+    "version": "0.7.2",
     "type": "application",
     "description": "PHP toolbox to manage Magento 2 project with a Docker Environment.",
     "license": "MIT",
