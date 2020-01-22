@@ -2,15 +2,18 @@
 
 namespace Magephi\Component;
 
+use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
 class ProcessFactory
 {
     private ConsoleOutput $ouputInterface;
+    private ArgvInput $inputInterface;
 
     public function __construct()
     {
         $this->ouputInterface = new ConsoleOutput();
+        $this->inputInterface = new ArgvInput();
     }
 
     /**
@@ -29,7 +32,12 @@ class ProcessFactory
         ?array $env = null,
         bool $shell = false
     ): Process {
-        return new Process($command, $timeout, $env, $shell);
+        return new Process(
+            $command,
+            $this->inputInterface->hasParameterOption('--no-timeout') ? null : $timeout,
+            $env,
+            $shell
+        );
     }
 
     /**

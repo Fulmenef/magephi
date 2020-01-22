@@ -13,6 +13,7 @@ use Magephi\Exception\EnvironmentException;
 use Magephi\Kernel;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -95,6 +96,16 @@ abstract class AbstractCommand extends Command
     public function getPrerequisites(): array
     {
         return ['binary' => ['Docker', 'Docker-Compose'], 'service' => ['Docker']];
+    }
+
+    protected function configure(): void
+    {
+        $this->addOption(
+            'no-timeout',
+            null,
+            InputOption::VALUE_NONE,
+            'Specify this option to remove timeout limitations.'
+        );
     }
 
     protected function initialize(InputInterface $input, OutputInterface $output): void

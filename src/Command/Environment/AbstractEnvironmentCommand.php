@@ -10,6 +10,7 @@ abstract class AbstractEnvironmentCommand extends AbstractCommand
 
     protected function configure(): void
     {
+        parent::configure();
         $this
             ->setName('magephi:environment:' . $this->command)
             ->setAliases([$this->command]);
