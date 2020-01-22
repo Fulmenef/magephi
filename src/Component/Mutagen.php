@@ -4,6 +4,7 @@ namespace Magephi\Component;
 
 use Magephi\Entity\Environment;
 use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Mutagen
@@ -12,10 +13,13 @@ class Mutagen
 
     private Environment $environment;
 
+    private OutputInterface $outputInterface;
+
     public function __construct(ProcessFactory $processFactory, Environment $environment)
     {
         $this->processFactory = $processFactory;
         $this->environment = $environment;
+        $this->outputInterface = new ConsoleOutput();
     }
 
     /**
@@ -116,11 +120,9 @@ class Mutagen
     /**
      * Display a progress bar until the file synchronization is done.
      *
-     * @param OutputInterface $output
-     *
      * @return bool
      */
-    public function monitorUntilSynced(OutputInterface $output): bool
+    public function monitorUntilSynced(): bool
     {
         $process = $this->processFactory->createProcess(
             [
@@ -130,7 +132,7 @@ class Mutagen
             ],
             300
         );
-        $progressBar = new ProgressBar($output, 100);
+        $progressBar = new ProgressBar($this->outputInterface, 100);
         $reStatus = '/Status: (.*)$/i';
         $reProgress = '/Staging files on beta: (\d+)%/i';
         $process->start();

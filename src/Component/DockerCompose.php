@@ -2,9 +2,11 @@
 
 namespace Magephi\Component;
 
+use Error;
 use Magephi\Entity\Environment;
 use Magephi\Exception\EnvironmentException;
 use Magephi\Exception\ProcessException;
+use Psr\Log\LoggerInterface;
 
 class DockerCompose
 {
@@ -12,16 +14,13 @@ class DockerCompose
 
     private Environment $environment;
 
-    /**
-     * DockerCompose constructor.
-     *
-     * @param ProcessFactory $processFactory
-     * @param Environment    $environment
-     */
-    public function __construct(ProcessFactory $processFactory, Environment $environment)
+    private LoggerInterface $logger;
+
+    public function __construct(ProcessFactory $processFactory, Environment $environment, LoggerInterface $logger)
     {
         $this->processFactory = $processFactory;
         $this->environment = $environment;
+        $this->logger = $logger;
     }
 
     /**
@@ -65,8 +64,20 @@ class DockerCompose
     {
         $command = "docker ps -q --no-trunc | grep $(docker-compose ps -q {$container})";
         $commands = explode(' ', $command);
-        $process =
-            $this->processFactory->runProcess($commands, 10, $this->environment->getDockerRequiredVariables(), true);
+
+        try {
+            $process =
+                $this->processFactory->runProcess(
+                    $commands,
+                    10,
+                    $this->environment->getDockerRequiredVariables(),
+                    true
+                );
+        } catch (Error $e) {
+            $this->logger->error($e->getMessage());
+
+            throw new EnvironmentException('Environment is not defined, install the environment first.');
+        }
 
         return $process->getProcess()->isSuccessful() && !empty($process->getProcess()->getOutput());
     }
@@ -89,18 +100,17 @@ class DockerCompose
             throw new EnvironmentException(sprintf('The container %s is not started.', $container));
         }
 
+        $arguments = [];
+        if ($container === 'php') {
+            $arguments = ['-u', 'www-data:www-data'];
+        }
+
         $finalCommand =
-            [
-                'docker-compose',
-                'exec',
-                '-u',
-                'www-data:www-data',
-                '-T',
-                $container,
-                'sh',
-                '-c',
-                sprintf('"%s"', escapeshellcmd($command)),
-            ];
+            array_merge(
+                ['docker-compose', 'exec'],
+                $arguments,
+                ['-T', $container, 'sh', '-c', sprintf('"%s"', escapeshellcmd($command))]
+            );
 
         if ($createOnly) {
             /** @var Process $process */

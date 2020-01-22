@@ -4,10 +4,11 @@ namespace Magephi\Component;
 
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class ProcessFactory
 {
-    private ConsoleOutput $ouputInterface;
+    private OutputInterface $ouputInterface;
     private ArgvInput $inputInterface;
 
     public function __construct()
@@ -84,7 +85,7 @@ class ProcessFactory
         int $maxSteps = null,
         bool $shell = false
     ): Process {
-        if ($this->ouputInterface->isVerbose()) {
+        if ($_ENV['SHELL_VERBOSITY'] >= 1) {
             return $this->runProcessWithOutput($command, $timeout, [], $shell);
         }
         $process = $this->createProcess($command, $timeout, null, $shell);

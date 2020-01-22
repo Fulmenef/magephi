@@ -17,6 +17,7 @@ use Magephi\Helper\Database;
 use Magephi\Helper\Make;
 use Magephi\Kernel;
 use Nadar\PhpComposerReader\ComposerReader;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -37,8 +38,6 @@ class InstallCommand extends AbstractEnvironmentCommand
 
     private Environment $environment;
 
-    private OutputInterface $output;
-
     private Make $make;
 
     private Mutagen $mutagen;
@@ -46,6 +45,8 @@ class InstallCommand extends AbstractEnvironmentCommand
     private System $prerequisite;
 
     private Database $database;
+
+    private LoggerInterface $logger;
 
     public function __construct(
         ProcessFactory $processFactory,
@@ -55,6 +56,7 @@ class InstallCommand extends AbstractEnvironmentCommand
         Mutagen $mutagen,
         Environment $environment,
         System $system,
+        LoggerInterface $logger,
         string $name = null
     ) {
         parent::__construct($processFactory, $dockerCompose, $name);
@@ -63,6 +65,7 @@ class InstallCommand extends AbstractEnvironmentCommand
         $this->environment = $environment;
         $this->prerequisite = $system;
         $this->database = $database;
+        $this->logger = $logger;
     }
 
     public function getPrerequisites(): array
@@ -78,12 +81,6 @@ class InstallCommand extends AbstractEnvironmentCommand
             ->setHelp('This command allows you to install the Magento 2 environment of the current project.');
     }
 
-    protected function initialize(InputInterface $input, OutputInterface $output): void
-    {
-        $this->output = $output;
-        parent::initialize($input, $output);
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         try {
@@ -93,7 +90,7 @@ class InstallCommand extends AbstractEnvironmentCommand
 
             $this->interactive->newLine();
 
-            $serverName = $this->prepareEnvironment($composer);
+            $this->prepareEnvironment($composer);
 
             $this->buildContainers();
 
@@ -116,9 +113,10 @@ class InstallCommand extends AbstractEnvironmentCommand
 
         $this->interactive->success('Your environment has been successfully installed.');
 
+        $serverName = $this->environment->getServerName(true);
         if ($imported && $this->environment->hasMagentoEnv()) {
             $this->interactive->success(
-                "Your project is ready, you can access it on https://{$serverName}"
+                "Your project is ready, you can access it on {$serverName}"
             );
         } else {
             if (!$this->environment->hasMagentoEnv()) {
@@ -130,7 +128,7 @@ class InstallCommand extends AbstractEnvironmentCommand
                 $this->interactive->warning('No database has been imported, install Magento or import the database.');
             }
             $this->interactive->success(
-                "Your project is almost ready, it'll will be available on https://{$serverName}"
+                "Your project is almost ready, it'll will be available on {$serverName}"
             );
         }
 
@@ -188,10 +186,8 @@ class InstallCommand extends AbstractEnvironmentCommand
 
     /**
      * @param ComposerReader $composer
-     *
-     * @return string
      */
-    protected function prepareEnvironment(ComposerReader $composer): string
+    protected function prepareEnvironment(ComposerReader $composer): void
     {
         $this->interactive->section('Configuring docker environment');
         if ($this->environment->__get('distEnv') === null) {
@@ -212,8 +208,6 @@ class InstallCommand extends AbstractEnvironmentCommand
 
         $serverName = $this->chooseServerName();
         $this->setupHost($serverName);
-
-        return $serverName;
     }
 
     /**
@@ -312,6 +306,8 @@ class InstallCommand extends AbstractEnvironmentCommand
         if (!$process->getProcess()->isSuccessful() && $process->getExitCode() !== Process::CODE_TIMEOUT) {
             $this->interactive->newLine(2);
 
+            $this->logger->error($process->getProcess()->getErrorOutput());
+
             throw new ProcessException(
                 'An error occured during the start, ensure there is no other containers running. To have more detail, run the command with verbosity.'
             );
@@ -321,7 +317,7 @@ class InstallCommand extends AbstractEnvironmentCommand
             $this->interactive->newLine();
             $this->interactive->text('Containers are up.');
             $this->interactive->section('File synchronization');
-            $synced = $this->mutagen->monitorUntilSynced($this->output);
+            $synced = $this->mutagen->monitorUntilSynced();
             if (!$synced) {
                 throw new ProcessException(
                     'Something happened during the sync, check the situation with <fg=yellow>mutagen monitor</>.'
@@ -387,6 +383,8 @@ class InstallCommand extends AbstractEnvironmentCommand
     }
 
     /**
+     * Let the user choose the server name of the project.
+     *
      * @return string
      */
     private function chooseServerName(): string

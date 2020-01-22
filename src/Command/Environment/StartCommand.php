@@ -44,11 +44,6 @@ class StartCommand extends AbstractEnvironmentCommand
         return $prerequisites;
     }
 
-    protected function initialize(InputInterface $input, OutputInterface $output): void
-    {
-        parent::initialize($input, $output);
-    }
-
     protected function configure(): void
     {
         parent::configure();
@@ -73,7 +68,7 @@ class StartCommand extends AbstractEnvironmentCommand
                 $this->interactive->newLine();
                 $this->interactive->text('Containers are up.');
                 $this->interactive->section('File synchronization');
-                $synced = $this->mutagen->monitorUntilSynced($output);
+                $synced = $this->mutagen->monitorUntilSynced();
                 if (!$synced) {
                     throw new Exception(
                         'Something happened during the sync, check the situation with <fg=yellow>mutagen monitor</>.'

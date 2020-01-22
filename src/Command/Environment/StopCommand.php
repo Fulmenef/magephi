@@ -36,11 +36,6 @@ class StopCommand extends AbstractEnvironmentCommand
         return $prerequisites;
     }
 
-    protected function initialize(InputInterface $input, OutputInterface $output): void
-    {
-        parent::initialize($input, $output);
-    }
-
     protected function configure(): void
     {
         parent::configure();
