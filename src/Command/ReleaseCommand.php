@@ -131,6 +131,11 @@ class ReleaseCommand extends Command
         if ($this->gitPush($version)) {
             return AbstractCommand::CODE_ERROR;
         }
+        $this->logger->debug('Tag pushed.');
+
+        if ($this->gitPush()) {
+            return AbstractCommand::CODE_ERROR;
+        }
         $this->logger->debug('Master pushed.');
 
         $this->interactive->success(
