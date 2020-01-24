@@ -3,9 +3,11 @@
 namespace Magephi\Command\Environment;
 
 use ErrorException;
+use Exception;
 use Magephi\Command\AbstractCommand;
 use Magephi\Component\DockerCompose;
 use Magephi\Component\ProcessFactory;
+use Magephi\Entity\System;
 use Magephi\Exception\ComposerException;
 use Nadar\PhpComposerReader\ComposerReader;
 use Psr\Log\LoggerInterface;
@@ -20,14 +22,18 @@ class CreateCommand extends AbstractEnvironmentCommand
 
     private LoggerInterface $logger;
 
+    private System $system;
+
     public function __construct(
         ProcessFactory $processFactory,
         DockerCompose $dockerCompose,
         LoggerInterface $logger,
+        System $system,
         string $name = null
     ) {
         parent::__construct($processFactory, $dockerCompose, $name);
         $this->logger = $logger;
+        $this->system = $system;
     }
 
     public function getPrerequisites(): array
@@ -96,6 +102,18 @@ class CreateCommand extends AbstractEnvironmentCommand
         try {
             $this->initComposerDev();
         } catch (ComposerException $e) {
+            $this->interactive->error($e->getMessage());
+
+            return AbstractCommand::CODE_ERROR;
+        }
+
+        if (!is_file('package.json') && is_file('package.json.sample')) {
+            copy('package.json.sample', 'package.json');
+        }
+
+        try {
+            $this->initPackageDev();
+        } catch (ComposerException | Exception $e) {
             $this->interactive->error($e->getMessage());
 
             return AbstractCommand::CODE_ERROR;
@@ -176,7 +194,7 @@ EOD;
     }
 
     /**
-     * Add .gitkeep file to usefule directories.
+     * Add .gitkeep file to useful directories.
      */
     protected function initGitkeep(): void
     {
@@ -212,7 +230,7 @@ EOD;
     }
 
     /**
-     * Use specific dependencies for dev.
+     * Use specific dependencies for dev for composer.
      *
      * @throws ComposerException
      */
@@ -237,7 +255,49 @@ EOD;
             ['composer', 'update', '--ignore-platform-reqs', '--optimize-autoloader'],
             90
         );
+        $this->interactive->comment('Composer dependencies installed');
 
         $this->processFactory->runProcess(['composer', 'exec', 'docker-local-install']);
+    }
+
+    /**
+     * Use specific dependencies for dev for yarn.
+     *
+     * @throws ComposerException
+     * @throws \Exception
+     */
+    protected function initPackageDev(): void
+    {
+        $package = new ComposerReader('package.json');
+        if (!$package->canRead()) {
+            throw new ComposerException('The package.json cannot be read.');
+        }
+        $content = $package->getContent();
+
+        $requireDev = [
+            '@magento/eslint-config'     => '^1.5.0',
+            'eslint'                     => '^6.5.1',
+            'eslint-config-google'       => '^0.14.0',
+            'eslint-config-recommended'  => '^4.0.0',
+            'eslint-plugin-jsx-a11y'     => '^6.2.3',
+            'eslint-plugin-package-json' => '^0.1.3',
+            'eslint-plugin-react'        => '^7.17.0',
+            'eslint-plugin-react-hooks'  => '^2.1.2',
+            'husky'                      => '^4.0.0-beta.2',
+            'lint-staged'                => '^10.0.0-0',
+            'stylelint'                  => '^11.1.1',
+            'stylelint-config-standard'  => '^19.0.0',
+        ];
+        $devDependencies = array_merge($requireDev, $content['devDependencies']);
+        asort($devDependencies);
+        $package->updateSection('devDependencies', $devDependencies);
+        $package->save();
+
+        if ($this->system->isInstalled('yarn')) {
+            $this->processFactory->runProcess(['yarn', 'install'], 180);
+            $this->interactive->comment('Yarn packages installed');
+        } else {
+            $this->interactive->note('Yarn is not installed locally, the packages have not been installed.');
+        }
     }
 }

@@ -65,6 +65,7 @@ magephi list
 - `magephi stop` to stop the environment.
 - `magephi install` to install the environment.
 - `magephi uninstall` to fully uninstall the environment. This will remove volumes and container but not the files on your local system..
+- `magephi create` Initialize a new project with the environment. See [here](#project-initialization) for more details about the command.
 
 #### Docker
 - `magephi php|mysql|nginx|redis` to connect to containers.
@@ -72,6 +73,59 @@ magephi list
 
 #### Magento
 - `magephi magento:install` to install Magento after you have installed the environment.
+
+## Details
+
+#### Project initialization
+You can initialize a project with the `magephi create`. If you are in an empty directory, the project will be installed inside it,
+if not you'll be asked for the project name and a directory with that name will be created and used as work directory.
+
+At the same time as the Magento 2 dependency, some development dependencies are added.
+
+Also, a custom .gitignore is set, you can have a look of the content [here](https://github.com/Fulmenef/magephi/blob/master/src/Command/Environment/CreateCommand.php#L118). 
+
+##### Composer
+
+- [Docker Magento 2](https://github.com/EmakinaFR/docker-magento2): Docker environment for your project
+- [PhpStan](https://github.com/phpstan/phpstan): Static code analyser for PHP
+- [PhpStan extension for Magento](https://github.com/bitExpert/phpstan-magento)
+- [PhpCsFixer](https://github.com/FriendsOfPHP/PHP-CS-Fixer): A tool to automatically fix PHP Coding Standards issues 
+- [Security Checker](https://github.com/sensiolabs/security-checker): Command line tool that checks if your application uses dependencies with known security vulnerabilities
+- [Security Advisories](https://github.com/Roave/SecurityAdvisories): Composer tool to help to prevent installing packages with know vulnerabilities
+
+##### Yarn
+
+- [Husky](https://github.com/typicode/husky): Tool to trigger action on git hooks
+- [Lint-Staged](https://github.com/okonet/lint-staged): Linter to apply checks on staged files, used with Husky.
+- [Eslint](https://eslint.org/): Static code analyser for Javascript
+- [Eslint extension for Magento](https://github.com/magento-research/magento-eslint)
+- [Stylelint](https://stylelint.io/): Linter for LESS/CSS files
+
+###### Example of configuration for Husky and Lint-Staged
+
+The following will run PHPCsFixer and PHPStan on each PHP and PHTML files, Stylelint for each LESS files and Eslint for 
+javascript files each time you run a `git commit`.
+```json
+// To be placed at the end of the package.json
+
+"husky": {
+    "hooks": {
+        "pre-commit": "lint-staged --relative --shell"
+    }
+},
+"lint-staged": {
+    "!(app/etc/*).php|*.phtml": [
+        "php ./vendor/bin/php-cs-fixer fix --config .php_cs",
+        "php ./vendor/bin/phpstan analyze --level=max --no-progress"
+    ],
+    "app/code/YourVendor/**/*.less|app/design/frontend/YourVendor/**/*.less": [
+        "php ./node_modules/.bin/stylelint --fix"
+    ],
+    "app/code/YourVendor/**/*.js|app/design/frontend/YourVendor/**/*.js": [
+        "php ./node_modules/.bin/eslint --fix"
+    ]
+}
+```
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.

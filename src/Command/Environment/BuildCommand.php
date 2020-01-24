@@ -49,7 +49,7 @@ class BuildCommand extends AbstractEnvironmentCommand
 
         if (!$process->getProcess()->isSuccessful()) {
             if ($process->getExitCode() === Process::CODE_TIMEOUT) {
-                $this->interactive->error('Build timeout, run directly `make build` to build the environment.');
+                $this->interactive->error('Build timeout, use the option --no-timeout or run directly `make build` to build the environment.');
             } else {
                 $this->interactive->error($process->getProcess()->getErrorOutput());
                 $this->interactive->note(
