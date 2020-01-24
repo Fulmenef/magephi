@@ -14,7 +14,9 @@ jobs:
       - uses: actions/checkout@v1
 
       - name: Install dependencies
-        run: composer install --ignore-platform-reqs --prefer-dist --no-progress --no-suggest --optimize-autoloader --classmap-authoritative
+        run: |
+          composer install --ignore-platform-reqs --prefer-dist --no-progress --no-suggest --optimize-autoloader --classmap-authoritative
+          yarn install
 
       - name: PHP-CS-Fixer
         run: ./vendor/bin/php-cs-fixer fix --verbose --dry-run
