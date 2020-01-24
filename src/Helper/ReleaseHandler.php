@@ -20,14 +20,16 @@ class ReleaseHandler
     {
         $customDir = $this->kernel->getCustomDir();
 
-        /** @var string[] $scan */
-        $scan = scandir($customDir);
+        if (is_dir($customDir)) {
+            /** @var string[] $scan */
+            $scan = scandir($customDir);
 
-        /** @var string[] $diff */
-        $diff = array_diff($scan, ['.', '..', $this->kernel->getVersion()]);
-        if (!empty($diff)) {
-            foreach ($diff as $directory) {
-                $this->deleteFiles($customDir . '/' . $directory);
+            /** @var string[] $diff */
+            $diff = array_diff($scan, ['.', '..', $this->kernel->getVersion()]);
+            if (!empty($diff)) {
+                foreach ($diff as $directory) {
+                    $this->deleteFiles($customDir . '/' . $directory);
+                }
             }
         }
     }
