@@ -9,8 +9,7 @@ use Magephi\Command\AbstractCommand;
  */
 abstract class AbstractMagentoCommand extends AbstractCommand
 {
-    /** @var string */
-    protected $command = '';
+    protected string $command = '';
 
     protected function configure(): void
     {

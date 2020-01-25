@@ -15,7 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class InstallCommand extends AbstractMagentoCommand
 {
-    protected $command = 'install';
+    protected string $command = 'install';
 
     private Environment $environment;
 
