@@ -59,7 +59,7 @@ class ImportCommand extends AbstractEnvironmentCommand
                 "Destination database. If no database provided, the database defined in docker/local/.env will be used. If the database does not exist, it'll be created."
             )
             ->setDescription('Import a SQL file into a database inside the MySQL Container.')
-            ->setHelp('This command allow you to import a SQL file');
+            ->setHelp('This command allows you to import a SQL file');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
