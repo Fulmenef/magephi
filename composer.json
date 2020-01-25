@@ -1,6 +1,5 @@
 {
     "name": "fulmenef/magephi",
-    "version": "0.7.4",
     "type": "application",
     "description": "PHP toolbox to manage Magento 2 project with a Docker Environment.",
     "license": "MIT",
@@ -25,6 +24,8 @@
         "symfony/yaml": "^5.0"
     },
     "require-dev": {
+        "captainhook/captainhook": "^5.1",
+        "captainhook/plugin-composer": "^5.0",
         "friendsofphp/php-cs-fixer": "3.0.x-dev",
         "nyholm/psr7": "^1.2",
         "phpstan/phpstan": "^0.12",

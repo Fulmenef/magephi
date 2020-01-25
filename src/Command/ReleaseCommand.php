@@ -7,7 +7,6 @@ use Magephi\Component\Git;
 use Magephi\Component\ProcessFactory;
 use Magephi\Exception\ComposerException;
 use Magephi\Exception\GitException;
-use Nadar\PhpComposerReader\ComposerReader;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -104,23 +103,6 @@ class ReleaseCommand extends Command
         }
         $this->logger->debug('Changes found.');
 
-        try {
-            $files = ['composer.json', 'package.json', 'package-lock.json'];
-
-            foreach ($files as $file) {
-                $this->updateJsonFile($version, $file);
-                $this->git->add($file);
-            }
-            $this->processFactory->runProcess(['composer', 'update'], 60);
-            $this->git->add('composer.lock');
-
-            $this->git->commitRelease($version);
-        } catch (Exception $e) {
-            $this->interactive->error($e->getMessage());
-
-            return AbstractCommand::CODE_ERROR;
-        }
-
         if (!$this->git->createTag($version)) {
             $this->interactive->error("A tag for version {$version} already exists");
 
@@ -157,24 +139,6 @@ class ReleaseCommand extends Command
         if (empty($match) || $match[0] !== $tag) {
             throw new ComposerException("Version {$tag} is not correct, format is MAJOR.MINOR.PATCH. eg: 1.2.3");
         }
-    }
-
-    /**
-     * Update json files (composer.json, package.json...) with the new version.
-     * The field must be named "version".
-     *
-     * @param string $version
-     * @param string $file
-     */
-    private function updateJsonFile(string $version, string $file): void
-    {
-        /** @var ComposerReader $json */
-        $json = new ComposerReader($file);
-        if (!$json->canRead()) {
-            throw new ComposerException('Unable to read json.');
-        }
-        $json->updateSection('version', $version);
-        $json->save();
     }
 
     /**
