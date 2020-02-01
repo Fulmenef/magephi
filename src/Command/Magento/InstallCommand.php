@@ -104,29 +104,33 @@ class InstallCommand extends AbstractMagentoCommand
             $this->dockerCompose->executeCommand('php', 'mkdir pub/static');
             $this->dockerCompose->executeCommand('php', 'composer dumpautoload && rm -rf generated');
             $this->interactive->section('Installation');
-            /** @var Process $install */
-            $install = $this->dockerCompose->executeCommand('php', $command, true);
-            $progressBar = new ProgressBar($output, 0);
-            $regex = '/Progress: (\d*) \/ (\d*)/i';
-            $install->start();
-            $progressBar->start();
-            $install->getProcess()->waitUntil(
-                function (string $type, string $buffer) use ($regex, $progressBar) {
-                    if ($_ENV['SHELL_VERBOSITY'] >= 1) {
-                        echo $buffer;
-                    }
-                    preg_match($regex, $buffer, $match);
-                    if (isset($match[1])) {
-                        if ($progressBar->getMaxSteps() !== $match[2]) {
-                            $progressBar->setMaxSteps($match[2]);
-                        }
-                        $progressBar->setProgress($match[1]);
-                    }
 
-                    return false;
+            if ($_ENV['SHELL_VERBOSITY'] >= 1) {
+                $install = $this->dockerCompose->executeCommand('php', $command);
+            } else {
+                /** @var Process $install */
+                $install = $this->dockerCompose->executeCommand('php', $command, true);
+                $progressBar = new ProgressBar($output, 0);
+                $regex = '/Progress: (\d*) \/ (\d*)/i';
+                $install->start();
+                $progressBar->start();
+                $install->getProcess()->waitUntil(
+                    function (string $type, string $buffer) use ($regex, $progressBar) {
+                        preg_match($regex, $buffer, $match);
+                        if (isset($match[1])) {
+                            if ($progressBar->getMaxSteps() !== $match[2]) {
+                                $progressBar->setMaxSteps($match[2]);
+                            }
+                            $progressBar->setProgress($match[1]);
+                        }
+
+                        return false;
+                    }
+                );
+                if ($install->getProcess()->isSuccessful()) {
+                    $progressBar->finish();
                 }
-            );
-            $progressBar->finish();
+            }
         } catch (EnvironmentException | ProcessException $e) {
             $this->interactive->error($e->getMessage());
 
@@ -134,6 +138,21 @@ class InstallCommand extends AbstractMagentoCommand
         }
 
         $this->interactive->newLine(2);
+
+        if (!$install->getProcess()->isSuccessful()) {
+            $this->interactive->error('An error occurred during installation');
+            $error = explode(PHP_EOL, $install->getProcess()->getErrorOutput());
+
+            // Clean error to have a smaller one
+            for ($i = 0; $i < 5; ++$i) {
+                array_pop($error);
+            }
+
+            $this->interactive->error(implode(PHP_EOL, $error));
+
+            return AbstractCommand::CODE_ERROR;
+        }
+
         $this->interactive->success(
             sprintf(
                 'Magento installed, you can access to your website with the url %s',
