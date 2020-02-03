@@ -2235,19 +2235,20 @@
         },
         {
             "name": "captainhook/plugin-composer",
-            "version": "5.0.0",
+            "version": "5.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/CaptainHookPhp/plugin-composer.git",
-                "reference": "513aa14b5249328796bdd21e107f15c7fa8006ef"
+                "reference": "5690b1de316643488426d4266937380fae09c8f1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/CaptainHookPhp/plugin-composer/zipball/513aa14b5249328796bdd21e107f15c7fa8006ef",
-                "reference": "513aa14b5249328796bdd21e107f15c7fa8006ef",
+                "url": "https://api.github.com/repos/CaptainHookPhp/plugin-composer/zipball/5690b1de316643488426d4266937380fae09c8f1",
+                "reference": "5690b1de316643488426d4266937380fae09c8f1",
                 "shasum": ""
             },
             "require": {
+                "captainhook/captainhook": "^5.0",
                 "composer-plugin-api": "^1.1",
                 "php": "^7.1"
             },
@@ -2281,7 +2282,7 @@
                 }
             ],
             "description": "Composer-Plugin handling your git-hooks",
-            "time": "2020-01-01T14:08:20+00:00"
+            "time": "2020-01-31T09:33:19+00:00"
         },
         {
             "name": "composer/xdebug-handler",
