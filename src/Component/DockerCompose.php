@@ -131,4 +131,18 @@ class DockerCompose
 
         return $process;
     }
+
+    /**
+     * Restart the given container.
+     *
+     * @param string $container
+     *
+     * @return bool
+     */
+    public function restartContainer(string $container): bool
+    {
+        $process = $this->processFactory->runProcess(['docker-compose', 'restart', $container], 60, $this->environment->getDockerRequiredVariables());
+
+        return $process->getProcess()->isSuccessful();
+    }
 }
