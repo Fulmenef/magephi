@@ -3,7 +3,10 @@
     "enabled": true,
     "actions": [
       {
-        "action": "\\CaptainHook\\App\\Hook\\Message\\Action\\Beams"
+        "action": "\\CaptainHook\\App\\Hook\\Message\\Action\\Beams",
+        "options": {
+          "subjectLength": "60"
+        }
       },
       {
         "action": "\\CaptainHook\\App\\Hook\\Message\\Action\\Rules",

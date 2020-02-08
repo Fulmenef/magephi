@@ -11,6 +11,7 @@ return PhpCsFixer\Config::create()
             'array_syntax'                           => ['syntax' => 'short'],
             'braces'                                 => ['allow_single_line_closure' => true],
             'binary_operator_spaces'                 => ['operators' => ['=>' => 'align_single_space']],
+            'class_attributes_separation'            => true,
             'concat_space'                           => ['spacing' => 'one'],
             'multiline_whitespace_before_semicolons' => ['strategy' => 'no_multi_line'],
         ]

@@ -20,9 +20,11 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 abstract class AbstractCommand extends Command
 {
     public const CODE_SUCCESS = 0;
+
     public const CODE_ERROR = 1;
 
     public const FILE_NAME = 'magephi.phar';
+
     public const PACKAGE_NAME = 'fulmenef/magephi';
 
     protected SymfonyStyle $interactive;
