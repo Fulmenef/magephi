@@ -11,3 +11,5 @@ parameters:
   ignoreErrors:
       - '#Property [a-zA-Z0-9\\_]+::\$[a-zA-Z0-9\\_]+ type has no value type specified in iterable type Symfony\\Component\\Process\\Process#'
       - '#Method [a-zA-Z0-9\\_]+::[a-zA-Z\\_]+\(\) return type has no value type specified in iterable type Symfony\\Component\\Process\\Process#'
+      # False positive from the php documentation
+      - "#Offset 'extension' does not exist on array#"

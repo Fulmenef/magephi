@@ -9,6 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ProcessFactory
 {
     private OutputInterface $ouputInterface;
+
     private ArgvInput $inputInterface;
 
     public function __construct()
