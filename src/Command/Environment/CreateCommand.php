@@ -80,9 +80,11 @@ class CreateCommand extends AbstractEnvironmentCommand
         $package = $input->getOption(
             'enterprise'
         ) ? 'magento/project-enterprise-edition' : 'magento/project-community-edition';
+
         /** @var string $patch */
         $patch = $input->getOption('patch');
         if ($patch) {
+            $patch = ltrim('=', $patch);
             $package .= "={$patch}";
         }
 
