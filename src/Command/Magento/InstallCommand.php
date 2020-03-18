@@ -102,7 +102,8 @@ class InstallCommand extends AbstractMagentoCommand
 
         try {
             $this->dockerCompose->executeCommand('php', 'mkdir pub/static');
-            $this->dockerCompose->executeCommand('php', 'composer dumpautoload && rm -rf generated');
+            $this->dockerCompose->executeCommand('php', 'composer dumpautoload');
+            $this->dockerCompose->executeCommand('php', 'rm -rf generated');
             $this->interactive->section('Installation');
 
             if ($_ENV['SHELL_VERBOSITY'] >= 1) {
