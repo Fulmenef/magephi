@@ -63,9 +63,10 @@ magephi list
 #### Environment
 - `magephi start` to start the environment.
 - `magephi stop` to stop the environment.
-- `magephi install` to install the environment.
-- `magephi uninstall` to fully uninstall the environment. This will remove volumes and container but not the files on your local system..
+- `magephi install` to install the environment (build + start).
+- `magephi uninstall` to fully uninstall the environment. This will remove volumes and container but not the files on your local system.
 - `magephi create` Initialize a new project with the environment. See [here](#project-initialization) for more details about the command.
+- `magephi backup|restore` Generate or restore a backup of your database and environment configuration.
 
 #### Docker
 - `magephi php|mysql|nginx|redis` to connect to containers.

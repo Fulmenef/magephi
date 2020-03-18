@@ -120,11 +120,13 @@ class Environment
         if ($files === false) {
             throw new FileNotFoundException('Error while searching files for pattern ' . $pattern);
         }
+
         switch (\count($files)) {
             case 0:
                 $val = '';
 
                 break;
+
             default:
                 $val = $files[0];
 

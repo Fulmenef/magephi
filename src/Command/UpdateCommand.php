@@ -60,6 +60,7 @@ class UpdateCommand extends AbstractCommand
                         $updater->getNewVersion()
                     )
                 );
+
                 exit(AbstractCommand::CODE_SUCCESS);    // Necessary to bypass Symfony post command check  and avoid errors
             }
 
