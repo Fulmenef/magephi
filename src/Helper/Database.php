@@ -63,11 +63,13 @@ class Database
                 $command = ['bsdtar', '-xOf-'];
 
                 break;
+
             case 'gz':
             case 'gzip':
                 $command = ['gunzip', '-cd'];
 
                 break;
+
             case 'sql':
             default:
                 $command = [];
