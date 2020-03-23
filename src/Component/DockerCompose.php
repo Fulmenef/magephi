@@ -3,6 +3,7 @@
 namespace Magephi\Component;
 
 use Error;
+use Magephi\Command\Docker\PhpCommand;
 use Magephi\Entity\Environment;
 use Magephi\Exception\EnvironmentException;
 use Magephi\Exception\ProcessException;
@@ -102,7 +103,7 @@ class DockerCompose
 
         $arguments = [];
         if ($container === 'php') {
-            $arguments = ['-u', 'www-data:www-data'];
+            $arguments = ['-u', PhpCommand::ARGUMENT_WWW_DATA];
         }
 
         $finalCommand =
@@ -141,8 +142,39 @@ class DockerCompose
      */
     public function restartContainer(string $container): bool
     {
-        $process = $this->processFactory->runProcess(['docker-compose', 'restart', $container], 60, $this->environment->getDockerRequiredVariables());
+        $process = $this->processFactory->runProcess(
+            ['docker-compose', 'restart', $container],
+            60,
+            $this->environment->getDockerRequiredVariables()
+        );
 
         return $process->getProcess()->isSuccessful();
+    }
+
+    /**
+     * List of containers and their status.
+     *
+     * @return string[]
+     */
+    public function list(): array
+    {
+        $process = $this->processFactory->runProcess(
+            ['docker-compose', 'ps'],
+            60,
+            $this->environment->getDockerRequiredVariables()
+        );
+
+        $regex = '/^(?![ -])(\S+).+(?=Up|Exit)(\S+)/mi';
+
+        $output = $process->getProcess()->getOutput();
+
+        preg_match_all($regex, $output, $matches, PREG_SET_ORDER, 0);
+
+        $containers = [];
+        foreach ($matches as $match) {
+            $containers[$match[1]] = $match[2];
+        }
+
+        return $containers;
     }
 }

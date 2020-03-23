@@ -8,7 +8,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class PhpCommand extends AbstractDockerCommand
 {
-    private const ARGUMENT_WWW_DATA = 'www-data:www-data';
+    public const ARGUMENT_WWW_DATA = 'www-data:www-data';
 
     private const ARGUMENT_ROOT = 'root:root';
 
