@@ -75,7 +75,7 @@ abstract class AbstractCommand extends Command
      *
      * @throws EnvironmentException
      */
-    public function check($success, $failure, $condition, $exit = true): void
+    public function check(string $success, string $failure, callable $condition, bool $exit = true): void
     {
         if ($condition()) {
             $this->interactive->writeln("<fg=green>  [*] {$success}</>");
