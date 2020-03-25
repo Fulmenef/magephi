@@ -15,6 +15,11 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class UpdateCommand extends AbstractCommand
 {
+    public function getPrerequisites(): array
+    {
+        return [];
+    }
+
     protected function configure(): void
     {
         $this
