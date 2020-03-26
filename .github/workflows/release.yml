@@ -26,7 +26,10 @@ jobs:
           docker run --interactive --volume=$(pwd):/app ajardin/humbug-box compile
 
       - name: Prepare release
-        run: git log --no-merges --pretty=format:'* %s (%h)' $(git tag | sort -r | head -2 | tail -1)...$(git tag | sort -r | head -1) >> body.md
+        run: |
+          git log --no-merges --pretty=format:'* %s (%h)' $(git tag --list  --sort '-version:refname' | head -n 2 | tail -1)...$(git tag --list  --sort '-version:refname' | head -n 1) >> body.md
+          echo "Changelog between $(git tag --list  --sort '-version:refname' | head -n 2 | tail -1) and $(git tag --list  --sort '-version:refname' | head -n 1)"
+          cat body.md
 
       - name: Create Release
         id: create_release
