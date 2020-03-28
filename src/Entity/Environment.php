@@ -2,9 +2,11 @@
 
 namespace Magephi\Entity;
 
+use Magephi\Component\Yaml;
 use Magephi\Exception\EnvironmentException;
+use Magephi\Kernel;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
-use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
+use Symfony\Component\Filesystem\Filesystem;
 
 class Environment
 {
@@ -36,8 +38,23 @@ class Environment
 
     private ?string $magentoEnv = null;
 
-    public function __construct()
+    public function __construct(Yaml $yaml, Filesystem $filesystem)
     {
+        $workingDir = null;
+        $configFile = Kernel::getCustomDir() . '/config.yml';
+        if ($filesystem->exists($configFile)) {
+            $content = $yaml->read($configFile);
+            $environments = array_keys($content['environment']);
+            $current = posix_getcwd();
+            foreach ($environments as $env) {
+                if (substr($current, 0, \strlen($env)) === $env) {
+                    chdir($env);
+
+                    break;
+                }
+            }
+        }
+
         $this->autoLocate();
     }
 
@@ -87,11 +104,7 @@ class Environment
             }
         }
 
-        $currentDir = getcwd();
-        if (!\is_string($currentDir)) {
-            throw new DirectoryNotFoundException('Current dir is not found.');
-        }
-        $this->currentDir = basename($currentDir);
+        $this->currentDir = basename(posix_getcwd());
 
         if ($this->localEnv) {
             $localEnv = file_get_contents($this->localEnv);
