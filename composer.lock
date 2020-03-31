@@ -823,16 +823,16 @@
         },
         {
             "name": "symfony/dotenv",
-            "version": "v5.0.6",
+            "version": "v5.0.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/dotenv.git",
-                "reference": "48c8fdda51e5b24d031ce8ec221caa186337e36f"
+                "reference": "28658ee990ea643c8111bac242d6ee5f3a15ef72"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/dotenv/zipball/48c8fdda51e5b24d031ce8ec221caa186337e36f",
-                "reference": "48c8fdda51e5b24d031ce8ec221caa186337e36f",
+                "url": "https://api.github.com/repos/symfony/dotenv/zipball/28658ee990ea643c8111bac242d6ee5f3a15ef72",
+                "reference": "28658ee990ea643c8111bac242d6ee5f3a15ef72",
                 "shasum": ""
             },
             "require": {
@@ -876,7 +876,7 @@
                 "env",
                 "environment"
             ],
-            "time": "2020-02-29T10:07:09+00:00"
+            "time": "2020-03-27T16:56:45+00:00"
         },
         {
             "name": "symfony/error-handler",
@@ -2929,12 +2929,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Roave/SecurityAdvisories.git",
-                "reference": "abf855b59c93a92efbebc39107e2a5a6215a0488"
+                "reference": "0f73cf4b4b9227eb8845723bc2a8869bc4dd6e8f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/abf855b59c93a92efbebc39107e2a5a6215a0488",
-                "reference": "abf855b59c93a92efbebc39107e2a5a6215a0488",
+                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/0f73cf4b4b9227eb8845723bc2a8869bc4dd6e8f",
+                "reference": "0f73cf4b4b9227eb8845723bc2a8869bc4dd6e8f",
                 "shasum": ""
             },
             "conflict": {
@@ -2975,8 +2975,8 @@
                 "doctrine/orm": ">=2,<2.4.8|>=2.5,<2.5.1",
                 "dolibarr/dolibarr": "<=10.0.6",
                 "dompdf/dompdf": ">=0.6,<0.6.2",
-                "drupal/core": ">=7,<7.69|>=8,<8.7.11|>=8.8,<8.8.1",
-                "drupal/drupal": ">=7,<7.69|>=8,<8.7.11|>=8.8,<8.8.1",
+                "drupal/core": ">=7,<7.69|>=8,<8.7.12|>=8.8,<8.8.4",
+                "drupal/drupal": ">=7,<7.69|>=8,<8.7.12|>=8.8,<8.8.4",
                 "endroid/qr-code-bundle": "<3.4.2",
                 "enshrined/svg-sanitize": "<0.13.1",
                 "erusev/parsedown": "<1.7.2",
@@ -3185,7 +3185,7 @@
                 }
             ],
             "description": "Prevents installation of composer packages with known security vulnerabilities: no API, simply require it",
-            "time": "2020-03-30T15:16:05+00:00"
+            "time": "2020-03-31T14:30:16+00:00"
         },
         {
             "name": "sebastianfeldmann/camino",
