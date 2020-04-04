@@ -5,12 +5,13 @@ namespace Magephi\Component;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
+use Symfony\Component\Process\Process as SymfonyProcess;
 
 class Process
 {
     public const CODE_TIMEOUT = 5;
 
-    private \Symfony\Component\Process\Process $process;
+    private SymfonyProcess $process;
 
     private ?ProgressBar $progressBar = null;
 
@@ -36,9 +37,9 @@ class Process
         if ($shell) {
             $command = implode(' ', $command);
             $this->process =
-                \Symfony\Component\Process\Process::fromShellCommandline($command, null, $env, null, $timeout);
+                SymfonyProcess::fromShellCommandline($command, null, $env, null, $timeout);
         } else {
-            $this->process = new \Symfony\Component\Process\Process($command, null, $env, null, $timeout);
+            $this->process = new SymfonyProcess($command, null, $env, null, $timeout);
         }
     }
 
@@ -161,9 +162,9 @@ class Process
     }
 
     /**
-     * @return \Symfony\Component\Process\Process
+     * @return SymfonyProcess
      */
-    public function getProcess(): \Symfony\Component\Process\Process
+    public function getProcess(): SymfonyProcess
     {
         return $this->process;
     }
