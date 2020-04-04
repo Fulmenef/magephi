@@ -13,7 +13,8 @@ on:
       - '!master'
 
 jobs:
-  tests:
+  run:
+
     runs-on: ubuntu-latest
     env:
       MAGENTO_DIRECTORY: ./tmp/magento
@@ -30,39 +31,54 @@ jobs:
           MUTAGEN_VERSION: v0.11.2
 
       - name: Cache Magephi dependencies
+        id: cache-magephi
         uses: actions/cache@v1
         with:
           path: vendor
           key: ${{ runner.OS }}-build-${{ hashFiles('**/composer.lock') }}
 
-      - name: Cache Magento dependencies
-        uses: actions/cache@v1
-        with:
-          path: ${{env.MAGENTO_DIRECTORY}}/vendor
-          key: ${{ runner.OS }}-build-${{ hashFiles('**/composer.lock') }}
-
       - name: Install dependencies
+        if: steps.cache-magephi.outputs.cache-hit != 'true'
         run: composer install --ignore-platform-reqs --prefer-dist --no-progress --no-suggest --optimize-autoloader --classmap-authoritative
 
       - name: Initialize Magento 2 project directory
         run: mkdir -p ${{env.MAGENTO_DIRECTORY}}
 
+      - name: Cache Magento application
+        id: cache-magento
+        uses: actions/cache@v1
+        with:
+          path: ${{env.MAGENTO_DIRECTORY}}
+          key: ${{ runner.OS }}-build-${{ hashFiles('**/composer.lock') }}-magento-app
+
+      - name: Regenerate files after cache restore
+        if: steps.cache-magento.outputs.cache-hit == 'true'
+        run: |
+          rm -rf generated
+          composer dumpautoload
+        working-directory: ${{env.MAGENTO_DIRECTORY}}
+
       - name: Create a Magento Open Source project
+        if: steps.cache-magento.outputs.cache-hit != 'true'
         run: composer create-project --repository-url=https://repo.magento.com/ magento/project-community-edition ${{env.MAGENTO_DIRECTORY}} --ignore-platform-reqs --no-progress --no-dev --no-install
         env:
           COMPOSER_AUTH: ${{secrets.COMPOSER_AUTH}}
 
       - name: Install the Docker environment through Composer
-        run: composer require emakinafr/docker-magento2 --dev --no-progress --ignore-platform-reqs
+        if: steps.cache-magento.outputs.cache-hit != 'true'
+        run: composer require emakinafr/docker-magento2 --dev --prefer-dist --no-progress --ignore-platform-reqs
         working-directory: ${{env.MAGENTO_DIRECTORY}}
         env:
           COMPOSER_AUTH: ${{secrets.COMPOSER_AUTH}}
 
+      - name: Reduces the size of the Magento directory
+        if: steps.cache-magento.outputs.cache-hit != 'true'
+        run: rm -rf update
+        working-directory: ${{env.MAGENTO_DIRECTORY}}
+
       - name: Install Magento
         run: sudo magephi install --no-interaction
         working-directory: ${{env.MAGENTO_DIRECTORY}}
-        env:
-          COMPOSER_AUTH: ${{secrets.COMPOSER_AUTH}}
 
       - name: Check status
         run: magephi status
@@ -70,6 +86,10 @@ jobs:
 
       - name: Try accessing the setup page
         run: curl --insecure --location --resolve "www.magento.localhost:443:127.0.0.1" https://www.magento.localhost/setup/
+
+      - name: Stop containers
+        run: magephi stop
+        working-directory: ${{env.MAGENTO_DIRECTORY}}
 
       - name: Uninstall project
         run: yes | magephi uninstall -v
