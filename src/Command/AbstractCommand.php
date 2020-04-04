@@ -10,6 +10,7 @@ use Magephi\Component\ProcessFactory;
 use Magephi\Entity\System;
 use Magephi\EventListener\CommandListener;
 use Magephi\Exception\EnvironmentException;
+use Magephi\Helper\UpdateHandler;
 use Magephi\Kernel;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -23,17 +24,13 @@ abstract class AbstractCommand extends Command
 
     public const CODE_ERROR = 1;
 
-    public const FILE_NAME = 'magephi.phar';
-
-    public const PACKAGE_NAME = 'fulmenef/magephi';
-
     protected SymfonyStyle $interactive;
 
     protected ProcessFactory $processFactory;
 
     protected DockerCompose $dockerCompose;
 
-    public function __construct(ProcessFactory $processFactory, DockerCompose $dockerCompose, string $name = null)
+    public function __construct(ProcessFactory $processFactory, DockerCompose $dockerCompose, $name = null)
     {
         $this->processFactory = $processFactory;
         $this->dockerCompose = $dockerCompose;
@@ -57,8 +54,8 @@ abstract class AbstractCommand extends Command
 
         $updater = new Updater(null, false);
         $strategy = new GithubStrategy();
-        $strategy->setPackageName(self::PACKAGE_NAME);
-        $strategy->setPharName(self::FILE_NAME);
+        $strategy->setPackageName(UpdateHandler::PACKAGE_NAME);
+        $strategy->setPharName(UpdateHandler::FILE_NAME);
         $strategy->setCurrentLocalVersion($version);
         $updater->setStrategyObject($strategy);
 
@@ -117,9 +114,20 @@ abstract class AbstractCommand extends Command
 
         $update = $this->checkNewVersionAvailable();
         if ($update !== null) {
-            $this->interactive->warning(
+            $this->interactive->note(
                 "A new version is available, use the update command to update to version {$update}"
             );
+            if ($this->interactive->confirm('Would you like to update ?', false)) {
+                $updateHandler = new UpdateHandler();
+                if ($updateHandler->handle()) {
+                    $this->interactive->success('Application updated, please relaunch your command');
+
+                    exit(self::CODE_SUCCESS); // Necessary to bypass Symfony post command check  and avoid errors
+                }
+                $this->interactive->warning(
+                    'Something went wrong, try again later or by using the update command'
+                );
+            }
         }
     }
 }

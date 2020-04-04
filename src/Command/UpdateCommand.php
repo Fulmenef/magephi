@@ -2,9 +2,9 @@
 
 namespace Magephi\Command;
 
-use Humbug\SelfUpdate\Strategy\GithubStrategy;
-use Humbug\SelfUpdate\Updater;
-use Magephi\Application;
+use Magephi\Component\DockerCompose;
+use Magephi\Component\ProcessFactory;
+use Magephi\Helper\UpdateHandler;
 use Magephi\Kernel;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -15,6 +15,14 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class UpdateCommand extends AbstractCommand
 {
+    private UpdateHandler $updateHandler;
+
+    public function __construct(ProcessFactory $processFactory, DockerCompose $dockerCompose, UpdateHandler $updateHandler)
+    {
+        $this->updateHandler = $updateHandler;
+        parent::__construct($processFactory, $dockerCompose);
+    }
+
     public function getPrerequisites(): array
     {
         return [];
@@ -44,32 +52,18 @@ class UpdateCommand extends AbstractCommand
         $update = $this->checkNewVersionAvailable();
 
         if ($update !== null && Kernel::getMode() !== 'dev') {
-            /** @var Application $app */
-            $app = $this->getApplication();
-            $version = $app->getVersion();
-
-            $updater = new Updater(null, false);
-            $strategy = new GithubStrategy();
-            $strategy->setPackageName(self::PACKAGE_NAME);
-            $strategy->setPharName(self::FILE_NAME);
-            $strategy->setCurrentLocalVersion($version);
-            $updater->setStrategyObject($strategy);
-
-            $result = $updater->update();
-
-            if ($result) {
+            if ($result = $this->updateHandler->handle()) {
                 $this->interactive->success(
                     sprintf(
                         '%s has been upgraded to %s.',
                         Kernel::NAME,
-                        $updater->getNewVersion()
+                        $result
                     )
                 );
 
                 exit(AbstractCommand::CODE_SUCCESS);    // Necessary to bypass Symfony post command check  and avoid errors
             }
 
-            $updater->rollback();
             $this->interactive->error('Update canceled, something happened.');
 
             return AbstractCommand::CODE_ERROR;
