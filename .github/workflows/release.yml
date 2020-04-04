@@ -1,3 +1,9 @@
+##################################################
+#
+# Create a new .phar and create a release when a tag is pushed
+#
+##################################################
+
 name: Release version
 
 on:
@@ -11,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
 
       - name: Validate composer.json and composer.lock
         run: composer validate
