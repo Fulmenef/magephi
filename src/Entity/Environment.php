@@ -46,7 +46,7 @@ class Environment
      */
     public function __get(string $name)
     {
-        return $this->{$name};
+        return isset($this->{$name}) ? $this->{$name} : null;
     }
 
     /**

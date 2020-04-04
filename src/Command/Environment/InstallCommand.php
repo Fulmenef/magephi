@@ -190,6 +190,10 @@ class InstallCommand extends AbstractEnvironmentCommand
     protected function prepareEnvironment(ComposerReader $composer): void
     {
         $this->interactive->section('Configuring docker environment');
+        if ($this->environment->__get('dockerComposeFile') === null) {
+            $this->environment->autoLocate();
+        }
+
         if ($this->environment->__get('distEnv') === null) {
             $this->interactive->section('Creating docker local directory');
             $composer->runCommand('exec docker-local-install');
