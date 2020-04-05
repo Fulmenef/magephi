@@ -42,18 +42,18 @@ class CacheCommand extends AbstractEnvironmentCommand
         $this->interactive->section('Redis');
         $progressBar = new ProgressBar($output, 2);
         $progressBar->display();
-        $this->dockerCompose->executeCommand('redis', 'redis-cli -n 1 FLUSHDB');
+        $this->dockerCompose->executeContainerCommand('redis', 'redis-cli -n 1 FLUSHDB');
         $progressBar->advance();
-        $this->dockerCompose->executeCommand('redis', 'redis-cli -n 2 FLUSHDB');
+        $this->dockerCompose->executeContainerCommand('redis', 'redis-cli -n 2 FLUSHDB');
         $progressBar->finish();
 
         $this->interactive->newLine(2);
         $this->interactive->section('Magento');
         $progressBar = new ProgressBar($output, 2);
         $progressBar->display();
-        $this->dockerCompose->executeCommand('php', 'rm -rf generated');
+        $this->dockerCompose->executeContainerCommand('php', 'rm -rf generated');
         $progressBar->advance();
-        $this->dockerCompose->executeCommand('php', 'rm -rf var/cache');
+        $this->dockerCompose->executeContainerCommand('php', 'rm -rf var/cache');
         $progressBar->finish();
 
         $this->interactive->newLine(2);

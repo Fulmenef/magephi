@@ -101,16 +101,16 @@ class InstallCommand extends AbstractMagentoCommand
         );
 
         try {
-            $this->dockerCompose->executeCommand('php', 'mkdir pub/static');
-            $this->dockerCompose->executeCommand('php', 'composer dumpautoload');
-            $this->dockerCompose->executeCommand('php', 'rm -rf generated');
+            $this->dockerCompose->executeContainerCommand('php', 'mkdir pub/static');
+            $this->dockerCompose->executeContainerCommand('php', 'composer dumpautoload');
+            $this->dockerCompose->executeContainerCommand('php', 'rm -rf generated');
             $this->interactive->section('Installation');
 
             if ($_ENV['SHELL_VERBOSITY'] >= 1) {
-                $install = $this->dockerCompose->executeCommand('php', $command);
+                $install = $this->dockerCompose->executeContainerCommand('php', $command);
             } else {
                 /** @var Process $install */
-                $install = $this->dockerCompose->executeCommand('php', $command, true);
+                $install = $this->dockerCompose->executeContainerCommand('php', $command, true);
                 $progressBar = new ProgressBar($output, 0);
                 $regex = '/Progress: (\d*) \/ (\d*)/i';
                 $install->start();

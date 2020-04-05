@@ -92,7 +92,7 @@ class DockerCompose
      *
      * @return Process
      */
-    public function executeCommand(
+    public function executeContainerCommand(
         string $container,
         string $command,
         bool $createOnly = false
@@ -131,6 +131,25 @@ class DockerCompose
         }
 
         return $process;
+    }
+
+    /**
+     * Execute a docker-compose command like `ps` or `logs`.
+     *
+     * @param string $command
+     *
+     * @return Process
+     */
+    public function executeGlobalCommand(string $command): Process
+    {
+        $commands = explode(' ', $command);
+
+        return $this->processFactory->runProcess(
+            array_merge(['docker-compose'], $commands),
+            600,
+            $this->environment->getDockerRequiredVariables(),
+            true
+        );
     }
 
     /**
