@@ -13,11 +13,14 @@ on:
 
 jobs:
   build:
-
+    name: Release
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
+
+      - name: Fetch last references
+        run: git fetch
 
       - name: Validate composer.json and composer.lock
         run: composer validate
@@ -34,8 +37,6 @@ jobs:
       - name: Prepare release
         run: |
           git log --no-merges --pretty=format:'* %s (%h)' $(git tag --list  --sort '-version:refname' | head -n 2 | tail -1)...$(git tag --list  --sort '-version:refname' | head -n 1) >> body.md
-          echo "Changelog between $(git tag --list  --sort '-version:refname' | head -n 2 | tail -1) and $(git tag --list  --sort '-version:refname' | head -n 1)"
-          cat body.md
 
       - name: Create Release
         id: create_release

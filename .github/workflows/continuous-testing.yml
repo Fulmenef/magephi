@@ -14,7 +14,7 @@ on:
 
 jobs:
   run:
-
+    name: Test application on Magento
     runs-on: ubuntu-latest
     env:
       MAGENTO_DIRECTORY: ./tmp/magento
