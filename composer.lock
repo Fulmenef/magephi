@@ -2467,12 +2467,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/FriendsOfPHP/PHP-CS-Fixer.git",
-                "reference": "5fa669eb2b0084bb611685a3d3574c2cdee8b74b"
+                "reference": "a707c976044faafcbe9a1a6df1d923d468beffa8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FriendsOfPHP/PHP-CS-Fixer/zipball/5fa669eb2b0084bb611685a3d3574c2cdee8b74b",
-                "reference": "5fa669eb2b0084bb611685a3d3574c2cdee8b74b",
+                "url": "https://api.github.com/repos/FriendsOfPHP/PHP-CS-Fixer/zipball/a707c976044faafcbe9a1a6df1d923d468beffa8",
+                "reference": "a707c976044faafcbe9a1a6df1d923d468beffa8",
                 "shasum": ""
             },
             "require": {
@@ -2550,7 +2550,7 @@
                 }
             ],
             "description": "A tool to automatically fix PHP code style",
-            "time": "2020-03-10T15:01:14+00:00"
+            "time": "2020-04-07T07:19:16+00:00"
         },
         {
             "name": "nyholm/psr7",
@@ -2753,16 +2753,16 @@
         },
         {
             "name": "phpstan/phpstan-symfony",
-            "version": "0.12.4",
+            "version": "0.12.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan-symfony.git",
-                "reference": "5e4b7ba02f2235271a069deeb88340a210d6c87c"
+                "reference": "063c8289357d42cceba956589bfb8b57b5ac4d40"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan-symfony/zipball/5e4b7ba02f2235271a069deeb88340a210d6c87c",
-                "reference": "5e4b7ba02f2235271a069deeb88340a210d6c87c",
+                "url": "https://api.github.com/repos/phpstan/phpstan-symfony/zipball/063c8289357d42cceba956589bfb8b57b5ac4d40",
+                "reference": "063c8289357d42cceba956589bfb8b57b5ac4d40",
                 "shasum": ""
             },
             "require": {
@@ -2819,7 +2819,7 @@
                 }
             ],
             "description": "Symfony Framework extensions and rules for PHPStan",
-            "time": "2020-01-22T10:19:41+00:00"
+            "time": "2020-04-09T07:41:44+00:00"
         },
         {
             "name": "psr/http-factory",
