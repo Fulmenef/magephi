@@ -79,7 +79,7 @@ class RestoreCommand extends AbstractEnvironmentCommand
                 '--volume $(pwd):/project',
                 '--volume ' . $path . ':/backup/' . $filename,
                 'busybox sh -c " \
-                tar ' . $tarParemeters . ' /backup/' . $filename . ' && \ 
+                tar ' . $tarParemeters . ' /backup/' . $filename . ' && \
                 tar xvf /backup/' . BackupCommand::MYSQL_BACKUP_FILE . ' var/lib/mysql && \
                 mv /backup/' . $magentoEnv . ' /project/' . $magentoEnv . '&& \
                 mv /backup/' . $dockerEnv . ' /project/' . $dockerEnv . ' \

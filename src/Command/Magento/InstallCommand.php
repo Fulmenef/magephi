@@ -40,21 +40,21 @@ class InstallCommand extends AbstractMagentoCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $command = sprintf(
-            "bin/magento setup:install 
+            "bin/magento setup:install
             --base-url=%s
-            --db-host=%s 
-            --db-name=%s 
-            --db-user=%s 
-            --db-password='%s' 
-            --backend-frontname=%s 
-            --admin-firstname=%s 
-            --admin-lastname=%s 
-            --admin-email=%s 
-            --admin-user=%s 
-            --admin-password=%s 
-            --language=%s 
-            --currency=%s 
-            --timezone=%s 
+            --db-host=%s
+            --db-name=%s
+            --db-user=%s
+            --db-password='%s'
+            --backend-frontname=%s
+            --admin-firstname=%s
+            --admin-lastname=%s
+            --admin-email=%s
+            --admin-user=%s
+            --admin-password=%s
+            --language=%s
+            --currency=%s
+            --timezone=%s
             --use-rewrites=%d",
             $this->environment->getServerName(true),
             'mysql',
