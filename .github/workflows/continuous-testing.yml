@@ -77,7 +77,7 @@ jobs:
         working-directory: ${{env.MAGENTO_DIRECTORY}}
 
       - name: Install Magento
-        run: sudo magephi install --no-interaction
+        run: sudo magephi install --no-interaction -v
         working-directory: ${{env.MAGENTO_DIRECTORY}}
 
       - name: Check status

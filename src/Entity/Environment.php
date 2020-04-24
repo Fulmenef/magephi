@@ -97,7 +97,7 @@ class Environment
                 throw new FileNotFoundException($this->localEnv . ' not found.');
             }
 
-            preg_match('/DOCKER_PHP_IMAGE=(\w+)/i', $localEnv, $match);
+            preg_match('/DOCKER_PHP_IMAGE=(\S+)/i', $localEnv, $match);
             if (empty($match)) {
                 throw new EnvironmentException('PHP image is undefined, ensure .env is correctly filled');
             }
