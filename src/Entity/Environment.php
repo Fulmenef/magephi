@@ -145,7 +145,7 @@ class Environment
     {
         return [
             'COMPOSE_FILE'         => './' . $this->dockerComposeFile,
-            'COMPOSE_PROJECT_NAME' => 'magento2_' . $this->currentDir,
+            'COMPOSE_PROJECT_NAME' => 'magento2_' . mb_strtolower($this->currentDir),
             'DOCKER_PHP_IMAGE'     => $this->phpImage,
             'PROJECT_LOCATION'     => getcwd() ?: '',
         ];
