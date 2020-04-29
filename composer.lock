@@ -1788,16 +1788,16 @@
         },
         {
             "name": "symfony/process",
-            "version": "v5.0.7",
+            "version": "v5.0.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/process.git",
-                "reference": "c5ca4a0fc16a0c888067d43fbcfe1f8a53d8e70e"
+                "reference": "3179f68dff5bad14d38c4114a1dab98030801fd7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/process/zipball/c5ca4a0fc16a0c888067d43fbcfe1f8a53d8e70e",
-                "reference": "c5ca4a0fc16a0c888067d43fbcfe1f8a53d8e70e",
+                "url": "https://api.github.com/repos/symfony/process/zipball/3179f68dff5bad14d38c4114a1dab98030801fd7",
+                "reference": "3179f68dff5bad14d38c4114a1dab98030801fd7",
                 "shasum": ""
             },
             "require": {
@@ -1833,7 +1833,7 @@
             ],
             "description": "Symfony Process Component",
             "homepage": "https://symfony.com",
-            "time": "2020-03-27T16:56:45+00:00"
+            "time": "2020-04-15T15:59:10+00:00"
         },
         {
             "name": "symfony/routing",
@@ -2933,12 +2933,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Roave/SecurityAdvisories.git",
-                "reference": "2bdae3cc8428d637d5c86c8c33d0a3354ce93f7f"
+                "reference": "81541a731da2f245a08666de73169cb5da7ac573"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/2bdae3cc8428d637d5c86c8c33d0a3354ce93f7f",
-                "reference": "2bdae3cc8428d637d5c86c8c33d0a3354ce93f7f",
+                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/81541a731da2f245a08666de73169cb5da7ac573",
+                "reference": "81541a731da2f245a08666de73169cb5da7ac573",
                 "shasum": ""
             },
             "conflict": {
@@ -3074,7 +3074,7 @@
                 "silverstripe/userforms": "<3",
                 "simple-updates/phpwhois": "<=1",
                 "simplesamlphp/saml2": "<1.10.6|>=2,<2.3.8|>=3,<3.1.4",
-                "simplesamlphp/simplesamlphp": "<1.18.4",
+                "simplesamlphp/simplesamlphp": "<1.18.6",
                 "simplesamlphp/simplesamlphp-module-infocard": "<1.0.1",
                 "simplito/elliptic-php": "<1.0.6",
                 "slim/slim": "<2.6",
@@ -3191,7 +3191,7 @@
                 }
             ],
             "description": "Prevents installation of composer packages with known security vulnerabilities: no API, simply require it",
-            "time": "2020-04-21T14:24:08+00:00"
+            "time": "2020-04-23T00:01:30+00:00"
         },
         {
             "name": "sebastianfeldmann/camino",
