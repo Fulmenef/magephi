@@ -42,7 +42,7 @@ class Make
     {
         return $this->processFactory->runProcessWithProgressBar(
             ['make', 'start'],
-            60,
+            $_ENV['SHELL_VERBOSITY'] >= 1 ? 360 : 60,
             function (/* @noinspection PhpUnusedParameterInspection */ $type, $buffer) {
                 return (strpos($buffer, 'Creating') !== false
                         && (

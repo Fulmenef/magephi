@@ -2,6 +2,8 @@
 
 namespace Magephi\Exception;
 
-class ComposerException extends \RuntimeException
+use RuntimeException;
+
+class ComposerException extends RuntimeException
 {
 }

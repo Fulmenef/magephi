@@ -2,6 +2,8 @@
 
 namespace Magephi\Exception;
 
-class EnvironmentException extends \RuntimeException
+use RuntimeException;
+
+class EnvironmentException extends RuntimeException
 {
 }

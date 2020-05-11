@@ -5,12 +5,14 @@ namespace Magephi\Command\Environment;
 use Exception;
 use Magephi\Command\AbstractCommand;
 use Magephi\Component\DockerCompose;
+use Magephi\Component\DockerHub;
 use Magephi\Component\Mutagen;
 use Magephi\Component\Process;
 use Magephi\Component\ProcessFactory;
 use Magephi\Entity\Environment;
 use Magephi\Entity\System;
 use Magephi\Exception\ComposerException;
+use Magephi\Exception\DockerHubException;
 use Magephi\Exception\EnvironmentException;
 use Magephi\Exception\ProcessException;
 use Magephi\Helper\Database;
@@ -21,6 +23,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 /**
  * Command to install the Magento2 project. It'll check if the prerequisites are filled before installing dependencies
@@ -40,6 +43,8 @@ class InstallCommand extends AbstractEnvironmentCommand
 
     private Make $make;
 
+    private DockerHub $dockerHub;
+
     private Mutagen $mutagen;
 
     private System $prerequisite;
@@ -52,6 +57,7 @@ class InstallCommand extends AbstractEnvironmentCommand
         ProcessFactory $processFactory,
         DockerCompose $dockerCompose,
         Make $make,
+        DockerHub $dockerHub,
         Database $database,
         Mutagen $mutagen,
         Environment $environment,
@@ -61,6 +67,7 @@ class InstallCommand extends AbstractEnvironmentCommand
     ) {
         parent::__construct($processFactory, $dockerCompose, $name);
         $this->make = $make;
+        $this->dockerHub = $dockerHub;
         $this->mutagen = $mutagen;
         $this->environment = $environment;
         $this->prerequisite = $system;
@@ -215,7 +222,8 @@ class InstallCommand extends AbstractEnvironmentCommand
     }
 
     /**
-     * @throws EnvironmentException
+     * @throws DockerHubException
+     * @throws TransportExceptionInterface
      */
     protected function prepareDockerEnv(): void
     {
@@ -233,44 +241,31 @@ class InstallCommand extends AbstractEnvironmentCommand
         }
         $this->envContent = $content;
 
-        $dockerfile = $this->environment->__get('phpDockerfile');
-        if (!\is_string($dockerfile)) {
-            throw new EnvironmentException(
-                'PHP Dockerfile does not exist. Ensure emakinafr/docker-magento2 is present in dependencies.'
-            );
-        }
-        $file = file_get_contents($dockerfile);
-        if ($file === false) {
-            throw new FileException('PHP Dockerfile not found.');
+        $availableTags = $this->dockerHub->getImageTags('magento2-php');
+
+        if (\count($availableTags) > 1) {
+            for ($i = \count($availableTags); $i > 0; --$i) {
+                $availableTags[$i] = $availableTags[$i - 1];
+            }
+            unset($availableTags[0]);
+            $image = (string) $this->interactive->choice('Select the image you want to use:', $availableTags, $availableTags[1]);
+        } else {
+            $image = (string) $availableTags[0];
         }
 
-        preg_match_all('/FROM .* as (\w*)/m', $file, $images);
-        $images = $images[1];
-        array_unshift($images, 'phoney');
-        unset($images[0]);
-
-        $image = $this->interactive->choice('Select the image you want to use:', $images, $images[1]);
-        $replacement = preg_replace('/(DOCKER_PHP_IMAGE=)(\w+)/i', "$1{$image}", $this->envContent);
+        $image = 'DOCKER_PHP_IMAGE=' . $image;
+        $replacement = preg_replace('/(DOCKER_PHP_IMAGE=\S*)/i', $image, $this->envContent);
         if ($replacement === null) {
             throw new EnvironmentException('Error while configuring Docker PHP Image.');
         }
         $this->envContent = $replacement;
         $this->environment->__set('phpImage', $image);
 
-        $imageType = explode('_', $image);
-        if (\count($imageType) > 2) {
-            $imageType = array_pop($imageType);
-            if (!\is_string($imageType)) {
-                throw new EnvironmentException('Image type is undefined.');
+        $types = ['blackfire', 'mysql'];
+        foreach ($types as $type) {
+            if ($this->interactive->confirm('Do you want to configure <fg=yellow>' . ucfirst($type) . '</> ?')) {
+                $this->configureEnv($type);
             }
-
-            if ($this->interactive->confirm("Do you want to configure <fg=yellow>{$imageType}</> ?")) {
-                $this->configureEnv($imageType);
-            }
-        }
-
-        if ($this->interactive->confirm('Do you want to configure <fg=yellow>MySQL</> ?')) {
-            $this->configureEnv('mysql');
         }
 
         file_put_contents(self::DOCKER_LOCAL_ENV, $this->envContent);

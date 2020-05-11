@@ -2,6 +2,8 @@
 
 namespace Magephi\Exception;
 
-class ProcessException extends \RuntimeException
+use RuntimeException;
+
+class ProcessException extends RuntimeException
 {
 }
