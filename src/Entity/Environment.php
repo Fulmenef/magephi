@@ -80,7 +80,7 @@ class Environment
 
         foreach ($files as $file => $data) {
             $retrievedFiles = $this->retrieveFile($data['pattern'], $file);
-            if (!empty($retrievedFiles[$file]) && !\is_array($retrievedFiles[$file])) {
+            if (!empty($retrievedFiles[$file])) {
                 $this->{$files[$file]['variable']} = $retrievedFiles[$file];
             }
         }
