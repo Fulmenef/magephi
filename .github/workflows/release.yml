@@ -18,9 +18,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-
-      - name: Fetch last references
-        run: git fetch
+      - run: |
+          git fetch --prune --unshallow
 
       - name: Validate composer.json and composer.lock
         run: composer validate
@@ -35,8 +34,12 @@ jobs:
           docker run --interactive --volume=$(pwd):/app ajardin/humbug-box compile
 
       - name: Prepare release
+        id: prepare_release
         run: |
-          git log --no-merges --pretty=format:'* %s (%h)' $(git tag --list  --sort '-version:refname' | head -n 2 | tail -1)...$(git tag --list  --sort '-version:refname' | head -n 1) >> body.md
+          old_tag=$(git tag --sort=-creatordate | head -n 2 | tail -n 1)
+          changelog=$(git log $old_tag..${{ github.ref }} --format='* %s (%h)' --no-merges --reverse)
+          changelog=${changelog//$'\n'/'%0A'}
+          echo "::set-output name=changelog::${changelog}"
 
       - name: Create Release
         id: create_release
@@ -44,5 +47,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          body_path: body.md
+          body: ${{ steps.prepare_release.outputs.changelog }}
           files: ./build/magephi.phar
