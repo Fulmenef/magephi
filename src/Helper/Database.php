@@ -11,6 +11,7 @@ use Magephi\Exception\EnvironmentException;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 class Database
 {
@@ -53,7 +54,11 @@ class Database
     public function import(string $database, string $filename): Process
     {
         if (!$this->dockerCompose->isContainerUp('mysql')) {
-            throw new EnvironmentException('Mysql container is not up');
+            throw new EnvironmentException('Mysql container is not started');
+        }
+
+        if (!file_exists($filename)) {
+            throw new FileException(sprintf('File %s does not exist', $filename));
         }
 
         $ext = pathinfo($filename, PATHINFO_EXTENSION);
@@ -124,7 +129,7 @@ class Database
     public function updateUrls(string $database)
     {
         if (!$this->dockerCompose->isContainerUp('mysql')) {
-            throw new EnvironmentException('Mysql container is not up');
+            throw new EnvironmentException('Mysql container is not started');
         }
 
         $serverName = $this->environment->getServerName(true);
