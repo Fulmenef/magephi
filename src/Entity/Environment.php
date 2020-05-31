@@ -192,11 +192,19 @@ class Environment
     }
 
     /**
-     * Retrieve default database defined in the local .env file.
+     * Retrieve default database defined in the magento env.php or local .env file as fallback
      * Return an empty string if database not found or undefined.
      */
     public function getDatabase(): string
     {
+        if ($this->hasMagentoEnv()) {
+            /** @var array<array> $env */
+            $env = require_once $this->magentoEnv;
+            if (isset($env['db']['connection']['default']['dbname'])) {
+                return $env['db']['connection']['default']['dbname'];
+            }
+        }
+
         return $this->getEnvData('mysql_database');
     }
 
