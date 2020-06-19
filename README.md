@@ -1,7 +1,7 @@
 # Magephi
 ![status](https://img.shields.io/badge/status-beta-important.svg?cacheSeconds=2592000)
 ![php](https://img.shields.io/badge/php-^7.4-blue.svg?cacheSeconds=2592000)
-![symfony](https://img.shields.io/badge/symfony-5.0.5-darkgreen.svg?cacheSeconds=2592000)
+![symfony](https://img.shields.io/badge/symfony-5.1-darkgreen.svg?cacheSeconds=2592000)
 [![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/fulmenef/magephi.svg)](https://github.com/fulmenef/magephi/tags)
 [![GitHub Issues](https://img.shields.io/github/issues/fulmenef/magephi.svg)](https://github.com/fulmenef/magephi/issues)
 ![Contributions welcome](https://img.shields.io/badge/contributions-welcome-green.svg)
@@ -17,9 +17,8 @@ For now Magephi has been only tested on Mac with the environment [docker-magento
 ## Installation
 
 ```
-curl -sL https://github.com/Fulmenef/magephi/releases/latest/download/magephi.phar --output magephi.phar
-chmod +x magephi.phar
-mv magephi.phar /usr/local/bin/magephi
+curl -sL https://github.com/Fulmenef/magephi/releases/latest/download/magephi.phar --output /usr/local/bin/magephi
+chmod +x /usr/local/bin/magephi
 ```
 
 ## Update
@@ -61,12 +60,13 @@ magephi list
 - `magephi update` to update Magephi.
 
 #### Environment
+- `magephi create` Initialize a new project with the environment. See [here](#project-initialization) for more details about the command.
+- `magephi install` to install the environment (build + start).
+- `magephi status` to give you a quick look on the project status (equivalent to docker-compose ps and mutagen list).
 - `magephi start` to start the environment.
 - `magephi stop` to stop the environment.
-- `magephi status` to give you a quick look on the project status (equivalent to docker-compose ps and mutagen list).
-- `magephi install` to install the environment (build + start).
+- `magephi cache` to flush Magento and Redis cache.
 - `magephi uninstall` to fully uninstall the environment. This will remove volumes and container but not the files on your local system.
-- `magephi create` Initialize a new project with the environment. See [here](#project-initialization) for more details about the command.
 - `magephi backup|restore` Generate or restore a backup of your database and environment configuration.
 
 #### Docker
