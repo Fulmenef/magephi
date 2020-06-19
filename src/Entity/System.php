@@ -8,7 +8,6 @@ class System
     private array $binaries = [
         'Docker'            => ['mandatory' => true, 'check' => 'docker'],
         'Docker-Compose'    => ['mandatory' => true, 'check' => 'docker-compose'],
-        'Mysql'             => ['mandatory' => true, 'check' => 'mysql'],
         'Mutagen'           => [
             'mandatory' => true,
             'check'     => 'mutagen',
@@ -23,7 +22,7 @@ class System
         'Pipe Viewer'       => [
             'mandatory' => false,
             'check'     => 'pv',
-            'comment'   => 'Necessary to import database with a progress bar.',
+            'comment'   => 'Necessary to display progress during database import.',
         ],
     ];
 

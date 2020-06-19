@@ -37,17 +37,6 @@ class ImportCommand extends AbstractEnvironmentCommand
         $this->environment = $environment;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getPrerequisites(): array
-    {
-        $prerequisites = parent::getPrerequisites();
-        $prerequisites['binary'] = array_merge($prerequisites['binary'], ['Mysql']);
-
-        return $prerequisites;
-    }
-
     protected function configure(): void
     {
         parent::configure();

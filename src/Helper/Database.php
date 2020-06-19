@@ -97,6 +97,12 @@ class Database
             array_merge($readCommand, [$filename, '|']),
             !empty($command) ? array_merge($command, ['|']) : $command,
             [
+                'docker-compose',
+                'exec',
+                '-T',
+                '--env',
+                'MYSQL_PWD=' . $password,
+                'mysql',
                 'mysql',
                 '-h',
                 '127.0.0.1',
@@ -112,7 +118,7 @@ class Database
         return $this->processFactory->runProcessWithOutput(
             $command,
             3600,
-            ['MYSQL_PWD' => $password],
+            $this->environment->getDockerRequiredVariables(),
             true
         );
     }
@@ -140,6 +146,12 @@ class Database
 
         return $this->processFactory->runProcess(
             [
+                'docker-compose',
+                'exec',
+                '-T',
+                '--env',
+                'MYSQL_PWD=' . $password,
+                'mysql',
                 'mysql',
                 '-h',
                 '127.0.0.1',
@@ -150,7 +162,7 @@ class Database
                 '"UPDATE core_config_data SET value=\"' . $serverName . '/\" WHERE path LIKE \"web%base_url\""',
             ],
             30,
-            ['MYSQL_PWD' => $password],
+            $this->environment->getDockerRequiredVariables(),
             true
         );
     }
