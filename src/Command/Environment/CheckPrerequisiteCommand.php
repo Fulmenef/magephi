@@ -68,7 +68,7 @@ class CheckPrerequisiteCommand extends AbstractEnvironmentCommand
         $table->render();
 
         if ($ready) {
-            $this->interactive->success('Ready perfectely.');
+            $this->interactive->success('Your system is ready.');
 
             return AbstractCommand::CODE_SUCCESS;
         }
