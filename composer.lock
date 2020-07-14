@@ -2883,16 +2883,16 @@
     "packages-dev": [
         {
             "name": "captainhook/captainhook",
-            "version": "5.3.0",
+            "version": "5.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/CaptainHookPhp/captainhook.git",
-                "reference": "ad835230338980d5efbed396fcee2706ee42467c"
+                "reference": "fcd03631b177540a59722ad65f2f4d2c19859c05"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/CaptainHookPhp/captainhook/zipball/ad835230338980d5efbed396fcee2706ee42467c",
-                "reference": "ad835230338980d5efbed396fcee2706ee42467c",
+                "url": "https://api.github.com/repos/CaptainHookPhp/captainhook/zipball/fcd03631b177540a59722ad65f2f4d2c19859c05",
+                "reference": "fcd03631b177540a59722ad65f2f4d2c19859c05",
                 "shasum": ""
             },
             "require": {
@@ -2957,7 +2957,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2020-05-03T17:46:23+00:00"
+            "time": "2020-07-13T22:20:40+00:00"
         },
         {
             "name": "captainhook/plugin-composer",
@@ -3219,16 +3219,16 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/FriendsOfPHP/PHP-CS-Fixer.git",
-                "reference": "9249b0c368e5d056167292293afa580d4467787a"
+                "reference": "2df0155c461fcb226499e1e9f856e0ee587e8ac4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FriendsOfPHP/PHP-CS-Fixer/zipball/9249b0c368e5d056167292293afa580d4467787a",
-                "reference": "9249b0c368e5d056167292293afa580d4467787a",
+                "url": "https://api.github.com/repos/FriendsOfPHP/PHP-CS-Fixer/zipball/2df0155c461fcb226499e1e9f856e0ee587e8ac4",
+                "reference": "2df0155c461fcb226499e1e9f856e0ee587e8ac4",
                 "shasum": ""
             },
             "require": {
-                "composer/semver": "^1.4",
+                "composer/semver": "^1.4 || ^2.0 || ^3.0",
                 "composer/xdebug-handler": "^1.2",
                 "doctrine/annotations": "^1.2",
                 "ext-json": "*",
@@ -3308,7 +3308,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2020-06-27T17:13:42+00:00"
+            "time": "2020-07-10T07:40:31+00:00"
         },
         {
             "name": "nyholm/psr7",
@@ -3715,12 +3715,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Roave/SecurityAdvisories.git",
-                "reference": "6d2e5ab854782830911ddd33b7d4649b9f18c10f"
+                "reference": "881b9e4a8de3186c93904230bdf6344b685fe6a5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/6d2e5ab854782830911ddd33b7d4649b9f18c10f",
-                "reference": "6d2e5ab854782830911ddd33b7d4649b9f18c10f",
+                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/881b9e4a8de3186c93904230bdf6344b685fe6a5",
+                "reference": "881b9e4a8de3186c93904230bdf6344b685fe6a5",
                 "shasum": ""
             },
             "conflict": {
@@ -3789,6 +3789,7 @@
                 "friendsofsymfony/user-bundle": ">=1.2,<1.3.5",
                 "fuel/core": "<1.8.1",
                 "getgrav/grav": "<1.7-beta.8",
+                "gos/web-socket-bundle": "<1.10.4|>=2,<2.6.1|>=3,<3.3",
                 "gree/jose": "<=2.2",
                 "gregwar/rst": "<1.0.3",
                 "guzzlehttp/guzzle": ">=4-rc.2,<4.2.4|>=5,<5.3.1|>=6,<6.2.1",
@@ -3814,8 +3815,9 @@
                 "magento/product-community-edition": ">=2,<2.2.10|>=2.3,<2.3.2-p.2",
                 "monolog/monolog": ">=1.8,<1.12",
                 "namshi/jose": "<2.2",
+                "nystudio107/craft-seomatic": "<3.3",
                 "nzo/url-encryptor-bundle": ">=4,<4.3.2|>=5,<5.0.1",
-                "october/october": ">=1.0.319,<1.0.466",
+                "october/october": ">=1.0.319,<1.0.467",
                 "onelogin/php-saml": "<2.10.4",
                 "oneup/uploader-bundle": "<1.9.3|>=2,<2.1.5",
                 "openid/php-openid": "<2.3",
@@ -3992,7 +3994,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2020-06-19T13:23:43+00:00"
+            "time": "2020-07-11T19:04:25+00:00"
         },
         {
             "name": "sebastianfeldmann/camino",
@@ -4045,16 +4047,16 @@
         },
         {
             "name": "sebastianfeldmann/cli",
-            "version": "3.2.7",
+            "version": "3.2.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianfeldmann/cli.git",
-                "reference": "070dace40a16a9dcd5e04f5cc756e1006e91a6ed"
+                "reference": "3629ec3f725d82206012901921455f1f25b5a014"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianfeldmann/cli/zipball/070dace40a16a9dcd5e04f5cc756e1006e91a6ed",
-                "reference": "070dace40a16a9dcd5e04f5cc756e1006e91a6ed",
+                "url": "https://api.github.com/repos/sebastianfeldmann/cli/zipball/3629ec3f725d82206012901921455f1f25b5a014",
+                "reference": "3629ec3f725d82206012901921455f1f25b5a014",
                 "shasum": ""
             },
             "require": {
@@ -4091,7 +4093,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2020-06-03T16:04:40+00:00"
+            "time": "2020-06-24T18:47:04+00:00"
         },
         {
             "name": "sebastianfeldmann/git",
