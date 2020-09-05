@@ -14,6 +14,7 @@
         "ext-ctype": "*",
         "ext-iconv": "*",
         "ext-json": "*",
+        "ext-posix": "*",
         "nadar/php-composer-reader": "^1.3",
         "padraic/phar-updater": "^1.0",
         "symfony/console": "^5.0",
