@@ -9,6 +9,7 @@ use Magephi\Component\DockerHub;
 use Magephi\Component\Mutagen;
 use Magephi\Component\Process;
 use Magephi\Component\ProcessFactory;
+use Magephi\Component\Yaml;
 use Magephi\Entity\Environment;
 use Magephi\Entity\System;
 use Magephi\Exception\ComposerException;
@@ -22,6 +23,7 @@ use Nadar\PhpComposerReader\ComposerReader;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
@@ -53,6 +55,10 @@ class InstallCommand extends AbstractEnvironmentCommand
 
     private LoggerInterface $logger;
 
+    private Filesystem $filesystem;
+
+    private Yaml $yaml;
+
     public function __construct(
         ProcessFactory $processFactory,
         DockerCompose $dockerCompose,
@@ -63,6 +69,8 @@ class InstallCommand extends AbstractEnvironmentCommand
         Environment $environment,
         System $system,
         LoggerInterface $logger,
+        Filesystem $filesystem,
+        Yaml $yaml,
         string $name = null
     ) {
         parent::__construct($processFactory, $dockerCompose, $name);
@@ -73,6 +81,8 @@ class InstallCommand extends AbstractEnvironmentCommand
         $this->prerequisite = $system;
         $this->database = $database;
         $this->logger = $logger;
+        $this->yaml = $yaml;
+        $this->filesystem = $filesystem;
     }
 
     public function getPrerequisites(): array
@@ -108,6 +118,17 @@ class InstallCommand extends AbstractEnvironmentCommand
             if ($imported = $this->importDatabase()) {
                 $this->updateDatabase();
             }
+
+            $dir = Kernel::getCustomDir();
+            if (!$this->filesystem->exists($dir)) {
+                $this->filesystem->mkdir($dir);
+            }
+
+            $configFile = $dir . '/config.yml';
+            if (!$this->filesystem->exists($configFile)) {
+                $this->filesystem->touch($configFile);
+            }
+            $this->yaml->update($configFile, ['environment' => [posix_getcwd() => ['type' => 'emakina']]]);
         } catch (Exception $e) {
             if ($e->getMessage() !== '') {
                 $this->interactive->error($e->getMessage());
@@ -233,7 +254,7 @@ class InstallCommand extends AbstractEnvironmentCommand
                 'env.dist does not exist. Ensure emakinafr/docker-magento2 is present in dependencies.'
             );
         }
-        copy($distEnv, self::DOCKER_LOCAL_ENV);
+        $this->filesystem->copy($distEnv, self::DOCKER_LOCAL_ENV, true);
         $this->environment->__set('localEnv', self::DOCKER_LOCAL_ENV);
         $content = file_get_contents(self::DOCKER_LOCAL_ENV);
         if ($content === false) {
@@ -251,7 +272,7 @@ class InstallCommand extends AbstractEnvironmentCommand
             }
         }
 
-        file_put_contents(self::DOCKER_LOCAL_ENV, $this->envContent);
+        $this->filesystem->dumpFile(self::DOCKER_LOCAL_ENV, $this->envContent);
     }
 
     protected function buildContainers(): void
@@ -356,9 +377,9 @@ class InstallCommand extends AbstractEnvironmentCommand
             if ($this->interactive->confirm(
                 'It seems like this host is not in your hosts file yet, do you want to add it ?'
             )) {
-                $hosts .= sprintf("# Added by %s\n", Kernel::NAME);
-                $hosts .= "127.0.0.1   {$serverName}\n";
-                file_put_contents('/etc/hosts', $hosts);
+                $newHost = sprintf("# Added by %s\n", Kernel::NAME);
+                $newHost .= "127.0.0.1   {$serverName}\n";
+                $this->filesystem->appendToFile('/etc/hosts', $newHost);
                 $this->interactive->text('Server added in your host file.');
             }
         }
@@ -401,7 +422,7 @@ class InstallCommand extends AbstractEnvironmentCommand
             }
 
             $this->nginxContent = $content;
-            file_put_contents($nginx, $this->nginxContent);
+            $this->filesystem->dumpFile($nginx, $this->nginxContent);
         }
 
         return $serverName;
