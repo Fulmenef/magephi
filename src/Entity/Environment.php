@@ -20,6 +20,8 @@ class Environment
 
     private string $phpImage;
 
+    private string $mysqlImage;
+
     private ?string $localEnv = null;
 
     private ?string $localEnvContent = null;
@@ -97,11 +99,8 @@ class Environment
                 throw new FileNotFoundException($this->localEnv . ' not found.');
             }
 
-            preg_match('/DOCKER_PHP_IMAGE=(\S+)/i', $localEnv, $match);
-            if (empty($match)) {
-                throw new EnvironmentException('PHP image is undefined, ensure .env is correctly filled');
-            }
-            $this->phpImage = $match[1];
+            $this->phpImage = $this->getVariableValue('DOCKER_PHP_IMAGE', $localEnv);
+            $this->mysqlImage = $this->getVariableValue('DOCKER_MYSQL_IMAGE', $localEnv);
         }
     }
 
@@ -147,6 +146,7 @@ class Environment
             'COMPOSE_FILE'         => './' . $this->dockerComposeFile,
             'COMPOSE_PROJECT_NAME' => 'magento2_' . mb_strtolower($this->currentDir),
             'DOCKER_PHP_IMAGE'     => $this->phpImage,
+            'DOCKER_MYSQL_IMAGE'   => $this->mysqlImage,
             'PROJECT_LOCATION'     => getcwd() ?: '',
         ];
     }
@@ -302,5 +302,23 @@ class Environment
         }
 
         return $prefix . $matches[0][1];
+    }
+
+    /**
+     * Get variable from the .env file.
+     *
+     * @param string $variable
+     * @param string $localEnv
+     *
+     * @return string
+     */
+    private function getVariableValue(string $variable, string $localEnv): string
+    {
+        preg_match("/{$variable}=(\\S+)/i", $localEnv, $match);
+        if (empty($match)) {
+            throw new EnvironmentException("{$variable} is undefined, ensure .env is correctly filled");
+        }
+
+        return (string) $match[1];
     }
 }

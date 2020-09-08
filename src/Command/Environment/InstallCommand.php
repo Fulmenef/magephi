@@ -241,25 +241,8 @@ class InstallCommand extends AbstractEnvironmentCommand
         }
         $this->envContent = $content;
 
-        $availableTags = $this->dockerHub->getImageTags('magento2-php');
-
-        if (\count($availableTags) > 1) {
-            for ($i = \count($availableTags); $i > 0; --$i) {
-                $availableTags[$i] = $availableTags[$i - 1];
-            }
-            unset($availableTags[0]);
-            $image = (string) $this->interactive->choice('Select the image you want to use:', $availableTags, $availableTags[1]);
-        } else {
-            $image = (string) $availableTags[0];
-        }
-
-        $image = 'DOCKER_PHP_IMAGE=' . $image;
-        $replacement = preg_replace('/(DOCKER_PHP_IMAGE=\S*)/i', $image, $this->envContent);
-        if ($replacement === null) {
-            throw new EnvironmentException('Error while configuring Docker PHP Image.');
-        }
-        $this->envContent = $replacement;
-        $this->environment->__set('phpImage', $image);
+        $this->environment->__set('phpImage', $this->selectImage('magento2-php', 'DOCKER_PHP_IMAGE'));
+        $this->environment->__set('mysqlImage', $this->selectImage('magento2-mysql', 'DOCKER_MYSQL_IMAGE'));
 
         $types = ['blackfire', 'mysql'];
         foreach ($types as $type) {
@@ -332,7 +315,7 @@ class InstallCommand extends AbstractEnvironmentCommand
      */
     private function configureEnv(string $type): void
     {
-        $regex = "/({$type}\\w+)=(\\w*)/im";
+        $regex = "/(^{$type}\\w+)=(\\w*)/im";
         preg_match_all($regex, $this->envContent, $matches, PREG_SET_ORDER, 0);
         if (\count($matches)) {
             foreach ($matches as $match) {
@@ -501,5 +484,44 @@ class InstallCommand extends AbstractEnvironmentCommand
         }
 
         return false;
+    }
+
+    /**
+     * Retrieve tags available for the given image and configure the variable accordingly to the user's choice.
+     *
+     * @param string $imageName
+     * @param string $variable
+     *
+     * @throws DockerHubException
+     * @throws TransportExceptionInterface
+     *
+     * @return string
+     */
+    private function selectImage(string $imageName, string $variable): string
+    {
+        $availableTags = $this->dockerHub->getImageTags($imageName);
+
+        if (\count($availableTags) > 1) {
+            for ($i = \count($availableTags); $i > 0; --$i) {
+                $availableTags[$i] = $availableTags[$i - 1];
+            }
+            unset($availableTags[0]);
+            $image = (string) $this->interactive->choice(
+                "Select the image you want to use for {$imageName} :",
+                $availableTags,
+                $availableTags[1]
+            );
+        } else {
+            $image = (string) $availableTags[0];
+        }
+
+        $value = "{$variable}={$image}";
+        $replacement = preg_replace("/({$variable}=\\S*)/i", $value, $this->envContent);
+        if ($replacement === null) {
+            throw new EnvironmentException("Error while configuring variable {$variable}.");
+        }
+        $this->envContent = $replacement;
+
+        return $image;
     }
 }
