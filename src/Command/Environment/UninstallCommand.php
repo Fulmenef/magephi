@@ -5,9 +5,12 @@ namespace Magephi\Command\Environment;
 use Magephi\Command\AbstractCommand;
 use Magephi\Component\DockerCompose;
 use Magephi\Component\ProcessFactory;
+use Magephi\Component\Yaml;
 use Magephi\Helper\Make;
+use Magephi\Kernel;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Command to uninstall the environment. It simply remove volumes and destroy containers and the mutagen session.
@@ -18,14 +21,22 @@ class UninstallCommand extends AbstractEnvironmentCommand
 
     private Make $make;
 
+    private Yaml $yaml;
+
+    private Filesystem $filesystem;
+
     public function __construct(
         ProcessFactory $processFactory,
         DockerCompose $dockerCompose,
         Make $make,
+        Yaml $yaml,
+        Filesystem $filesystem,
         string $name = null
     ) {
         parent::__construct($processFactory, $dockerCompose, $name);
         $this->make = $make;
+        $this->yaml = $yaml;
+        $this->filesystem = $filesystem;
     }
 
     public function getPrerequisites(): array
@@ -66,6 +77,12 @@ class UninstallCommand extends AbstractEnvironmentCommand
 
                 return AbstractCommand::CODE_ERROR;
             }
+
+            $configFile = Kernel::getCustomDir() . '/config.yml';
+            if (!$this->filesystem->exists($configFile)) {
+                $this->filesystem->touch($configFile);
+            }
+            $this->yaml->remove($configFile, ['environment' => posix_getcwd()]);
 
             $this->interactive->success('This project has been successfully uninstalled.');
         }
