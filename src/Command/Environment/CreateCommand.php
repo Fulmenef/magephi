@@ -97,7 +97,8 @@ class CreateCommand extends AbstractEnvironmentCommand
                 $package,
                 '.',
             ],
-            900
+            900,
+            ['COMPOSER_MEMORY_LIMIT' => '2G']
         );
         $this->logger->info('Based project created');
 
