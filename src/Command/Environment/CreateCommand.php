@@ -256,7 +256,8 @@ EOD;
 
         $this->processFactory->runProcess(
             ['composer', 'update', '--ignore-platform-reqs', '--optimize-autoloader'],
-            90
+            90,
+            ['COMPOSER_MEMORY_LIMIT' => '2G']
         );
         $this->interactive->comment('Composer dependencies installed');
 
