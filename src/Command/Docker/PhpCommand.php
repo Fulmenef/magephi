@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Magephi\Command\Docker;
 
 use Symfony\Component\Console\Input\InputInterface;

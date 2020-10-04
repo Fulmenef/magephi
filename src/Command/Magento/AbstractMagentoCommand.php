@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Magephi\Command\Magento;
 
 use Magephi\Command\AbstractCommand;
@@ -13,8 +15,6 @@ abstract class AbstractMagentoCommand extends AbstractCommand
 
     protected function configure(): void
     {
-        $this
-            ->setName('magephi:magento:' . $this->command)
-            ->setAliases(['magento:' . $this->command]);
+        $this->setName('magento:' . $this->command);
     }
 }

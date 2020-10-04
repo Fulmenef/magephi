@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Magephi\Command\Environment;
 
 use Magephi\Command\AbstractCommand;
@@ -12,7 +14,7 @@ abstract class AbstractEnvironmentCommand extends AbstractCommand
     {
         parent::configure();
         $this
-            ->setName('magephi:environment:' . $this->command)
+            ->setName('environment:' . $this->command)
             ->setAliases([$this->command]);
     }
 }
