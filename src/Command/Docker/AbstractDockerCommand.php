@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Magephi\Command\Docker;
 
 use Magephi\Command\AbstractCommand;
@@ -20,7 +22,7 @@ abstract class AbstractDockerCommand extends AbstractCommand
     protected function configure(): void
     {
         $this
-            ->setName('magephi:docker:' . $this->service)
+            ->setName('docker:' . $this->service)
             ->setAliases([$this->service])
             ->setDescription("Open a terminal to the {$this->service} container.")
             ->setHelp("This command allows you to connect to the {$this->service} container.");

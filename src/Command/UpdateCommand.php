@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Magephi\Command;
 
 use Magephi\Component\DockerCompose;
@@ -31,8 +33,7 @@ class UpdateCommand extends AbstractCommand
     protected function configure(): void
     {
         $this
-            ->setName('magephi:update')
-            ->setAliases(['update'])
+            ->setName('update')
             ->setDescription('Updates Magephi to the latest version');
     }
 

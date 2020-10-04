@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Magephi\Command\Docker;
 
 use Magephi\Command\AbstractCommand;
@@ -12,7 +14,7 @@ class ExecCommand extends AbstractCommand
     protected function configure(): void
     {
         $this
-            ->setName('magephi:docker:exec')
+            ->setName('docker:exec')
             ->setAliases(['exec'])
             ->setDescription('Execute a command into a container')
             ->setHelp('This command allows you to execute a command into the specified container')

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Magephi;
 
 use Symfony\Component\Console\Application as BaseApplication;

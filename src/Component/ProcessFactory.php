@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Magephi\Component;
 
 use Symfony\Component\Console\Input\ArgvInput;

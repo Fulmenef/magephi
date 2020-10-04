@@ -2,6 +2,8 @@ build
 downloads
 node_modules
 
+src/.preload.php
+
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Magephi\Command\Magento;
 
 use Magephi\Command\AbstractCommand;

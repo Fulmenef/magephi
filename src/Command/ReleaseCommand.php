@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Magephi\Command;
 
 use Exception;
@@ -58,8 +60,7 @@ class ReleaseCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setName('magephi:release')
-            ->setAliases(['release'])
+            ->setName('release')
             ->setDescription('Release a new version of Magephi')
             ->addArgument(
                 'version',
