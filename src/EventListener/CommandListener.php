@@ -36,7 +36,7 @@ class CommandListener
         $command = $event->getCommand();
         /** @var AbstractCommand $command */
         if ($command instanceof AbstractCommand) {
-            if (!\in_array($command->getName(), ['magephi:default', 'magephi:environment:create', 'magephi:update', 'magephi:environment:install'], true)) {
+            if (!\in_array($command->getName(), ['default', 'environment:create', 'update', 'environment:install'], true)) {
                 if ($this->environment->__get('dockerComposeFile') === null) {
                     throw new EnvironmentException(
                         'This command cannot be used here, install the environment with the `install` command or go inside a configured project directory.'

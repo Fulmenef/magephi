@@ -15,7 +15,7 @@ class DefaultCommand extends AbstractCommand
     /**
      * {@inheritdoc}
      */
-    protected static $defaultName = 'magephi:default';
+    protected static $defaultName = 'default';
 
     /**
      * {@inheritdoc}
