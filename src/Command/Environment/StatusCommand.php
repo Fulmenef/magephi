@@ -8,7 +8,7 @@ use Magephi\Command\AbstractCommand;
 use Magephi\Component\DockerCompose;
 use Magephi\Component\Mutagen;
 use Magephi\Component\ProcessFactory;
-use Magephi\Entity\Environment;
+use Magephi\Entity\Environment\Manager;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -22,21 +22,14 @@ class StatusCommand extends AbstractEnvironmentCommand
 
     private Mutagen $mutagen;
 
-    /**
-     * @var Environment
-     */
-    private Environment $environment;
-
     public function __construct(
         ProcessFactory $processFactory,
         DockerCompose $dockerCompose,
-        Mutagen $mutagen,
-        Environment $environment,
-        string $name = null
+        Manager $manager,
+        Mutagen $mutagen
     ) {
-        parent::__construct($processFactory, $dockerCompose, $name);
+        parent::__construct($processFactory, $dockerCompose, $manager);
         $this->mutagen = $mutagen;
-        $this->environment = $environment;
     }
 
     protected function configure(): void

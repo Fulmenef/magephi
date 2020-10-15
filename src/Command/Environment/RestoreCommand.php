@@ -6,9 +6,6 @@ namespace Magephi\Command\Environment;
 
 use InvalidArgumentException;
 use Magephi\Command\AbstractCommand;
-use Magephi\Component\DockerCompose;
-use Magephi\Component\ProcessFactory;
-use Magephi\Entity\Environment;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -25,18 +22,6 @@ class RestoreCommand extends AbstractEnvironmentCommand
     private const DEFAULT_TIMEOUT = 300;
 
     protected string $command = 'restore';
-
-    private Environment $environment;
-
-    public function __construct(
-        ProcessFactory $processFactory,
-        DockerCompose $dockerCompose,
-        Environment $environment,
-        string $name = null
-    ) {
-        parent::__construct($processFactory, $dockerCompose, $name);
-        $this->environment = $environment;
-    }
 
     protected function configure(): void
     {
@@ -64,11 +49,17 @@ class RestoreCommand extends AbstractEnvironmentCommand
             $timeout = self::DEFAULT_TIMEOUT * 2;
         }
         $filename = basename($path);
-        $magentoEnv = $this->environment->__get('magentoEnv');
-        $dockerEnv = $this->environment->__get('localEnv');
+
+        $backupCommand = '';
+        foreach ($this->manager->getBackupFiles() as $file) {
+            if (!empty($backupCommand)) {
+                $backupCommand .= '&&';
+            }
+            $backupCommand .= " mv /backup/{$file} /project/{$file} ";
+        }
 
         $this->interactive->section('Backup restoration');
-        $tarParemeters = 'x' . ($compressed ? 'z' : '') . 'vf';
+        $tarParameters = 'x' . ($compressed ? 'z' : '') . 'vf';
 
         try {
             if (!$output->isVerbose()) {
@@ -79,18 +70,17 @@ class RestoreCommand extends AbstractEnvironmentCommand
                 'docker run --rm',
                 '--volumes-from $(docker-compose ps -q mysql)',
                 '--volume $(pwd):/project',
-                '--volume ' . $path . ':/backup/' . $filename,
                 'busybox sh -c " \
-                tar ' . $tarParemeters . ' /backup/' . $filename . ' && \
-                tar xvf /backup/' . BackupCommand::MYSQL_BACKUP_FILE . ' var/lib/mysql && \
-                mv /backup/' . $magentoEnv . ' /project/' . $magentoEnv . '&& \
-                mv /backup/' . $dockerEnv . ' /project/' . $dockerEnv . ' \
+                tar ' . $tarParameters . ' /project/' . $filename . ' &&
+                tar xvf /backup/' . BackupCommand::MYSQL_BACKUP_FILE . ' var/lib/mysql &&' .
+                $backupCommand . ' \
                 "',
             ];
+
             $this->processFactory->runProcess(
                 $command,
                 $timeout,
-                $this->environment->getDockerRequiredVariables(),
+                $this->manager->getDockerRequiredVariables(),
                 true
             );
 

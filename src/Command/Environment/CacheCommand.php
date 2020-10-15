@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Magephi\Command\Environment;
 
 use Magephi\Command\AbstractCommand;
-use Magephi\Component\DockerCompose;
-use Magephi\Component\ProcessFactory;
-use Magephi\Entity\Environment;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -18,18 +15,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 class CacheCommand extends AbstractEnvironmentCommand
 {
     protected string $command = 'cache';
-
-    private Environment $environment;
-
-    public function __construct(
-        ProcessFactory $processFactory,
-        DockerCompose $dockerCompose,
-        Environment $environment,
-        string $name = null
-    ) {
-        parent::__construct($processFactory, $dockerCompose, $name);
-        $this->environment = $environment;
-    }
 
     protected function configure(): void
     {

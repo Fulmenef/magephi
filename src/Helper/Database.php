@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace Magephi\Helper;
 
-use Magephi\Component\DockerCompose;
 use Magephi\Component\Process;
 use Magephi\Component\ProcessFactory;
-use Magephi\Entity\Environment;
+use Magephi\Entity\Environment\EnvironmentInterface;
 use Magephi\Entity\System;
 use Magephi\Exception\EnvironmentException;
-use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
@@ -19,28 +16,18 @@ class Database
 {
     private ProcessFactory $processFactory;
 
-    private DockerCompose $dockerCompose;
-
-    private Environment $environment;
+    private EnvironmentInterface $environment;
 
     private System $system;
 
-    private SymfonyStyle $interactive;
-
-    private ConsoleOutput $outputInterface;
+    private SymfonyStyle $output;
 
     public function __construct(
-        DockerCompose $dockerCompose,
         ProcessFactory $processFactory,
-        Environment $environment,
         System $system
     ) {
-        $this->dockerCompose = $dockerCompose;
         $this->processFactory = $processFactory;
-        $this->environment = $environment;
         $this->system = $system;
-        $this->outputInterface = new ConsoleOutput();
-        $this->interactive = new SymfonyStyle(new ArgvInput(), $this->outputInterface);
     }
 
     /**
@@ -55,10 +42,6 @@ class Database
      */
     public function import(string $database, string $filename): Process
     {
-        if (!$this->dockerCompose->isContainerUp('mysql')) {
-            throw new EnvironmentException('Mysql container is not started');
-        }
-
         if (!file_exists($filename)) {
             throw new FileException(sprintf('File %s does not exist', $filename));
         }
@@ -86,7 +69,7 @@ class Database
 
         $readCommand = ['pv', '-ptefab'];
         if (!$this->system->getBinaryPrerequisites()['Pipe Viewer']['status']) {
-            $this->interactive->comment('Pipe Viewer is not installed, it is necessary to have a progress bar.');
+            $this->output->comment('Pipe Viewer is not installed, it is necessary to have a progress bar.');
             $readCommand = ['cat'];
         }
 
@@ -115,7 +98,7 @@ class Database
             ]
         );
 
-        $this->interactive->section('Import started');
+        $this->output->section('Import started');
 
         return $this->processFactory->runProcessWithOutput(
             $command,
@@ -136,10 +119,6 @@ class Database
      */
     public function updateUrls(string $database)
     {
-        if (!$this->dockerCompose->isContainerUp('mysql')) {
-            throw new EnvironmentException('Mysql container is not started');
-        }
-
         $serverName = $this->environment->getServerName(true);
         $username = $this->environment->getEnvData('mysql_user') ?: 'root';
         $password = $username === 'root' ? $this->environment->getEnvData(
@@ -167,5 +146,29 @@ class Database
             $this->environment->getDockerRequiredVariables(),
             true
         );
+    }
+
+    /**
+     * @param EnvironmentInterface $environment
+     *
+     * @return Database
+     */
+    public function setEnvironment(EnvironmentInterface $environment): self
+    {
+        $this->environment = $environment;
+
+        return $this;
+    }
+
+    /**
+     * @param SymfonyStyle $output
+     *
+     * @return Database
+     */
+    public function setOutput(SymfonyStyle $output): self
+    {
+        $this->output = $output;
+
+        return $this;
     }
 }

@@ -20,7 +20,7 @@ php-cs-fixer: ## Fixes code style in all PHP files
 .PHONY: php-cs-fixer
 
 phpstan: ## Executes a static analysis at the higher level on all PHP files
-	./vendor/bin/phpstan analyze src --level=max --memory-limit="-1" --verbose
+	./vendor/bin/phpstan analyze src --level=max --memory-limit=1G --verbose
 .PHONY: phpstan
 
 security: ## Executes a security audit on all PHP dependencies

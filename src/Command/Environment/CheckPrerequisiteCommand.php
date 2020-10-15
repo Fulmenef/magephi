@@ -7,6 +7,7 @@ namespace Magephi\Command\Environment;
 use Magephi\Command\AbstractCommand;
 use Magephi\Component\DockerCompose;
 use Magephi\Component\ProcessFactory;
+use Magephi\Entity\Environment\Manager;
 use Magephi\Entity\System;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -25,10 +26,10 @@ class CheckPrerequisiteCommand extends AbstractEnvironmentCommand
     public function __construct(
         ProcessFactory $processFactory,
         DockerCompose $dockerCompose,
-        System $prerequisite,
-        string $name = null
+        Manager $manager,
+        System $prerequisite
     ) {
-        parent::__construct($processFactory, $dockerCompose, $name);
+        parent::__construct($processFactory, $dockerCompose, $manager);
         $this->prerequisite = $prerequisite;
     }
 

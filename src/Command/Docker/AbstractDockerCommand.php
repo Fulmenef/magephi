@@ -31,7 +31,7 @@ abstract class AbstractDockerCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         try {
-            $this->dockerCompose->openTerminal($this->service, $this->arguments);
+            $this->manager->openTerminal($this->service, $this->arguments);
         } catch (EnvironmentException | ProcessException $e) {
             $this->interactive->error($e->getMessage());
 

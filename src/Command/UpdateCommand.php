@@ -6,6 +6,7 @@ namespace Magephi\Command;
 
 use Magephi\Component\DockerCompose;
 use Magephi\Component\ProcessFactory;
+use Magephi\Entity\Environment\Manager;
 use Magephi\Helper\UpdateHandler;
 use Magephi\Kernel;
 use Symfony\Component\Console\Input\InputInterface;
@@ -19,10 +20,14 @@ class UpdateCommand extends AbstractCommand
 {
     private UpdateHandler $updateHandler;
 
-    public function __construct(ProcessFactory $processFactory, DockerCompose $dockerCompose, UpdateHandler $updateHandler)
-    {
+    public function __construct(
+        ProcessFactory $processFactory,
+        DockerCompose $dockerCompose,
+        Manager $manager,
+        UpdateHandler $updateHandler
+    ) {
+        parent::__construct($processFactory, $dockerCompose, $manager);
         $this->updateHandler = $updateHandler;
-        parent::__construct($processFactory, $dockerCompose);
     }
 
     public function getPrerequisites(): array

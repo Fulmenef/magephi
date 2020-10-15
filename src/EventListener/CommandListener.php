@@ -6,7 +6,7 @@ namespace Magephi\EventListener;
 
 use ArgumentCountError;
 use Magephi\Command\AbstractCommand;
-use Magephi\Entity\Environment;
+use Magephi\Entity\Environment\Manager;
 use Magephi\Entity\System;
 use Magephi\Exception\EnvironmentException;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
@@ -15,12 +15,12 @@ class CommandListener
 {
     private System $system;
 
-    private Environment $environment;
+    private Manager $manager;
 
-    public function __construct(System $system, Environment $environment)
+    public function __construct(System $system, Manager $manager)
     {
         $this->system = $system;
-        $this->environment = $environment;
+        $this->manager = $manager;
     }
 
     /**
@@ -37,12 +37,13 @@ class CommandListener
         /** @var AbstractCommand $command */
         if ($command instanceof AbstractCommand) {
             if (!\in_array($command->getName(), ['default', 'environment:create', 'update', 'environment:install'], true)) {
-                if ($this->environment->__get('dockerComposeFile') === null) {
+                if (!$this->manager->hasEnvironment()) {
                     throw new EnvironmentException(
                         'This command cannot be used here, install the environment with the `install` command or go inside a configured project directory.'
                     );
                 }
             }
+
             $commandPrerequisites = $command->getPrerequisites();
             if (!empty($commandPrerequisites['binary'])) {
                 $systemPrerequisites = $this->system->getBinaryPrerequisites();
@@ -59,6 +60,7 @@ class CommandListener
                     }
                 }
             }
+
             if (!empty($commandPrerequisites['service'])) {
                 $systemPrerequisites = $this->system->getServicesPrerequisites();
                 $this->checkUndefinedPrerequisites(

@@ -7,27 +7,17 @@ namespace Magephi\Command\Environment;
 use Exception;
 use Magephi\Command\AbstractCommand;
 use Magephi\Component\DockerCompose;
-use Magephi\Component\DockerHub;
-use Magephi\Component\Mutagen;
-use Magephi\Component\Process;
 use Magephi\Component\ProcessFactory;
 use Magephi\Component\Yaml;
-use Magephi\Entity\Environment;
+use Magephi\Entity\Environment\Manager;
 use Magephi\Entity\System;
 use Magephi\Exception\ComposerException;
-use Magephi\Exception\DockerHubException;
-use Magephi\Exception\EnvironmentException;
-use Magephi\Exception\ProcessException;
 use Magephi\Helper\Database;
-use Magephi\Helper\Make;
-use Magephi\Kernel;
 use Nadar\PhpComposerReader\ComposerReader;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 /**
  * Command to install the Magento2 project. It'll check if the prerequisites are filled before installing dependencies
@@ -38,18 +28,6 @@ class InstallCommand extends AbstractEnvironmentCommand
     public const DOCKER_LOCAL_ENV = 'docker/local/.env';
 
     protected string $command = 'install';
-
-    private string $envContent;
-
-    private string $nginxContent;
-
-    private Environment $environment;
-
-    private Make $make;
-
-    private DockerHub $dockerHub;
-
-    private Mutagen $mutagen;
 
     private System $prerequisite;
 
@@ -64,22 +42,14 @@ class InstallCommand extends AbstractEnvironmentCommand
     public function __construct(
         ProcessFactory $processFactory,
         DockerCompose $dockerCompose,
-        Make $make,
-        DockerHub $dockerHub,
+        Manager $manager,
         Database $database,
-        Mutagen $mutagen,
-        Environment $environment,
         System $system,
         LoggerInterface $logger,
         Filesystem $filesystem,
-        Yaml $yaml,
-        string $name = null
+        Yaml $yaml
     ) {
-        parent::__construct($processFactory, $dockerCompose, $name);
-        $this->make = $make;
-        $this->dockerHub = $dockerHub;
-        $this->mutagen = $mutagen;
-        $this->environment = $environment;
+        parent::__construct($processFactory, $dockerCompose, $manager);
         $this->prerequisite = $system;
         $this->database = $database;
         $this->logger = $logger;
@@ -109,28 +79,9 @@ class InstallCommand extends AbstractEnvironmentCommand
 
             $this->interactive->newLine();
 
-            $this->prepareEnvironment($composer);
+            $this->manager->install(['composer' => $composer]);
 
-            $this->buildContainers();
-
-            $this->interactive->newLine(2);
-
-            $this->startContainers();
-
-            if ($imported = $this->importDatabase()) {
-                $this->updateDatabase();
-            }
-
-            $dir = Kernel::getCustomDir();
-            if (!$this->filesystem->exists($dir)) {
-                $this->filesystem->mkdir($dir);
-            }
-
-            $configFile = $dir . '/config.yml';
-            if (!$this->filesystem->exists($configFile)) {
-                $this->filesystem->touch($configFile);
-            }
-            $this->yaml->update($configFile, ['environment' => [posix_getcwd() => ['type' => 'emakina']]]);
+            $imported = $this->importDatabase();
         } catch (Exception $e) {
             if ($e->getMessage() !== '') {
                 $this->interactive->error($e->getMessage());
@@ -143,13 +94,14 @@ class InstallCommand extends AbstractEnvironmentCommand
 
         $this->interactive->success('Your environment has been successfully installed.');
 
-        $serverName = $this->environment->getServerName(true);
-        if ($imported && $this->environment->hasMagentoEnv()) {
+        $environment = $this->manager->getEnvironment();
+        $serverName = $environment->getServerName(true);
+        if ($imported && $environment->hasMagentoEnv()) {
             $this->interactive->success(
                 "Your project is ready, you can access it on {$serverName}"
             );
         } else {
-            if (!$this->environment->hasMagentoEnv()) {
+            if (!$environment->hasMagentoEnv()) {
                 $this->interactive->warning(
                     'The file app/etc/env.php is missing. Install Magento or retrieve it from another project.'
                 );
@@ -215,226 +167,12 @@ class InstallCommand extends AbstractEnvironmentCommand
     }
 
     /**
-     * @param ComposerReader $composer
-     */
-    protected function prepareEnvironment(ComposerReader $composer): void
-    {
-        $this->interactive->section('Configuring docker environment');
-        if ($this->environment->__get('dockerComposeFile') === null) {
-            $this->environment->autoLocate();
-        }
-
-        if ($this->environment->__get('distEnv') === null) {
-            $this->interactive->section('Creating docker local directory');
-            $composer->runCommand('exec docker-local-install');
-            $this->environment->autoLocate();
-        }
-
-        $configureEnv = $this->environment->__get('localEnv') === null ?:
-            $this->interactive->confirm(
-                'An existing docker <fg=yellow>.env</> file already exist, do you want to override it ?',
-                false
-            );
-
-        if ($configureEnv) {
-            $this->prepareDockerEnv();
-        }
-
-        $serverName = $this->chooseServerName();
-        $this->setupHost($serverName);
-    }
-
-    /**
-     * @throws DockerHubException
-     * @throws TransportExceptionInterface
-     */
-    protected function prepareDockerEnv(): void
-    {
-        $distEnv = $this->environment->__get('distEnv');
-        if (!\is_string($distEnv)) {
-            throw new EnvironmentException(
-                'env.dist does not exist. Ensure emakinafr/docker-magento2 is present in dependencies.'
-            );
-        }
-        $this->filesystem->copy($distEnv, self::DOCKER_LOCAL_ENV, true);
-        $this->environment->__set('localEnv', self::DOCKER_LOCAL_ENV);
-        $content = file_get_contents(self::DOCKER_LOCAL_ENV);
-        if ($content === false) {
-            throw new FileException('Local env not found.');
-        }
-        $this->envContent = $content;
-
-        $this->environment->__set('phpImage', $this->selectImage('magento2-php', 'DOCKER_PHP_IMAGE'));
-        $this->environment->__set('mysqlImage', $this->selectImage('magento2-mysql', 'DOCKER_MYSQL_IMAGE'));
-
-        $types = ['blackfire', 'mysql'];
-        foreach ($types as $type) {
-            if ($this->interactive->confirm('Do you want to configure <fg=yellow>' . ucfirst($type) . '</> ?')) {
-                $this->configureEnv($type);
-            }
-        }
-
-        $this->filesystem->dumpFile(self::DOCKER_LOCAL_ENV, $this->envContent);
-    }
-
-    protected function buildContainers(): void
-    {
-        $this->interactive->section('Building containers');
-        $process = $this->make->build();
-
-        if (!$process->getProcess()->isSuccessful()) {
-            $this->interactive->newLine(2);
-            if ($process->getExitCode() === Process::CODE_TIMEOUT) {
-                $errorMessage = 'Build timeout, run directly `make build` to build the environment.';
-            } else {
-                $this->interactive->note(
-                    [
-                        "Ensure you're not using a deleted branch for package emakinafr/docker-magento2.",
-                        'This issue may came from a missing package in the PHP dockerfile after a version upgrade.',
-                    ]
-                );
-                $errorMessage = $process->getProcess()->getErrorOutput();
-            }
-
-            throw new ProcessException($errorMessage);
-        }
-    }
-
-    /**
-     * @throws ProcessException
-     */
-    protected function startContainers(): void
-    {
-        $this->interactive->section('Starting environment');
-
-        $process = $this->make->start(true);
-        if (!$process->getProcess()->isSuccessful() && $process->getExitCode() !== Process::CODE_TIMEOUT) {
-            $this->interactive->newLine(2);
-
-            $this->logger->error($process->getProcess()->getErrorOutput());
-
-            throw new ProcessException(
-                'An error occured during the start, ensure there is no other containers running. To have more detail, run the command with verbosity.'
-            );
-        }
-        if ($process->getExitCode() === Process::CODE_TIMEOUT) {
-            $this->make->startMutagen();
-            $this->interactive->newLine();
-            $this->interactive->text('Containers are up.');
-            $this->interactive->section('File synchronization');
-            $synced = $this->mutagen->monitorUntilSynced();
-            if (!$synced) {
-                throw new ProcessException(
-                    'Something happened during the sync, check the situation with <fg=yellow>mutagen monitor</>.'
-                );
-            }
-        }
-    }
-
-    /**
-     * Configure environment variables in the .env file for a specific type.
-     *
-     * @param string $type Section to configure
-     */
-    private function configureEnv(string $type): void
-    {
-        $regex = "/(^{$type}\\w+)=(\\w*)/im";
-        preg_match_all($regex, $this->envContent, $matches, PREG_SET_ORDER, 0);
-        if (\count($matches)) {
-            foreach ($matches as $match) {
-                $conf = $this->interactive->ask(
-                    $match[1],
-                    $match[2] ?? null
-                );
-                if ($conf !== '' && $match[2] !== $conf) {
-                    $pattern = "/({$match[1]}=)(\\w*)/i";
-                    $content = preg_replace($pattern, "$1{$conf}", $this->envContent);
-                    if (!\is_string($content)) {
-                        throw new EnvironmentException('Error while configuring environment.');
-                    }
-
-                    $this->envContent = $content;
-                }
-            }
-        } else {
-            $this->interactive->warning(
-                "Type <fg=yellow>{$type}</> has no configuration, maybe it is not supported yet or there's nothing to configure."
-            );
-        }
-    }
-
-    /**
-     * @param string $serverName
-     */
-    private function setupHost(string $serverName): void
-    {
-        $hosts = file_get_contents('/etc/hosts');
-        if (!\is_string($hosts)) {
-            throw new FileException('/etc/hosts file not found.');
-        }
-
-        $serverName = "www.{$serverName}";
-        preg_match_all("/{$serverName}/i", $hosts, $matches, PREG_SET_ORDER, 0);
-        if (empty($matches)) {
-            if ($this->interactive->confirm(
-                'It seems like this host is not in your hosts file yet, do you want to add it ?'
-            )) {
-                $newHost = sprintf("# Added by %s\n", Kernel::NAME);
-                $newHost .= "127.0.0.1   {$serverName}\n";
-                $this->filesystem->appendToFile('/etc/hosts', $newHost);
-                $this->interactive->text('Server added in your host file.');
-            }
-        }
-    }
-
-    /**
-     * Let the user choose the server name of the project.
-     *
-     * @return string
-     */
-    private function chooseServerName(): string
-    {
-        $nginx = $this->environment->__get('nginxConf');
-        if (!\is_string($nginx)) {
-            throw new EnvironmentException(
-                'nginx.conf does not exist. Ensure emakinafr/docker-magento2 is present in dependencies.'
-            );
-        }
-        $content = file_get_contents($nginx);
-        if (!\is_string($content)) {
-            throw new EnvironmentException(
-                "Something went wrong while reading {$nginx}, ensure the file is present."
-            );
-        }
-        $this->nginxContent = $content;
-        preg_match_all('/server_name (\S*);/m', $this->nginxContent, $matches, PREG_SET_ORDER, 0);
-        $serverName = $matches[0][1];
-        if ($this->interactive->confirm(
-            "The server name is currently <fg=yellow>{$serverName}</>, do you want to change it ?",
-            false
-        )) {
-            $serverName = $this->interactive->ask(
-                'Specify the server name',
-                $serverName
-            );
-            $pattern = '/(server_name )(\\S+)/i';
-            $content = preg_replace($pattern, "$1{$serverName};", $this->nginxContent);
-            if (!\is_string($content)) {
-                throw new EnvironmentException('Error while preparing the nginx conf.');
-            }
-
-            $this->nginxContent = $content;
-            $this->filesystem->dumpFile($nginx, $this->nginxContent);
-        }
-
-        return $serverName;
-    }
-
-    /**
      * Import database from a file on the project. The file must be at the root or in a direct subdirectory.
      * TODO: Import database from Magento Cloud CLI if available.
+     *
+     * @return bool
      */
-    private function importDatabase(): bool
+    protected function importDatabase(): bool
     {
         $this->interactive->newLine(2);
         $this->interactive->section('Database');
@@ -455,96 +193,17 @@ class InstallCommand extends AbstractEnvironmentCommand
                     }
                 }
                 if ($file !== null) {
-                    if ($database = $this->environment->getDatabase()) {
-                        try {
-                            $process = $this->database->import($this->environment->getDatabase(), $file);
-
-                            if (!$process->getProcess()->isSuccessful()) {
-                                throw new ProcessException($process->getProcess()->getErrorOutput());
-                            }
-
-                            return true;
-                        } catch (Exception $e) {
-                            $this->interactive->error($e->getMessage());
-                        }
-                    }
-                    $this->interactive->text("No database found in {$this->environment->__get('localEnv')}.");
+                    return $this->manager->importDatabase($file);
                 }
             } else {
                 $this->interactive->text('No compatible file found.');
             }
         }
+
         $this->interactive->text(
             'If you want to import a database later, you can use the <fg=yellow>import</> command.'
         );
 
         return false;
-    }
-
-    /**
-     * Update database url with chosen server name.
-     *
-     * @return bool
-     */
-    private function updateDatabase(): bool
-    {
-        if ($this->interactive->confirm('Do you want to update the urls ?', true)) {
-            try {
-                $process = $this->database->updateUrls($this->environment->getDatabase());
-            } catch (Exception $e) {
-                $this->interactive->error($e->getMessage());
-
-                return false;
-            }
-
-            if (!$process->getProcess()->isSuccessful()) {
-                $this->interactive->error($process->getProcess()->getErrorOutput());
-
-                return false;
-            }
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Retrieve tags available for the given image and configure the variable accordingly to the user's choice.
-     *
-     * @param string $imageName
-     * @param string $variable
-     *
-     * @throws DockerHubException
-     * @throws TransportExceptionInterface
-     *
-     * @return string
-     */
-    private function selectImage(string $imageName, string $variable): string
-    {
-        $availableTags = $this->dockerHub->getImageTags($imageName);
-
-        if (\count($availableTags) > 1) {
-            for ($i = \count($availableTags); $i > 0; --$i) {
-                $availableTags[$i] = $availableTags[$i - 1];
-            }
-            unset($availableTags[0]);
-            $image = (string) $this->interactive->choice(
-                "Select the image you want to use for {$imageName} :",
-                $availableTags,
-                $availableTags[1]
-            );
-        } else {
-            $image = (string) $availableTags[0];
-        }
-
-        $value = "{$variable}={$image}";
-        $replacement = preg_replace("/({$variable}=\\S*)/i", $value, $this->envContent);
-        if ($replacement === null) {
-            throw new EnvironmentException("Error while configuring variable {$variable}.");
-        }
-        $this->envContent = $replacement;
-
-        return $image;
     }
 }
