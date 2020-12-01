@@ -86,7 +86,7 @@ class CreateCommand extends AbstractEnvironmentCommand
         /** @var string $patch */
         $patch = $input->getOption('patch');
         if ($patch) {
-            ltrim('=', $patch);
+            $patch = ltrim('=', $patch);
             $package .= "={$patch}";
         }
 

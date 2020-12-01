@@ -171,7 +171,7 @@ class Environment
                 }
                 $this->localEnvContent = $content;
             } else {
-                new EnvironmentException('Local .env is not defined, please install the environment first.');
+                throw new EnvironmentException('Local .env is not defined, please install the environment first.');
             }
         }
 

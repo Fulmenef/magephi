@@ -29,7 +29,7 @@
         "action": "php ./vendor/bin/php-cs-fixer fix --verbose --config .php_cs {$STAGED_FILES|of-type:php}"
       },
       {
-        "action": "php ./vendor/bin/phpstan analyze -l 7 --no-progress {$STAGED_FILES|of-type:php}"
+        "action": "php -d memory_limit=2G ./vendor/bin/phpstan analyze -l max --no-progress {$STAGED_FILES|of-type:php}"
       }
     ]
   },
