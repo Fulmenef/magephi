@@ -145,7 +145,7 @@ class Mutagen
                 if (isset($statusMatch[1])) {
                     preg_match($reProgress, $statusMatch[1], $progressMatch);
                     if (!empty($progressMatch)) {
-                        $progressBar->setProgress($progressMatch[1]);
+                        $progressBar->setProgress((int) $progressMatch[1]);
                     }
 
                     return rtrim($statusMatch[1]) === 'Watching for changes';
