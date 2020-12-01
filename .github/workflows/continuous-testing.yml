@@ -18,6 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       MAGENTO_DIRECTORY: ./tmp/magento
+      PHP_VERSION: 7.4
 
     steps:
       - uses: actions/checkout@v2
@@ -39,7 +40,11 @@ jobs:
 
       - name: Install dependencies
         if: steps.cache-magephi.outputs.cache-hit != 'true'
-        run: composer install --ignore-platform-reqs --prefer-dist --no-progress --no-suggest --optimize-autoloader --classmap-authoritative
+        uses: php-actions/composer@v4
+        with:
+          php_version: ${{env.PHP_VERSION}}
+          args: --ignore-platform-reqs --prefer-dist --optimize-autoloader --classmap-authoritative
+          dev: no
 
       - name: Initialize Magento 2 project directory
         run: mkdir -p ${{env.MAGENTO_DIRECTORY}}
@@ -60,16 +65,27 @@ jobs:
 
       - name: Create a Magento Open Source project
         if: steps.cache-magento.outputs.cache-hit != 'true'
-        run: composer create-project --repository-url=https://repo.magento.com/ magento/project-community-edition ${{env.MAGENTO_DIRECTORY}} --ignore-platform-reqs --no-progress --no-dev --no-install
+        uses: php-actions/composer@v4
+        with:
+          php_version: ${{env.PHP_VERSION}}
+          composer_version: 1
+          command: create-project
+          args: --repository-url=https://repo.magento.com/ magento/project-community-edition ${{env.MAGENTO_DIRECTORY}} --ignore-platform-reqs --no-install
+          dev: no
         env:
           COMPOSER_AUTH: ${{secrets.COMPOSER_AUTH}}
 
       - name: Install the Docker environment through Composer
         if: steps.cache-magento.outputs.cache-hit != 'true'
-        run: composer require emakinafr/docker-magento2 --dev --prefer-dist --no-progress --ignore-platform-reqs
-        working-directory: ${{env.MAGENTO_DIRECTORY}}
+        uses: php-actions/composer@v4
+        with:
+          php_version: ${{env.PHP_VERSION}}
+          composer_version: 1
+          command: require emakinafr/docker-magento2
+          args: --prefer-dist --ignore-platform-reqs -d ${{env.MAGENTO_DIRECTORY}}
         env:
           COMPOSER_AUTH: ${{secrets.COMPOSER_AUTH}}
+          COMPOSER_MEMORY_LIMIT: 2G
 
       - name: Reduces the size of the Magento directory
         if: steps.cache-magento.outputs.cache-hit != 'true'
