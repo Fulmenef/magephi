@@ -2941,22 +2941,22 @@
         },
         {
             "name": "captainhook/plugin-composer",
-            "version": "5.2.2",
+            "version": "5.2.3",
             "source": {
                 "type": "git",
-                "url": "https://github.com/CaptainHookPhp/plugin-composer.git",
-                "reference": "25c294aed9fd30cfa056dd0d5d56a58c5b6f986d"
+                "url": "https://github.com/captainhookphp/plugin-composer.git",
+                "reference": "7c0c809011c24c1517d3896c5a7318268cea70ee"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/CaptainHookPhp/plugin-composer/zipball/25c294aed9fd30cfa056dd0d5d56a58c5b6f986d",
-                "reference": "25c294aed9fd30cfa056dd0d5d56a58c5b6f986d",
+                "url": "https://api.github.com/repos/captainhookphp/plugin-composer/zipball/7c0c809011c24c1517d3896c5a7318268cea70ee",
+                "reference": "7c0c809011c24c1517d3896c5a7318268cea70ee",
                 "shasum": ""
             },
             "require": {
                 "captainhook/captainhook": "^5.0",
                 "composer-plugin-api": "^1.1|^2.0",
-                "php": "^7.1"
+                "php": ">=7.1"
             },
             "require-dev": {
                 "composer/composer": "*"
@@ -2988,7 +2988,7 @@
                 }
             ],
             "description": "Composer-Plugin handling your git-hooks",
-            "time": "2020-10-24T17:34:58+00:00"
+            "time": "2020-12-07T19:27:49+00:00"
         },
         {
             "name": "composer/xdebug-handler",
@@ -3201,12 +3201,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/FriendsOfPHP/PHP-CS-Fixer.git",
-                "reference": "223d0c297deb4f49d912be37cf1321f9aa735144"
+                "reference": "dc144d7463bc2cc10e055539aabb62df773f3947"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FriendsOfPHP/PHP-CS-Fixer/zipball/223d0c297deb4f49d912be37cf1321f9aa735144",
-                "reference": "223d0c297deb4f49d912be37cf1321f9aa735144",
+                "url": "https://api.github.com/repos/FriendsOfPHP/PHP-CS-Fixer/zipball/dc144d7463bc2cc10e055539aabb62df773f3947",
+                "reference": "dc144d7463bc2cc10e055539aabb62df773f3947",
                 "shasum": ""
             },
             "require": {
@@ -3215,7 +3215,7 @@
                 "doctrine/annotations": "^1.2",
                 "ext-json": "*",
                 "ext-tokenizer": "*",
-                "php": "^5.6 || ^7.0",
+                "php": "^5.6 || ^7.0 || ^8.0",
                 "php-cs-fixer/diff": "^2.0",
                 "symfony/console": "^3.4.43 || ^4.4.11 || ^5.1.3",
                 "symfony/event-dispatcher": "^3.0 || ^4.0 || ^5.0",
@@ -3291,7 +3291,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2020-12-01T20:31:32+00:00"
+            "time": "2020-12-07T21:33:46+00:00"
         },
         {
             "name": "nyholm/psr7",
