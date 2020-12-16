@@ -3201,12 +3201,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/FriendsOfPHP/PHP-CS-Fixer.git",
-                "reference": "d9273477d939bb7648a39ac978002d1be7c6d980"
+                "reference": "95b636399ccd2058ae77fb1d076dfdd3a73471e3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FriendsOfPHP/PHP-CS-Fixer/zipball/d9273477d939bb7648a39ac978002d1be7c6d980",
-                "reference": "d9273477d939bb7648a39ac978002d1be7c6d980",
+                "url": "https://api.github.com/repos/FriendsOfPHP/PHP-CS-Fixer/zipball/95b636399ccd2058ae77fb1d076dfdd3a73471e3",
+                "reference": "95b636399ccd2058ae77fb1d076dfdd3a73471e3",
                 "shasum": ""
             },
             "require": {
@@ -3292,7 +3292,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2020-12-16T01:49:46+00:00"
+            "time": "2020-12-16T13:51:48+00:00"
         },
         {
             "name": "nyholm/psr7",
@@ -3467,16 +3467,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "0.12.58",
+            "version": "0.12.63",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "2a4847df6047b30af28854ed9dc95304cdb56ae5"
+                "reference": "c97ec4754bd53099a06c24847bd2870b99966b6a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/2a4847df6047b30af28854ed9dc95304cdb56ae5",
-                "reference": "2a4847df6047b30af28854ed9dc95304cdb56ae5",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/c97ec4754bd53099a06c24847bd2870b99966b6a",
+                "reference": "c97ec4754bd53099a06c24847bd2870b99966b6a",
                 "shasum": ""
             },
             "require": {
@@ -3519,7 +3519,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2020-11-29T13:32:03+00:00"
+            "time": "2020-12-15T16:37:16+00:00"
         },
         {
             "name": "phpstan/phpstan-symfony",
