@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Magephi\Command\Environment;
 
 use Magephi\Command\AbstractCommand;
-use Magephi\Component\DockerCompose;
-use Magephi\Component\ProcessFactory;
-use Magephi\Entity\Environment;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -36,18 +33,6 @@ class BackupCommand extends AbstractEnvironmentCommand
 
     protected string $command = 'backup';
 
-    private Environment $environment;
-
-    public function __construct(
-        ProcessFactory $processFactory,
-        DockerCompose $dockerCompose,
-        Environment $environment,
-        string $name = null
-    ) {
-        parent::__construct($processFactory, $dockerCompose, $name);
-        $this->environment = $environment;
-    }
-
     protected function configure(): void
     {
         parent::configure();
@@ -70,7 +55,7 @@ class BackupCommand extends AbstractEnvironmentCommand
         $filename .= self::EXTENSION;
 
         $timeout = self::DEFAULT_TIMEOUT;
-        if ($compression = $input->hasOption(self::ARGUMENT_COMPRESSION)) {
+        if ($compression = $input->getOption(self::ARGUMENT_COMPRESSION)) {
             $filename .= self::COMPRESSED_EXTENSION;
             $timeout *= 3;
         }
@@ -93,7 +78,7 @@ class BackupCommand extends AbstractEnvironmentCommand
             $this->processFactory->runProcess(
                 $command,
                 $timeout,
-                $this->environment->getDockerRequiredVariables(),
+                $this->manager->getDockerRequiredVariables(),
                 true
             );
 
@@ -101,20 +86,24 @@ class BackupCommand extends AbstractEnvironmentCommand
                 $progressBar->advance();
             }
 
-            $tarParemeters = 'c' . ($compression ? 'z' : '') . 'vf';
+            $tarParameters = 'c' . ($compression ? 'z' : '') . 'vf';
+
+            $backupFiles = '';
+            foreach ($this->manager->getBackupFiles() as $file) {
+                $backupFiles .= " /backup/{$file}";
+            }
 
             $command = [
                 'docker run --rm',
                 '--volume $(pwd):/backup',
-                'busybox sh -c "tar ' . $tarParemeters . ' /backup/' . $filename . ' /backup/'
-                    . self::MYSQL_BACKUP_FILE . ' /backup/'
-                    . $this->environment->__get('magentoEnv') . ' /backup/' . $this->environment->__get('localEnv')
+                'busybox sh -c "tar ' . $tarParameters . ' /backup/' . $filename . ' /backup/'
+                    . self::MYSQL_BACKUP_FILE . $backupFiles
                     . '"',
             ];
             $this->processFactory->runProcess(
                 $command,
                 $timeout,
-                $this->environment->getDockerRequiredVariables(),
+                $this->manager->getDockerRequiredVariables(),
                 true
             );
             unlink(self::MYSQL_BACKUP_FILE);

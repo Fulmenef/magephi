@@ -16,18 +16,20 @@ jobs:
   tests:
     name: Static code analysis
     runs-on: ubuntu-latest
+    env:
+        PHP_VERSION: 7.4
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: Cache PHP dependencies
-        uses: actions/cache@v1
+      - name: Setup PHP with composer v2
+        uses: shivammathur/setup-php@v2
         with:
-          path: vendor
-          key: ${{ runner.OS }}-build-${{ hashFiles('**/composer.lock') }}
+          php-version: ${{env.PHP_VERSION}}
+          tools: composer:v2
 
       - name: Install dependencies
-        run: composer install --ignore-platform-reqs --prefer-dist --no-progress --no-suggest --optimize-autoloader --classmap-authoritative
+        run: composer install --ignore-platform-reqs --prefer-dist --no-progress --optimize-autoloader --classmap-authoritative
 
       - name: PHP-CS-Fixer
         run: ./vendor/bin/php-cs-fixer fix --verbose --dry-run

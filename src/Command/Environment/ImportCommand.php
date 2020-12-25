@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace Magephi\Command\Environment;
 
-use Exception;
-use InvalidArgumentException;
 use Magephi\Command\AbstractCommand;
 use Magephi\Component\DockerCompose;
 use Magephi\Component\ProcessFactory;
-use Magephi\Entity\Environment;
+use Magephi\Entity\Environment\Manager;
 use Magephi\Helper\Database;
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\Console\Input\InputArgument;
@@ -25,18 +23,14 @@ class ImportCommand extends AbstractEnvironmentCommand
 
     protected Database $database;
 
-    private Environment $environment;
-
     public function __construct(
         ProcessFactory $processFactory,
         DockerCompose $dockerCompose,
-        Database $database,
-        Environment $environment,
-        string $name = null
+        Manager $manager,
+        Database $database
     ) {
-        parent::__construct($processFactory, $dockerCompose, $name);
+        parent::__construct($processFactory, $dockerCompose, $manager);
         $this->database = $database;
-        $this->environment = $environment;
     }
 
     protected function configure(): void
@@ -58,62 +52,8 @@ class ImportCommand extends AbstractEnvironmentCommand
         $file = $this->convertToString($input->getArgument('file'));
 
         $database = $this->convertToString($input->getArgument('database'));
-        if (empty($database)) {
-            $database = $this->environment->getDatabase();
-        }
 
-        if ($database === '') {
-            throw new InvalidArgumentException(
-                "The database is not defined. Ensure a database is defined in {$this->environment->__get('localEnv')} or provide one in the command."
-            );
-        }
-
-        try {
-            $process = $this->database->import($database, $file);
-        } catch (Exception $e) {
-            $this->interactive->error($e->getMessage());
-
-            return AbstractCommand::CODE_ERROR;
-        }
-
-        if (!$process->getProcess()->isSuccessful()) {
-            $this->interactive->error($process->getProcess()->getErrorOutput());
-
-            return AbstractCommand::CODE_ERROR;
-        }
-
-        $seconds = round($process->getDuration());
-
-        $this->interactive->success(
-            sprintf(
-                'The dump has been imported in %s in %d minutes and %d seconds ',
-                $database,
-                $seconds / 60,
-                $seconds % 60
-            )
-        );
-
-        if ($this->interactive->confirm('Do you want to update the urls ?', true)) {
-            try {
-                $process = $this->database->updateUrls($database);
-            } catch (Exception $e) {
-                $this->interactive->error($e->getMessage());
-
-                return AbstractCommand::CODE_ERROR;
-            }
-
-            if (!$process->getProcess()->isSuccessful()) {
-                $this->interactive->error($process->getProcess()->getOutput());
-                $this->interactive->error($process->getProcess()->getErrorOutput());
-
-                return AbstractCommand::CODE_ERROR;
-            }
-            $this->interactive->success(
-                'The urls has been updated.'
-            );
-        }
-
-        return AbstractCommand::CODE_SUCCESS;
+        return $this->manager->importDatabase($file, $database) ? AbstractCommand::CODE_SUCCESS : AbstractCommand::CODE_ERROR;
     }
 
     /**

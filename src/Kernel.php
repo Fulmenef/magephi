@@ -29,7 +29,7 @@ class Kernel extends BaseKernel
      *
      * @throws InvalidConfigurationException
      */
-    public function getCustomDir(): string
+    public static function getCustomDir(): string
     {
         $home = PHP_OS_FAMILY !== 'Windows' ? getenv('HOME') : $_SERVER['HOMEDRIVE'] . $_SERVER['HOMEPATH'];
 

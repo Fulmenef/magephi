@@ -40,7 +40,10 @@ class DockerHub
 
         if (\is_array($parsedResponse) && \array_key_exists('results', $parsedResponse)
             && \is_array($parsedResponse['results'])) {
-            return array_column($parsedResponse['results'], 'name');
+            $tags = array_column($parsedResponse['results'], 'name');
+            rsort($tags);
+
+            return $tags;
         }
 
         throw new DockerHubException('Unable to retrieve the image tags.');

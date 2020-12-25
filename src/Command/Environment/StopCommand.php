@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace Magephi\Command\Environment;
 
 use Magephi\Command\AbstractCommand;
-use Magephi\Component\DockerCompose;
-use Magephi\Component\ProcessFactory;
-use Magephi\Helper\Make;
+use Magephi\Exception\EnvironmentException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -17,18 +15,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 class StopCommand extends AbstractEnvironmentCommand
 {
     protected string $command = 'stop';
-
-    private Make $make;
-
-    public function __construct(
-        ProcessFactory $processFactory,
-        DockerCompose $dockerCompose,
-        Make $make,
-        string $name = null
-    ) {
-        parent::__construct($processFactory, $dockerCompose, $name);
-        $this->make = $make;
-    }
 
     public function getPrerequisites(): array
     {
@@ -52,21 +38,21 @@ class StopCommand extends AbstractEnvironmentCommand
     {
         $this->interactive->section('Stopping environment');
 
-        $process = $this->make->stop();
-
-        $this->interactive->newLine(2);
-
-        if (!$process->getProcess()->isSuccessful()) {
+        try {
+            $this->manager->stop();
+        } catch (EnvironmentException $e) {
+            $this->interactive->newLine(2);
             $this->interactive->error(
                 [
                     "Environment couldn't be stopped: ",
-                    $process->getProcess()->getErrorOutput(),
+                    $e->getMessage(),
                 ]
             );
 
             return AbstractCommand::CODE_ERROR;
         }
 
+        $this->interactive->newLine(2);
         $this->interactive->success('Environment stopped.');
 
         return AbstractCommand::CODE_SUCCESS;

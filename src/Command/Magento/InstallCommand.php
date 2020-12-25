@@ -5,10 +5,7 @@ declare(strict_types=1);
 namespace Magephi\Command\Magento;
 
 use Magephi\Command\AbstractCommand;
-use Magephi\Component\DockerCompose;
 use Magephi\Component\Process;
-use Magephi\Component\ProcessFactory;
-use Magephi\Entity\Environment;
 use Magephi\Exception\EnvironmentException;
 use Magephi\Exception\ProcessException;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -18,18 +15,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 class InstallCommand extends AbstractMagentoCommand
 {
     protected string $command = 'install';
-
-    private Environment $environment;
-
-    public function __construct(
-        ProcessFactory $processFactory,
-        DockerCompose $dockerCompose,
-        Environment $environment,
-        string $name = null
-    ) {
-        parent::__construct($processFactory, $dockerCompose, $name);
-        $this->environment = $environment;
-    }
 
     protected function configure(): void
     {
@@ -41,6 +26,9 @@ class InstallCommand extends AbstractMagentoCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $environment = $this->manager->getEnvironment();
+
+        //TODO Add elasticsearch to match Magento 2.4
         $command = sprintf(
             "bin/magento setup:install
             --base-url=%s
@@ -58,11 +46,11 @@ class InstallCommand extends AbstractMagentoCommand
             --currency=%s
             --timezone=%s
             --use-rewrites=%d",
-            $this->environment->getServerName(true),
+            $environment->getServerName(true),
             'mysql',
-            $this->environment->getDatabase(),
-            $this->environment->getEnvData('mysql_user'),
-            $this->environment->getEnvData('mysql_password'),
+            $environment->getDatabase(),
+            $environment->getEnvData('mysql_user'),
+            $environment->getEnvData('mysql_password'),
             $this->interactive->ask('What must be the backend frontname ?', 'admin'),
             $this->interactive->ask('What is the admin firstname ?', 'admin'),
             $this->interactive->ask('What is the admin lastname ?', 'admin'),
@@ -159,7 +147,7 @@ class InstallCommand extends AbstractMagentoCommand
         $this->interactive->success(
             sprintf(
                 'Magento installed, you can access to your website with the url %s',
-                $this->environment->getServerName(true)
+                $environment->getServerName(true)
             )
         );
 

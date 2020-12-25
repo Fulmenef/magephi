@@ -9,6 +9,7 @@ use Exception;
 use Magephi\Command\AbstractCommand;
 use Magephi\Component\DockerCompose;
 use Magephi\Component\ProcessFactory;
+use Magephi\Entity\Environment\Manager;
 use Magephi\Entity\System;
 use Magephi\Exception\ComposerException;
 use Nadar\PhpComposerReader\ComposerReader;
@@ -29,11 +30,11 @@ class CreateCommand extends AbstractEnvironmentCommand
     public function __construct(
         ProcessFactory $processFactory,
         DockerCompose $dockerCompose,
+        Manager $manager,
         LoggerInterface $logger,
-        System $system,
-        string $name = null
+        System $system
     ) {
-        parent::__construct($processFactory, $dockerCompose, $name);
+        parent::__construct($processFactory, $dockerCompose, $manager);
         $this->logger = $logger;
         $this->system = $system;
     }

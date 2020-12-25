@@ -8,29 +8,37 @@ use Magephi\Component\DockerCompose;
 use Magephi\Component\Mutagen;
 use Magephi\Component\Process;
 use Magephi\Component\ProcessFactory;
-use Magephi\Entity\Environment;
+use Magephi\Entity\Environment\EnvironmentInterface;
 use Magephi\Exception\ProcessException;
 
 class Make
 {
+    private EnvironmentInterface $environment;
+
     private ProcessFactory $processFactory;
 
     private DockerCompose $dockerCompose;
 
     private Mutagen $mutagen;
 
-    private Environment $environment;
-
     public function __construct(
         DockerCompose $dockerCompose,
         ProcessFactory $processFactory,
-        Mutagen $mutagen,
-        Environment $environment
+        Mutagen $mutagen
     ) {
         $this->dockerCompose = $dockerCompose;
         $this->processFactory = $processFactory;
         $this->mutagen = $mutagen;
+    }
+
+    /**
+     * @param EnvironmentInterface $environment
+     */
+    public function setEnvironment(EnvironmentInterface $environment): void
+    {
         $this->environment = $environment;
+        $this->dockerCompose->setEnvironment($environment);
+        $this->mutagen->setEnvironment($environment);
     }
 
     /**
@@ -131,6 +139,7 @@ class Make
         if (!$this->dockerCompose->isContainerUp('synchro')) {
             throw new ProcessException('Synchro container is not started');
         }
+
         if ($this->mutagen->isExistingSession()) {
             if ($this->mutagen->isPaused()) {
                 $this->mutagen->resumeSession();

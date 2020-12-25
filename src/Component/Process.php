@@ -34,7 +34,7 @@ class Process
      * @param null|string[] $env
      * @param bool          $shell
      */
-    public function __construct($command, ?float $timeout, ?array $env = [], bool $shell = false)
+    public function __construct(array $command, ?float $timeout, ?array $env = [], bool $shell = false)
     {
         if ($shell) {
             $command = implode(' ', $command);

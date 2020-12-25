@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Magephi\Component;
 
-use Magephi\Entity\Environment;
+use Magephi\Entity\Environment\EnvironmentInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -13,15 +13,26 @@ class Mutagen
 {
     private ProcessFactory $processFactory;
 
-    private Environment $environment;
+    private OutputInterface $output;
 
-    private OutputInterface $outputInterface;
+    private EnvironmentInterface $environment;
 
-    public function __construct(ProcessFactory $processFactory, Environment $environment)
+    public function __construct(ProcessFactory $processFactory)
     {
         $this->processFactory = $processFactory;
+        $this->output = new ConsoleOutput();
+    }
+
+    /**
+     * @param EnvironmentInterface $environment
+     *
+     * @return Mutagen
+     */
+    public function setEnvironment(EnvironmentInterface $environment): self
+    {
         $this->environment = $environment;
-        $this->outputInterface = new ConsoleOutput();
+
+        return $this;
     }
 
     /**
@@ -41,9 +52,7 @@ class Mutagen
             '--symlink-mode=posix-raw',
             "--label=name={$this->environment->getDockerRequiredVariables()['COMPOSE_PROJECT_NAME']}",
             getcwd() ?: '',
-            $this->environment->getDockerRequiredVariables()['COMPOSE_PROJECT_NAME']
-                ? "docker://magento2_{$this->environment->__get('currentDir')}_synchro/var/www/html/"
-                : '',
+            "docker://{$this->environment->getDockerRequiredVariables()['COMPOSE_PROJECT_NAME']}_synchro/var/www/html/",
         ];
 
         return $this->processFactory->runProcess($command, 60);
@@ -134,7 +143,7 @@ class Mutagen
             ],
             300
         );
-        $progressBar = new ProgressBar($this->outputInterface, 100);
+        $progressBar = new ProgressBar($this->output, 100);
         $reStatus = '/Status: (.*)$/i';
         $reProgress = '/Staging files on beta: (\d+)%/i';
         $process->start();

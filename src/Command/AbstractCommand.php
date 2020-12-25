@@ -9,6 +9,7 @@ use Humbug\SelfUpdate\Updater;
 use Magephi\Application;
 use Magephi\Component\DockerCompose;
 use Magephi\Component\ProcessFactory;
+use Magephi\Entity\Environment\Manager;
 use Magephi\Entity\System;
 use Magephi\EventListener\CommandListener;
 use Magephi\Exception\EnvironmentException;
@@ -32,11 +33,14 @@ abstract class AbstractCommand extends Command
 
     protected DockerCompose $dockerCompose;
 
-    public function __construct(ProcessFactory $processFactory, DockerCompose $dockerCompose, $name = null)
+    protected Manager $manager;
+
+    public function __construct(ProcessFactory $processFactory, DockerCompose $dockerCompose, Manager $manager)
     {
         $this->processFactory = $processFactory;
         $this->dockerCompose = $dockerCompose;
-        parent::__construct($name);
+        $this->manager = $manager;
+        parent::__construct();
     }
 
     /**
@@ -111,8 +115,10 @@ abstract class AbstractCommand extends Command
 
     protected function initialize(InputInterface $input, OutputInterface $output): void
     {
-        $this->interactive = new SymfonyStyle($input, $output);
         parent::initialize($input, $output);
+
+        $this->interactive = new SymfonyStyle($input, $output);
+        $this->manager->setOutput($this->interactive);
 
         $update = $this->checkNewVersionAvailable();
         if ($update !== null) {

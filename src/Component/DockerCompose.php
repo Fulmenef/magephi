@@ -6,7 +6,7 @@ namespace Magephi\Component;
 
 use Error;
 use Magephi\Command\Docker\PhpCommand;
-use Magephi\Entity\Environment;
+use Magephi\Entity\Environment\EnvironmentInterface;
 use Magephi\Exception\EnvironmentException;
 use Magephi\Exception\ProcessException;
 use Psr\Log\LoggerInterface;
@@ -15,14 +15,13 @@ class DockerCompose
 {
     private ProcessFactory $processFactory;
 
-    private Environment $environment;
+    private EnvironmentInterface $environment;
 
     private LoggerInterface $logger;
 
-    public function __construct(ProcessFactory $processFactory, Environment $environment, LoggerInterface $logger)
+    public function __construct(ProcessFactory $processFactory, LoggerInterface $logger)
     {
         $this->processFactory = $processFactory;
-        $this->environment = $environment;
         $this->logger = $logger;
     }
 
@@ -42,7 +41,7 @@ class DockerCompose
         }
         if (!\Symfony\Component\Process\Process::isTtySupported()) {
             throw new ProcessException(
-                "TTY is not supported, ensure you're running the application from the command line."
+                'TTY is not supported, ensure you\'re running the application from the command line.'
             );
         }
         $commands = ['docker-compose', 'exec'];
@@ -197,5 +196,17 @@ class DockerCompose
         }
 
         return $containers;
+    }
+
+    /**
+     * @param EnvironmentInterface $environment
+     *
+     * @return DockerCompose
+     */
+    public function setEnvironment(EnvironmentInterface $environment): self
+    {
+        $this->environment = $environment;
+
+        return $this;
     }
 }

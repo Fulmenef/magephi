@@ -37,14 +37,13 @@ class ReleaseCommand extends Command
         KernelInterface $appKernel,
         ProcessFactory $processFactory,
         Git $git,
-        LoggerInterface $logger,
-        string $name = null
+        LoggerInterface $logger
     ) {
+        parent::__construct();
         $this->kernel = $appKernel;
         $this->processFactory = $processFactory;
         $this->git = $git;
         $this->logger = $logger;
-        parent::__construct($name);
     }
 
     /**

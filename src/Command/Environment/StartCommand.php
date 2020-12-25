@@ -6,11 +6,6 @@ namespace Magephi\Command\Environment;
 
 use Exception;
 use Magephi\Command\AbstractCommand;
-use Magephi\Component\DockerCompose;
-use Magephi\Component\Mutagen;
-use Magephi\Component\Process;
-use Magephi\Component\ProcessFactory;
-use Magephi\Helper\Make;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -20,22 +15,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 class StartCommand extends AbstractEnvironmentCommand
 {
     protected string $command = 'start';
-
-    private Make $make;
-
-    private Mutagen $mutagen;
-
-    public function __construct(
-        ProcessFactory $processFactory,
-        DockerCompose $dockerCompose,
-        Make $make,
-        Mutagen $mutagen,
-        string $name = null
-    ) {
-        parent::__construct($processFactory, $dockerCompose, $name);
-        $this->make = $make;
-        $this->mutagen = $mutagen;
-    }
 
     public function getPrerequisites(): array
     {
@@ -61,36 +40,22 @@ class StartCommand extends AbstractEnvironmentCommand
         $this->interactive->section('Starting environment');
 
         try {
-            $process = $this->make->start();
-            if (!$process->getProcess()->isSuccessful() && $process->getExitCode() !== Process::CODE_TIMEOUT) {
-                throw new Exception($process->getProcess()->getErrorOutput());
-            }
-            if ($process->getExitCode() === Process::CODE_TIMEOUT) {
-                $this->make->startMutagen();
-                $this->interactive->newLine();
-                $this->interactive->text('Containers are up.');
-                $this->interactive->section('File synchronization');
-                $synced = $this->mutagen->monitorUntilSynced();
-                if (!$synced) {
-                    throw new Exception(
-                        'Something happened during the sync, check the situation with <fg=yellow>mutagen monitor</>.'
-                    );
-                }
-            }
-
-            $this->interactive->newLine(2);
-            $this->interactive->success('Environment started.');
-
-            return AbstractCommand::CODE_SUCCESS;
+            $this->manager->start();
         } catch (Exception $e) {
+            $this->interactive->newLine(2);
             $this->interactive->error(
                 [
-                    "Environment couldn't been started:",
+                    "Environment couldn't be started:",
                     $e->getMessage(),
                 ]
             );
 
             return AbstractCommand::CODE_ERROR;
         }
+
+        $this->interactive->newLine(2);
+        $this->interactive->success('Environment started.');
+
+        return AbstractCommand::CODE_SUCCESS;
     }
 }
