@@ -15,11 +15,18 @@ jobs:
   build:
     name: Release
     runs-on: ubuntu-latest
+    env:
+      PHP_VERSION: 7.4
 
     steps:
       - uses: actions/checkout@v2
-      - run: |
-          git fetch --prune --unshallow
+      - run: git fetch --prune --unshallow
+
+      - name: Setup PHP with composer v2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{env.PHP_VERSION}}
+          tools: composer:v2
 
       - name: Validate composer.json and composer.lock
         run: composer validate
