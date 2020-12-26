@@ -89,7 +89,7 @@ class Manager
     {
         if ($this->getEnvironment()->install($data)) {
             $configFile = $this->getConfigFile();
-            $this->yaml->update($configFile, ['environment' => [$this->getEnvironment()->getWorkingDir() => ['type' => $this->getEnvironment()->getType()]]]);
+            $this->yaml->update($configFile, ['environment' => [$this->getEnvironment()->getWorkingDir(true) => ['type' => $this->getEnvironment()->getType()]]]);
 
             return true;
         }
@@ -106,7 +106,7 @@ class Manager
     {
         if ($this->getEnvironment()->uninstall()) {
             $configFile = $this->getConfigFile();
-            $this->yaml->remove($configFile, ['environment' => $this->getEnvironment()->getWorkingDir()]);
+            $this->yaml->remove($configFile, ['environment' => $this->getEnvironment()->getWorkingDir(true)]);
 
             return true;
         }
@@ -234,7 +234,6 @@ class Manager
 
         switch (\get_class($environment)) {
             case Emakina::class:
-                // @var Emakina $environment
                 return $environment->hasComposeFile();
 
             default:

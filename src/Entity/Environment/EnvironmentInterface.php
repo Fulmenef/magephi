@@ -124,7 +124,9 @@ interface EnvironmentInterface
     /**
      * Get working directory.
      *
+     * @param bool $complete Return the complete path of the directory
+     *
      * @return string
      */
-    public function getWorkingDir(): string;
+    public function getWorkingDir(bool $complete = false): string;
 }

@@ -82,7 +82,7 @@ jobs:
           php_version: ${{env.PHP_VERSION}}
           composer_version: 1
           command: require emakinafr/docker-magento2
-          args: --prefer-dist --ignore-platform-reqs -d ${{env.MAGENTO_DIRECTORY}}
+          args: --prefer-dist --ignore-platform-reqs --no-progress -d ${{env.MAGENTO_DIRECTORY}}
         env:
           COMPOSER_AUTH: ${{secrets.COMPOSER_AUTH}}
           COMPOSER_MEMORY_LIMIT: 2G
