@@ -6,6 +6,8 @@
 
 box: ## Compiles the project into a PHAR archive
 	composer dump-env prod
+	./bin/console cache:clear
+	./bin/console cache:warmup
 	box compile
 	rm .env.local.php
 .PHONY: box
