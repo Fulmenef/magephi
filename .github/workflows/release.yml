@@ -37,6 +37,7 @@ jobs:
       - name: Compilation
         run: |
           mkdir ~/.magephi
+          composer global config minimum-stability dev
           composer global require humbug/box:3.10.0
           make box
 
