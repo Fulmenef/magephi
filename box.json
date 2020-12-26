@@ -9,7 +9,6 @@
   "files": [
     ".env.local.php"
   ],
-  "force-autodiscovery": true,
   "git-version": "package_version",
   "compression": "GZ",
   "replacements": {
