@@ -69,6 +69,7 @@ class Emakina implements EnvironmentInterface
 
         /** @var string $current */
         $current = posix_getcwd();
+        // TODO Put it in Manager or another class ?
         $configFile = Kernel::getCustomDir() . '/config.yml';
         if ($filesystem->exists($configFile)) {
             $content = $yaml->read($configFile);
@@ -77,7 +78,7 @@ class Emakina implements EnvironmentInterface
                 foreach ($environments as $env) {
                     if (substr($current, 0, \strlen($env)) === $env) {
                         chdir($env);
-                        $this->workingDir = basename($env);
+                        $this->workingDir = $env;
 
                         break;
                     }
@@ -86,7 +87,7 @@ class Emakina implements EnvironmentInterface
         }
 
         if (!isset($this->workingDir)) {
-            $this->workingDir = basename($current);
+            $this->workingDir = $current;
         }
 
         $this->autoLocate();
@@ -394,9 +395,9 @@ class Emakina implements EnvironmentInterface
     /**
      * {@inheritDoc}
      */
-    public function getWorkingDir(): string
+    public function getWorkingDir(bool $complete = false): string
     {
-        return $this->workingDir;
+        return $complete ? $this->workingDir : basename($this->workingDir);
     }
 
     /**
