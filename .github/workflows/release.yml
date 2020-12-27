@@ -32,14 +32,13 @@ jobs:
         run: composer validate
 
       - name: Install dependencies
-        run: composer install --ignore-platform-reqs --prefer-dist --no-progress --no-dev --no-suggest --optimize-autoloader --classmap-authoritative
+        run: composer install --ignore-platform-reqs --prefer-dist --no-progress --no-dev --optimize-autoloader --classmap-authoritative
 
       - name: Compilation
         run: |
           mkdir ~/.magephi
-          composer global config minimum-stability dev
-          composer global require humbug/box:3.10.0
           make box
+          ./build/magephi.phar list
 
       - name: Prepare release
         id: prepare_release
@@ -55,5 +54,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          tag_name: Test fix workflow ${{ github.ref }}
+          draft: true
           body: ${{ steps.prepare_release.outputs.changelog }}
           files: ./build/magephi.phar
