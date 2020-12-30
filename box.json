@@ -1,18 +1,18 @@
 {
-  "main": "bin/console",
-  "output": "build/magephi.phar",
-  "directories": [
-    "config",
-    "src",
-    "vendor"
-  ],
-  "files": [
-    ".env.local.php"
-  ],
-  "force-autodiscovery": true,
-  "git-version": "package_version",
-  "compression": "GZ",
-  "replacements": {
-    "mode": "prod"
-  }
+    "main": "bin/console",
+    "output": "build/magephi.phar",
+    "directories": [
+        "config",
+        "src",
+        "vendor"
+    ],
+    "files": [
+        ".env.local.php"
+    ],
+    "check-requirements": false,
+    "git-version": "package_version",
+    "compression": "GZ",
+    "replacements": {
+        "mode": "prod"
+    }
 }

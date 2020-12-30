@@ -6,11 +6,13 @@
 
 box: ## Compiles the project into a PHAR archive
 	composer dump-env prod
-	box compile
+	./bin/console cache:clear
+	./bin/console cache:warmup
+	docker run --rm --interactive --volume="$$(pwd):/app:delegated" ajardin/humbug-box compile --verbose --ansi
 	rm .env.local.php
 .PHONY: box
 
-install: ## Executes a copy/paste analysis
+install: ## Install built version
 	rm -rf ${HOME}/.magephi/cache/* ${HOME}/.magephi/logs/*
 	mv -f ./build/magephi.phar /usr/local/bin/magephi
 .PHONY: install

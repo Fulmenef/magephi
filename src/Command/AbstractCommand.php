@@ -44,6 +44,16 @@ abstract class AbstractCommand extends Command
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function setName(string $name)
+    {
+        $name = $name === 'default' ? $name : 'magephi:' . $name;
+
+        return parent::setName($name);
+    }
+
+    /**
      * Check if there's a new version available.
      *
      * @return null|string Return latest new version or null if nothing is available
