@@ -6,8 +6,8 @@
 
 box: ## Compiles the project into a PHAR archive
 	composer dump-env prod
-	./bin/console cache:clear
-	./bin/console cache:warmup
+	./bin/magephi cache:clear
+	./bin/magephi cache:warmup
 	docker run --rm --interactive --volume="$$(pwd):/app:delegated" ajardin/humbug-box compile --verbose --ansi
 	rm .env.local.php
 .PHONY: box
@@ -26,7 +26,7 @@ phpstan: ## Executes a static analysis at the higher level on all PHP files
 .PHONY: phpstan
 
 security: ## Executes a security audit on all PHP dependencies
-	bin/console security:check
+	bin/magephi security:check
 .PHONY: security
 
 help:

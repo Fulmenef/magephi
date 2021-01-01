@@ -18,6 +18,14 @@ class DefaultCommand extends AbstractCommand
     protected static $defaultName = 'default';
 
     /**
+     * {@inheritDoc}
+     */
+    public function getPrerequisites(): array
+    {
+        return [];
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function configure(): void

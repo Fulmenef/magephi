@@ -9,6 +9,9 @@
             "email": "axel.perroud@outlook.com"
         }
     ],
+    "bin": [
+        "bin/magephi"
+    ],
     "require": {
         "php": "^7.4",
         "ext-ctype": "*",
@@ -30,7 +33,6 @@
         "captainhook/plugin-composer": "^5.0",
         "friendsofphp/php-cs-fixer": "3.0.x-dev",
         "nyholm/psr7": "^1.2",
-        "phpstan/phpstan": "^0.12",
         "phpstan/phpstan-symfony": "^0.12.1",
         "roave/security-advisories": "dev-master",
         "sensiolabs/security-checker": "^6.0",
@@ -57,7 +59,7 @@
     },
     "scripts": {
         "auto-scripts": {
-            "cache:clear": "symfony-cmd"
+            "bin/magephi cache:clear": "script"
         },
         "post-autoload-dump": [
             "@auto-scripts"
