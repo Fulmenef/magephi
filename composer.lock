@@ -3202,12 +3202,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/FriendsOfPHP/PHP-CS-Fixer.git",
-                "reference": "245ccce266895d5609fe8b77ecc44548eb220271"
+                "reference": "b8f2789f21ee602992630c07dff46f1d43717f70"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FriendsOfPHP/PHP-CS-Fixer/zipball/245ccce266895d5609fe8b77ecc44548eb220271",
-                "reference": "245ccce266895d5609fe8b77ecc44548eb220271",
+                "url": "https://api.github.com/repos/FriendsOfPHP/PHP-CS-Fixer/zipball/b8f2789f21ee602992630c07dff46f1d43717f70",
+                "reference": "b8f2789f21ee602992630c07dff46f1d43717f70",
                 "shasum": ""
             },
             "require": {
@@ -3238,11 +3238,11 @@
                 "php-cs-fixer/phpunit-constraint-isidenticalstring": "^1.2",
                 "php-cs-fixer/phpunit-constraint-xmlmatchesxsd": "^1.2.1",
                 "phpspec/prophecy-phpunit": "^1.1 || ^2.0",
-                "phpunit/phpunit": "^5.7.27 || ^6.5.14 || ^7.5.20 || ^8.5.13 || ^9.4.4 <9.5",
+                "phpunit/phpunit": "^5.7.27 || ^6.5.14 || ^7.5.20 || ^8.5.13 || ^9.5",
                 "phpunitgoodpractices/polyfill": "^1.5",
                 "phpunitgoodpractices/traits": "^1.9.1",
                 "sanmai/phpunit-legacy-adapter": "^6.4 || ^8.2.1",
-                "symfony/phpunit-bridge": "^5.1",
+                "symfony/phpunit-bridge": "^5.2.1",
                 "symfony/yaml": "^3.0 || ^4.0 || ^5.0"
             },
             "suggest": {
@@ -3294,7 +3294,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2020-12-31T14:16:08+00:00"
+            "time": "2021-01-09T23:19:07+00:00"
         },
         {
             "name": "nyholm/psr7",
@@ -3525,16 +3525,16 @@
         },
         {
             "name": "phpstan/phpstan-symfony",
-            "version": "0.12.12",
+            "version": "0.12.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan-symfony.git",
-                "reference": "fb66d5e3ee2e9e60c14931d0fb8c45263bbb0b6f"
+                "reference": "d8313ec2849876aff0e019725eb8afe9456be9cf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan-symfony/zipball/fb66d5e3ee2e9e60c14931d0fb8c45263bbb0b6f",
-                "reference": "fb66d5e3ee2e9e60c14931d0fb8c45263bbb0b6f",
+                "url": "https://api.github.com/repos/phpstan/phpstan-symfony/zipball/d8313ec2849876aff0e019725eb8afe9456be9cf",
+                "reference": "d8313ec2849876aff0e019725eb8afe9456be9cf",
                 "shasum": ""
             },
             "require": {
@@ -3586,7 +3586,7 @@
                 }
             ],
             "description": "Symfony Framework extensions and rules for PHPStan",
-            "time": "2020-12-13T13:13:56+00:00"
+            "time": "2021-01-08T10:34:29+00:00"
         },
         {
             "name": "psr/http-factory",
