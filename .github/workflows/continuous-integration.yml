@@ -36,6 +36,3 @@ jobs:
 
       - name: PHPStan
         run: make phpstan
-
-      - name: Security
-        run: make security

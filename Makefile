@@ -25,10 +25,6 @@ phpstan: ## Executes a static analysis at the higher level on all PHP files
 	./vendor/bin/phpstan analyze src --level=max --memory-limit=1G --verbose
 .PHONY: phpstan
 
-security: ## Executes a security audit on all PHP dependencies
-	bin/console security:check
-.PHONY: security
-
 help:
 	@grep -E '(^[a-zA-Z_-]+:.*?##.*$$)|(^##)' $(MAKEFILE_LIST) \
 		| awk 'BEGIN {FS = ":.*?## "}; {printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}' \
