@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Magephi\Command\Environment;
 
-use Magephi\Command\AbstractCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -45,6 +44,6 @@ class UninstallCommand extends AbstractEnvironmentCommand
             }
         }
 
-        return AbstractCommand::CODE_SUCCESS;
+        return self::SUCCESS;
     }
 }

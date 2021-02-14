@@ -85,7 +85,7 @@ jobs:
           args: --prefer-dist --ignore-platform-reqs --no-progress -d ${{env.MAGENTO_DIRECTORY}}
         env:
           COMPOSER_AUTH: ${{secrets.COMPOSER_AUTH}}
-          COMPOSER_MEMORY_LIMIT: 2G
+          COMPOSER_MEMORY_LIMIT: 4G
 
       - name: Reduces the size of the Magento directory
         if: steps.cache-magento.outputs.cache-hit != 'true'

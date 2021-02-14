@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Magephi\Command\Environment;
 
-use Magephi\Command\AbstractCommand;
 use Magephi\Component\DockerCompose;
 use Magephi\Component\Mutagen;
 use Magephi\Component\ProcessFactory;
@@ -68,6 +67,6 @@ class StatusCommand extends AbstractEnvironmentCommand
 
         $this->interactive->writeln('Mutagen status: <info>' . $mutagenStatus . '</info>');
 
-        return AbstractCommand::CODE_SUCCESS;
+        return self::SUCCESS;
     }
 }

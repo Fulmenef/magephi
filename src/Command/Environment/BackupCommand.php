@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Magephi\Command\Environment;
 
-use Magephi\Command\AbstractCommand;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -97,8 +96,8 @@ class BackupCommand extends AbstractEnvironmentCommand
                 'docker run --rm',
                 '--volume $(pwd):/backup',
                 'busybox sh -c "tar ' . $tarParameters . ' /backup/' . $filename . ' /backup/'
-                    . self::MYSQL_BACKUP_FILE . $backupFiles
-                    . '"',
+                . self::MYSQL_BACKUP_FILE . $backupFiles
+                . '"',
             ];
             $this->processFactory->runProcess(
                 $command,
@@ -123,9 +122,9 @@ class BackupCommand extends AbstractEnvironmentCommand
                 . ' minutes, please run again the command with the option --no-timeout'
             );
 
-            return AbstractCommand::CODE_ERROR;
+            return self::FAILURE;
         }
 
-        return AbstractCommand::CODE_SUCCESS;
+        return self::SUCCESS;
     }
 }

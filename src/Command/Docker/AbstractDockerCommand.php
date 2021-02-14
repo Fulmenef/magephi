@@ -35,9 +35,9 @@ abstract class AbstractDockerCommand extends AbstractCommand
         } catch (EnvironmentException | ProcessException $e) {
             $this->interactive->error($e->getMessage());
 
-            return AbstractCommand::CODE_ERROR;
+            return self::FAILURE;
         }
 
-        return AbstractCommand::CODE_SUCCESS;
+        return self::SUCCESS;
     }
 }

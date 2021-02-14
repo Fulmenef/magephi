@@ -6,7 +6,6 @@ namespace Magephi\Command\Environment;
 
 use ErrorException;
 use Exception;
-use Magephi\Command\AbstractCommand;
 use Magephi\Component\DockerCompose;
 use Magephi\Component\ProcessFactory;
 use Magephi\Entity\Environment\Manager;
@@ -69,7 +68,7 @@ class CreateCommand extends AbstractEnvironmentCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         if (!($currentDir = getcwd()) || !($scan = scandir($currentDir))) {
-            throw new DirectoryNotFoundException('Your current directory is not readable', AbstractCommand::CODE_ERROR);
+            throw new DirectoryNotFoundException('Your current directory is not readable', self::FAILURE);
         }
 
         try {
@@ -77,7 +76,7 @@ class CreateCommand extends AbstractEnvironmentCommand
         } catch (ErrorException $e) {
             $this->interactive->error($e->getMessage());
 
-            return AbstractCommand::CODE_ERROR;
+            return self::FAILURE;
         }
 
         $package = $input->getOption(
@@ -110,7 +109,7 @@ class CreateCommand extends AbstractEnvironmentCommand
         } catch (ComposerException $e) {
             $this->interactive->error($e->getMessage());
 
-            return AbstractCommand::CODE_ERROR;
+            return self::FAILURE;
         }
 
         if (!is_file('package.json') && is_file('package.json.sample')) {
@@ -122,7 +121,7 @@ class CreateCommand extends AbstractEnvironmentCommand
         } catch (ComposerException | Exception $e) {
             $this->interactive->error($e->getMessage());
 
-            return AbstractCommand::CODE_ERROR;
+            return self::FAILURE;
         }
 
         $this->initGitignore();
@@ -131,7 +130,7 @@ class CreateCommand extends AbstractEnvironmentCommand
 
         $this->interactive->success('Your project has been created, you can now use the install command.');
 
-        return AbstractCommand::CODE_SUCCESS;
+        return self::SUCCESS;
     }
 
     /**

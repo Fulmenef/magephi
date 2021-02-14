@@ -67,16 +67,16 @@ class UpdateCommand extends AbstractCommand
                     )
                 );
 
-                exit(AbstractCommand::CODE_SUCCESS);    // Necessary to bypass Symfony post command check  and avoid errors
+                exit(self::SUCCESS);    // Necessary to bypass Symfony post command check  and avoid errors
             }
 
             $this->interactive->error('Update canceled, something happened.');
 
-            return AbstractCommand::CODE_ERROR;
+            return self::FAILURE;
         }
 
         $this->interactive->note('No new version to download');
 
-        return AbstractCommand::CODE_SUCCESS;
+        return self::SUCCESS;
     }
 }

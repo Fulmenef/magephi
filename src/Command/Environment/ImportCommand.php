@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Magephi\Command\Environment;
 
-use Magephi\Command\AbstractCommand;
 use Magephi\Component\DockerCompose;
 use Magephi\Component\ProcessFactory;
 use Magephi\Entity\Environment\Manager;
@@ -53,7 +52,7 @@ class ImportCommand extends AbstractEnvironmentCommand
 
         $database = $this->convertToString($input->getArgument('database'));
 
-        return $this->manager->importDatabase($file, $database) ? AbstractCommand::CODE_SUCCESS : AbstractCommand::CODE_ERROR;
+        return $this->manager->importDatabase($file, $database) ? self::SUCCESS : self::FAILURE;
     }
 
     /**

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Magephi\Command\Environment;
 
-use Magephi\Command\AbstractCommand;
 use Magephi\Component\DockerCompose;
 use Magephi\Component\ProcessFactory;
 use Magephi\Entity\Environment\Manager;
@@ -73,10 +72,10 @@ class CheckPrerequisiteCommand extends AbstractEnvironmentCommand
         if ($ready) {
             $this->interactive->success('Your system is ready.');
 
-            return AbstractCommand::CODE_SUCCESS;
+            return self::SUCCESS;
         }
         $this->interactive->error('Your system is not ready yet, install the missing components.');
 
-        return AbstractCommand::CODE_ERROR;
+        return self::FAILURE;
     }
 }

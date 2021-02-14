@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Magephi\Command\Environment;
 
 use Exception;
-use Magephi\Command\AbstractCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -50,12 +49,12 @@ class StartCommand extends AbstractEnvironmentCommand
                 ]
             );
 
-            return AbstractCommand::CODE_ERROR;
+            return self::FAILURE;
         }
 
         $this->interactive->newLine(2);
         $this->interactive->success('Environment started.');
 
-        return AbstractCommand::CODE_SUCCESS;
+        return self::SUCCESS;
     }
 }

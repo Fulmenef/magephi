@@ -106,17 +106,17 @@ class ReleaseCommand extends Command
         if (!$this->git->createTag($version)) {
             $this->interactive->error("A tag for version {$version} already exists");
 
-            return AbstractCommand::CODE_ERROR;
+            return self::FAILURE;
         }
         $this->logger->debug('Tag created.');
 
         if ($this->gitPush($version)) {
-            return AbstractCommand::CODE_ERROR;
+            return self::FAILURE;
         }
         $this->logger->debug('Tag pushed.');
 
         if ($this->gitPush()) {
-            return AbstractCommand::CODE_ERROR;
+            return self::FAILURE;
         }
         $this->logger->debug('Master pushed.');
 
@@ -124,7 +124,7 @@ class ReleaseCommand extends Command
             "Version {$version} has been pushed."
         );
 
-        return AbstractCommand::CODE_SUCCESS;
+        return self::SUCCESS;
     }
 
     /**
@@ -153,11 +153,11 @@ class ReleaseCommand extends Command
         } catch (GitException $e) {
             $this->interactive->error($e->getMessage());
 
-            return AbstractCommand::CODE_ERROR;
+            return self::FAILURE;
         } catch (ProcessTimedOutException $e) {
             $this->interactive->note($e->getMessage());
         }
 
-        return AbstractCommand::CODE_SUCCESS;
+        return self::SUCCESS;
     }
 }

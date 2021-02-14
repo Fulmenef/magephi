@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Magephi\Command\Magento;
 
-use Magephi\Command\AbstractCommand;
-use Magephi\Component\Process;
 use Magephi\Exception\EnvironmentException;
 use Magephi\Exception\ProcessException;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -21,14 +19,13 @@ class InstallCommand extends AbstractMagentoCommand
         parent::configure();
         $this
             ->setDescription('Install the Magento2 project in the current directory.')
-            ->setHelp('This command allows you to install the Magento 2 project in the current directory.');
+            ->setHelp('This command allows you to install a basic Magento 2 project in the current directory.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $environment = $this->manager->getEnvironment();
 
-        //TODO Add elasticsearch to match Magento 2.4
         $command = sprintf(
             "bin/magento setup:install
             --base-url=%s
@@ -45,7 +42,10 @@ class InstallCommand extends AbstractMagentoCommand
             --language=%s
             --currency=%s
             --timezone=%s
-            --use-rewrites=%d",
+            --use-rewrites=%d
+            --search-engine=%s
+            --elasticsearch-host=%s
+            --elasticsearch-port=%s",
             $environment->getServerName(true),
             'mysql',
             $environment->getDatabase(),
@@ -87,7 +87,10 @@ class InstallCommand extends AbstractMagentoCommand
             $this->interactive->ask('What is the project default language ?', 'en_US'),
             $this->interactive->ask('What is the project default currency ?', 'USD'),
             $this->interactive->ask('What is the project default timezone ?', 'America/Chicago'),
-            $this->interactive->confirm('Do you want to use url rewrites ?', true) ? 1 : 0
+            $this->interactive->confirm('Do you want to use url rewrites ?', true) ? 1 : 0,
+            $this->interactive->ask('What search engine do you want ?', 'elasticsearch7'),
+            'elasticsearch',
+            9200
         );
 
         try {
@@ -99,10 +102,10 @@ class InstallCommand extends AbstractMagentoCommand
             if ($_ENV['SHELL_VERBOSITY'] >= 1) {
                 $install = $this->dockerCompose->executeContainerCommand('php', $command);
             } else {
-                /** @var Process $install */
                 $install = $this->dockerCompose->executeContainerCommand('php', $command, true);
                 $progressBar = new ProgressBar($output, 0);
                 $regex = '/Progress: (\d*) \/ (\d*)/i';
+
                 $install->start();
                 $progressBar->start();
                 $install->getProcess()->waitUntil(
@@ -110,14 +113,15 @@ class InstallCommand extends AbstractMagentoCommand
                         preg_match($regex, $buffer, $match);
                         if (isset($match[1])) {
                             if ($progressBar->getMaxSteps() !== $match[2]) {
-                                $progressBar->setMaxSteps($match[2]);
+                                $progressBar->setMaxSteps((int) $match[2]);
                             }
-                            $progressBar->setProgress($match[1]);
+                            $progressBar->setProgress((int) $match[1]);
                         }
 
                         return false;
                     }
                 );
+
                 if ($install->getProcess()->isSuccessful()) {
                     $progressBar->finish();
                 }
@@ -125,7 +129,7 @@ class InstallCommand extends AbstractMagentoCommand
         } catch (EnvironmentException | ProcessException $e) {
             $this->interactive->error($e->getMessage());
 
-            return AbstractCommand::CODE_ERROR;
+            return self::FAILURE;
         }
 
         $this->interactive->newLine(2);
@@ -141,7 +145,7 @@ class InstallCommand extends AbstractMagentoCommand
 
             $this->interactive->error(implode(PHP_EOL, $error));
 
-            return AbstractCommand::CODE_ERROR;
+            return self::FAILURE;
         }
 
         $this->interactive->success(
@@ -151,6 +155,6 @@ class InstallCommand extends AbstractMagentoCommand
             )
         );
 
-        return AbstractCommand::CODE_SUCCESS;
+        return self::SUCCESS;
     }
 }
