@@ -3204,12 +3204,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/FriendsOfPHP/PHP-CS-Fixer.git",
-                "reference": "d172836ce7819423fb259b3d75929424706b11f9"
+                "reference": "dcaed13be7f125fbd539c7e2eaf88324278592b9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FriendsOfPHP/PHP-CS-Fixer/zipball/d172836ce7819423fb259b3d75929424706b11f9",
-                "reference": "d172836ce7819423fb259b3d75929424706b11f9",
+                "url": "https://api.github.com/repos/FriendsOfPHP/PHP-CS-Fixer/zipball/dcaed13be7f125fbd539c7e2eaf88324278592b9",
+                "reference": "dcaed13be7f125fbd539c7e2eaf88324278592b9",
                 "shasum": ""
             },
             "require": {
@@ -3281,7 +3281,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2021-02-02T20:38:16+00:00"
+            "time": "2021-02-13T22:37:47+00:00"
         },
         {
             "name": "nyholm/psr7",
@@ -3512,16 +3512,16 @@
         },
         {
             "name": "phpstan/phpstan-symfony",
-            "version": "0.12.17",
+            "version": "0.12.18",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan-symfony.git",
-                "reference": "6f270710294b1b5a029464765bcb6d0f564ff3a1"
+                "reference": "cc9d9ac264b8ac04961a03dc5b481b58ceaac248"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan-symfony/zipball/6f270710294b1b5a029464765bcb6d0f564ff3a1",
-                "reference": "6f270710294b1b5a029464765bcb6d0f564ff3a1",
+                "url": "https://api.github.com/repos/phpstan/phpstan-symfony/zipball/cc9d9ac264b8ac04961a03dc5b481b58ceaac248",
+                "reference": "cc9d9ac264b8ac04961a03dc5b481b58ceaac248",
                 "shasum": ""
             },
             "require": {
@@ -3574,7 +3574,7 @@
                 }
             ],
             "description": "Symfony Framework extensions and rules for PHPStan",
-            "time": "2021-02-11T18:45:32+00:00"
+            "time": "2021-02-13T07:38:10+00:00"
         },
         {
             "name": "psr/http-factory",
