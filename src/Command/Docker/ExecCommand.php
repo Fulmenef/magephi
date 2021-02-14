@@ -41,6 +41,6 @@ class ExecCommand extends AbstractCommand
             $this->interactive->error($process->getProcess()->getErrorOutput());
         }
 
-        return self::CODE_SUCCESS;
+        return self::SUCCESS;
     }
 }

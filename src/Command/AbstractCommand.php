@@ -23,10 +23,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 abstract class AbstractCommand extends Command
 {
-    public const CODE_SUCCESS = 0;
-
-    public const CODE_ERROR = 1;
-
     protected SymfonyStyle $interactive;
 
     protected ProcessFactory $processFactory;
@@ -140,7 +136,7 @@ abstract class AbstractCommand extends Command
                 if ($updateHandler->handle()) {
                     $this->interactive->success('Application updated, please relaunch your command');
 
-                    exit(self::CODE_SUCCESS); // Necessary to bypass Symfony post command check  and avoid errors
+                    exit(self::SUCCESS); // Necessary to bypass Symfony post command check  and avoid errors
                 }
                 $this->interactive->warning(
                     'Something went wrong, try again later or by using the update command'

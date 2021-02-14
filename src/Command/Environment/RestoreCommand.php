@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Magephi\Command\Environment;
 
 use InvalidArgumentException;
-use Magephi\Command\AbstractCommand;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -100,12 +99,12 @@ class RestoreCommand extends AbstractEnvironmentCommand
                 . ' minutes, please run again the command with the option --no-timeout'
             );
 
-            return AbstractCommand::CODE_ERROR;
+            return self::FAILURE;
         }
 
         $this->interactive->newLine(2);
         $this->interactive->success('Restore is complete');
 
-        return AbstractCommand::CODE_SUCCESS;
+        return self::SUCCESS;
     }
 }

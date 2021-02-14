@@ -9,6 +9,7 @@ use Magephi\Command\AbstractCommand;
 use Magephi\Entity\Environment\Manager;
 use Magephi\Entity\System;
 use Magephi\Exception\EnvironmentException;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 
 class CommandListener
@@ -81,7 +82,7 @@ class CommandListener
             }
         }
 
-        return AbstractCommand::CODE_SUCCESS;
+        return Command::SUCCESS;
     }
 
     /**

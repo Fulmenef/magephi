@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Magephi\Command\Environment;
 
 use Exception;
-use Magephi\Command\AbstractCommand;
 use Magephi\Component\DockerCompose;
 use Magephi\Component\ProcessFactory;
 use Magephi\Component\Yaml;
@@ -87,7 +86,7 @@ class InstallCommand extends AbstractEnvironmentCommand
                 $this->interactive->error($e->getMessage());
             }
 
-            return AbstractCommand::CODE_ERROR;
+            return self::FAILURE;
         }
 
         $this->interactive->newLine(2);
@@ -114,7 +113,7 @@ class InstallCommand extends AbstractEnvironmentCommand
             );
         }
 
-        return AbstractCommand::CODE_SUCCESS;
+        return self::SUCCESS;
     }
 
     /**
