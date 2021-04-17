@@ -28,9 +28,8 @@
     "require-dev": {
         "captainhook/captainhook": "^5.1",
         "captainhook/plugin-composer": "^5.0",
-        "friendsofphp/php-cs-fixer": "3.0.x-dev",
+        "friendsofphp/php-cs-fixer": "^2.18",
         "nyholm/psr7": "^1.2",
-        "phpstan/phpstan": "^0.12",
         "phpstan/phpstan-symfony": "^0.12.1",
         "roave/security-advisories": "dev-latest",
         "symfony/var-dumper": "^5.0"
