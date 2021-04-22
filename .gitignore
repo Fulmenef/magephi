@@ -14,5 +14,6 @@ src/.preload.php
 ###< symfony/framework-bundle ###
 
 ###> friendsofphp/php-cs-fixer ###
+/.php_cs
 /.php_cs.cache
 ###< friendsofphp/php-cs-fixer ###
