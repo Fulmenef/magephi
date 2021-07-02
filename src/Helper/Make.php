@@ -54,13 +54,13 @@ class Make
             ['make', 'start'],
             $_ENV['SHELL_VERBOSITY'] >= 1 ? 360 : 60,
             function (/* @noinspection PhpUnusedParameterInspection */ $type, $buffer) {
-                return (strpos($buffer, 'Creating') !== false
+                return (stripos($buffer, 'Creating') !== false
                         && (
-                            strpos($buffer, 'network')
-                            || strpos($buffer, 'volume')
-                            || strpos($buffer, 'done')
+                            stripos($buffer, 'network') !== false
+                            || stripos($buffer, 'volume') !== false
+                            || stripos($buffer, 'done') !== false
                         ))
-                    || (strpos($buffer, 'Starting') && strpos($buffer, 'done'));
+                    || (stripos($buffer, 'Starting') !== false && stripos($buffer, 'done') !== false);
             },
             $install ? $this->environment->getContainers() + $this->environment->getVolumes()
                 + 2 : $this->environment->getContainers() + 1
@@ -78,7 +78,7 @@ class Make
             ['make', 'build'],
             600,
             function (/* @noinspection PhpUnusedParameterInspection */ $type, $buffer) {
-                return strpos($buffer, 'skipping') || strpos($buffer, 'tagged');
+                return stripos($buffer, 'skipping') || stripos($buffer, 'tagged');
             },
             $this->environment->getContainers()
         );
@@ -95,7 +95,7 @@ class Make
             ['make', 'stop'],
             60,
             function ($type, $buffer) {
-                return stripos($buffer, 'stopping') && stripos($buffer, 'done');
+                return stripos($buffer, 'stopping') !== false && stripos($buffer, 'done') !== false;
             },
             $this->environment->getContainers() + 1
         );
@@ -123,7 +123,7 @@ class Make
                     || (
                         stripos($buffer, 'removing') !== false
                         && (
-                            stripos($buffer, 'network') || stripos($buffer, 'volume')
+                            stripos($buffer, 'network') !== false || stripos($buffer, 'volume') !== false
                         )
                     );
             },

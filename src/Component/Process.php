@@ -127,7 +127,7 @@ class Process
             } else {
                 $progressBar->start();
             }
-            $progressFunction = $this->progressCallback;
+            $progressFunction = $this->getProgressCallback();
 
             try {
                 $this->process->wait(
