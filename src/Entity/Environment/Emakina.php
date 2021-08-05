@@ -34,6 +34,8 @@ class Emakina implements EnvironmentInterface
 
     private string $mysqlImage;
 
+    private string $elasticsearchImage;
+
     private string $localEnv = 'docker/local/.env';
 
     private string $localEnvContent;
@@ -56,8 +58,6 @@ class Emakina implements EnvironmentInterface
 
     private DockerHub $dockerHub;
 
-    private Yaml $yaml;
-
     public function __construct(Make $make, Mutagen $mutagen, Filesystem $filesystem, DockerHub $dockerHub, Yaml $yaml)
     {
         $this->make = $make;
@@ -65,7 +65,6 @@ class Emakina implements EnvironmentInterface
         $this->mutagen = $mutagen;
         $this->filesystem = $filesystem;
         $this->dockerHub = $dockerHub;
-        $this->yaml = $yaml;
 
         /** @var string $current */
         $current = posix_getcwd();
@@ -103,6 +102,7 @@ class Emakina implements EnvironmentInterface
         if (!empty($localEnv)) {
             $this->phpImage = $this->getVariableValue('DOCKER_PHP_IMAGE', $localEnv);
             $this->mysqlImage = $this->getVariableValue('DOCKER_MYSQL_IMAGE', $localEnv);
+            $this->elasticsearchImage = $this->getVariableValue('DOCKER_ELASTICSEARCH_IMAGE', $localEnv);
         }
     }
 
@@ -122,11 +122,12 @@ class Emakina implements EnvironmentInterface
     public function getDockerRequiredVariables(): array
     {
         return [
-            'COMPOSE_FILE'         => './' . $this->dockerComposeFile,
-            'COMPOSE_PROJECT_NAME' => 'magento2_' . mb_strtolower($this->getWorkingDir()),
-            'DOCKER_PHP_IMAGE'     => $this->phpImage,
-            'DOCKER_MYSQL_IMAGE'   => $this->mysqlImage,
-            'PROJECT_LOCATION'     => getcwd() ?: '',
+            'COMPOSE_FILE'               => './' . $this->dockerComposeFile,
+            'COMPOSE_PROJECT_NAME'       => 'magento2_' . mb_strtolower($this->getWorkingDir()),
+            'DOCKER_PHP_IMAGE'           => $this->phpImage,
+            'DOCKER_MYSQL_IMAGE'         => $this->mysqlImage,
+            'DOCKER_ELASTICSEARCH_IMAGE' => $this->elasticsearchImage,
+            'PROJECT_LOCATION'           => getcwd() ?: '',
         ];
     }
 
@@ -497,8 +498,9 @@ class Emakina implements EnvironmentInterface
 
         $this->localEnvContent = $this->getLocalEnvData();
 
-        $this->phpImage = $this->selectImage('magento2-php', 'DOCKER_PHP_IMAGE');
+        $this->phpImage = $this->selectImage('php', 'DOCKER_PHP_IMAGE');
         $this->mysqlImage = $this->selectImage('magento2-mysql', 'DOCKER_MYSQL_IMAGE');
+        $this->elasticsearchImage = $this->selectImage('magento2-elasticsearch', 'DOCKER_ELASTICSEARCH_IMAGE');
 
         $types = ['blackfire', 'mysql'];
         foreach ($types as $type) {
@@ -536,7 +538,7 @@ class Emakina implements EnvironmentInterface
                 $availableTags[1]
             );
         } else {
-            $image = (string) $availableTags[0];
+            $image = $availableTags[0];
         }
 
         $value = "{$variable}={$image}";
