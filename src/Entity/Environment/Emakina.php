@@ -222,6 +222,11 @@ class Emakina implements EnvironmentInterface
         return $this->dockerComposeContent;
     }
 
+    public function isVariableUsed(string $variable): bool
+    {
+        return stripos($this->getDockerComposeContent(), '${' . $variable . '}') !== false;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -442,6 +447,10 @@ class Emakina implements EnvironmentInterface
      */
     private function getVariableValue(string $variable, string $localEnv): string
     {
+        if (!$this->isVariableUsed($variable)) {
+            return '';
+        }
+
         preg_match("/{$variable}=(\\S+)/i", $localEnv, $match);
         if (empty($match)) {
             throw new EnvironmentException("{$variable} is undefined, ensure .env is correctly filled");
@@ -467,8 +476,8 @@ class Emakina implements EnvironmentInterface
             $composer->runCommand('exec docker-local-install');
         }
 
-        $configureEnv = !$this->filesystem->exists($this->localEnv) ?:
-            $this->output->confirm(
+        $configureEnv = !$this->filesystem->exists($this->localEnv)
+            || $this->output->confirm(
                 'An existing docker <fg=yellow>.env</> file already exist, do you want to override it ?',
                 false
             );
