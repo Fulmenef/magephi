@@ -36,6 +36,8 @@ class Emakina implements EnvironmentInterface
 
     private string $elasticsearchImage;
 
+    private string $redisImage;
+
     private string $localEnv = 'docker/local/.env';
 
     private string $localEnvContent;
@@ -103,6 +105,7 @@ class Emakina implements EnvironmentInterface
             $this->phpImage = $this->getVariableValue('DOCKER_PHP_IMAGE', $localEnv);
             $this->mysqlImage = $this->getVariableValue('DOCKER_MYSQL_IMAGE', $localEnv);
             $this->elasticsearchImage = $this->getVariableValue('DOCKER_ELASTICSEARCH_IMAGE', $localEnv);
+            $this->redisImage = $this->getVariableValue('DOCKER_REDIS_IMAGE', $localEnv);
         }
     }
 
@@ -127,6 +130,7 @@ class Emakina implements EnvironmentInterface
             'DOCKER_PHP_IMAGE'           => $this->phpImage,
             'DOCKER_MYSQL_IMAGE'         => $this->mysqlImage,
             'DOCKER_ELASTICSEARCH_IMAGE' => $this->elasticsearchImage,
+            'DOCKER_REDIS_IMAGE'         => $this->redisImage,
             'PROJECT_LOCATION'           => getcwd() ?: '',
         ];
     }
@@ -156,7 +160,7 @@ class Emakina implements EnvironmentInterface
             }
         }
 
-        return isset($content) ? $content : '';
+        return $content ?? '';
     }
 
     /**
@@ -167,7 +171,7 @@ class Emakina implements EnvironmentInterface
         $name = strtoupper($name);
         preg_match("/{$name}=(\\w+)/", $this->getLocalEnvData(), $match);
 
-        return isset($match[1]) ? $match[1] : '';
+        return $match[1] ?? '';
     }
 
     /**
