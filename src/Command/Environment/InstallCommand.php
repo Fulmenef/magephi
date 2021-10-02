@@ -7,16 +7,13 @@ namespace Magephi\Command\Environment;
 use Exception;
 use Magephi\Component\DockerCompose;
 use Magephi\Component\ProcessFactory;
-use Magephi\Component\Yaml;
 use Magephi\Entity\Environment\Manager;
 use Magephi\Entity\System;
 use Magephi\Exception\ComposerException;
 use Magephi\Helper\Database;
 use Nadar\PhpComposerReader\ComposerReader;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Command to install the Magento2 project. It'll check if the prerequisites are filled before installing dependencies
@@ -30,30 +27,14 @@ class InstallCommand extends AbstractEnvironmentCommand
 
     private System $prerequisite;
 
-    private Database $database;
-
-    private LoggerInterface $logger;
-
-    private Filesystem $filesystem;
-
-    private Yaml $yaml;
-
     public function __construct(
         ProcessFactory $processFactory,
         DockerCompose $dockerCompose,
         Manager $manager,
-        Database $database,
-        System $system,
-        LoggerInterface $logger,
-        Filesystem $filesystem,
-        Yaml $yaml
+        System $system
     ) {
         parent::__construct($processFactory, $dockerCompose, $manager);
         $this->prerequisite = $system;
-        $this->database = $database;
-        $this->logger = $logger;
-        $this->yaml = $yaml;
-        $this->filesystem = $filesystem;
     }
 
     public function getPrerequisites(): array

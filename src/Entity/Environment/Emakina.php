@@ -124,15 +124,26 @@ class Emakina implements EnvironmentInterface
      */
     public function getDockerRequiredVariables(): array
     {
-        return [
-            'COMPOSE_FILE'               => './' . $this->dockerComposeFile,
-            'COMPOSE_PROJECT_NAME'       => 'magento2_' . mb_strtolower($this->getWorkingDir()),
-            'DOCKER_PHP_IMAGE'           => $this->phpImage,
-            'DOCKER_MYSQL_IMAGE'         => $this->mysqlImage,
-            'DOCKER_ELASTICSEARCH_IMAGE' => $this->elasticsearchImage,
-            'DOCKER_REDIS_IMAGE'         => $this->redisImage,
-            'PROJECT_LOCATION'           => getcwd() ?: '',
+        $array = [
+            'COMPOSE_FILE'         => './' . $this->dockerComposeFile,
+            'COMPOSE_PROJECT_NAME' => 'magento2_' . mb_strtolower($this->getWorkingDir()),
+            'PROJECT_LOCATION'     => getcwd() ?: '',
         ];
+
+        if (isset($this->phpImage)) {
+            $array['DOCKER_PHP_IMAGE'] = $this->phpImage;
+        }
+        if (isset($this->phpImage)) {
+            $array['DOCKER_MYSQL_IMAGE'] = $this->mysqlImage;
+        }
+        if (isset($this->phpImage)) {
+            $array['DOCKER_ELASTICSEARCH_IMAGE'] = $this->elasticsearchImage;
+        }
+        if (isset($this->phpImage)) {
+            $array['DOCKER_REDIS_IMAGE'] = $this->redisImage;
+        }
+
+        return $array;
     }
 
     /**

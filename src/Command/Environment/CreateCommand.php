@@ -249,9 +249,8 @@ EOD;
         $requireDev = [
             'bitexpert/phpstan-magento'   => 'dev-master',
             'emakinafr/docker-magento2'   => '^3.0',
-            'friendsofphp/php-cs-fixer'   => '3.0.x-dev',
-            'roave/security-advisories'   => 'dev-master',
-            'sensiolabs/security-checker' => '^5.0',
+            'friendsofphp/php-cs-fixer'   => '^2.0',
+            'roave/security-advisories'   => 'dev-latest',
         ];
         $composer->updateSection('require-dev', $requireDev);
         $composer->save();
