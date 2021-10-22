@@ -99,13 +99,11 @@ class Emakina implements EnvironmentInterface
      */
     public function autoLocate(): void
     {
-        $localEnv = $this->getLocalEnvData();
-
-        if (!empty($localEnv)) {
-            $this->phpImage = $this->getVariableValue('DOCKER_PHP_IMAGE', $localEnv);
-            $this->mysqlImage = $this->getVariableValue('DOCKER_MYSQL_IMAGE', $localEnv);
-            $this->elasticsearchImage = $this->getVariableValue('DOCKER_ELASTICSEARCH_IMAGE', $localEnv);
-            $this->redisImage = $this->getVariableValue('DOCKER_REDIS_IMAGE', $localEnv);
+        if (!empty($this->getLocalEnvData())) {
+            $this->phpImage = $this->getVariableValue('DOCKER_PHP_IMAGE');
+            $this->mysqlImage = $this->getVariableValue('DOCKER_MYSQL_IMAGE');
+            $this->elasticsearchImage = $this->getVariableValue('DOCKER_ELASTICSEARCH_IMAGE');
+            $this->redisImage = $this->getVariableValue('DOCKER_REDIS_IMAGE');
         }
     }
 
@@ -164,14 +162,15 @@ class Emakina implements EnvironmentInterface
      */
     public function getLocalEnvData(): string
     {
-        if ($this->filesystem->exists($this->localEnv)) {
+        if (!isset($this->localEnvContent) && $this->filesystem->exists($this->localEnv)) {
             $content = file_get_contents($this->localEnv);
             if (!\is_string($content)) {
                 throw new FileNotFoundException($this->localEnv . ' empty.');
             }
+            $this->localEnvContent = $content;
         }
 
-        return $content ?? '';
+        return $this->localEnvContent ?? '';
     }
 
     /**
@@ -456,17 +455,16 @@ class Emakina implements EnvironmentInterface
      * Get variable from the .env file.
      *
      * @param string $variable
-     * @param string $localEnv
      *
      * @return string
      */
-    private function getVariableValue(string $variable, string $localEnv): string
+    private function getVariableValue(string $variable): string
     {
         if (!$this->isVariableUsed($variable)) {
             return '';
         }
 
-        preg_match("/{$variable}=(\\S+)/i", $localEnv, $match);
+        preg_match("/{$variable}=(\\S+)/i", $this->getLocalEnvData(), $match);
         if (empty($match)) {
             throw new EnvironmentException("{$variable} is undefined, ensure .env is correctly filled");
         }
@@ -526,6 +524,11 @@ class Emakina implements EnvironmentInterface
         $this->mysqlImage = $this->selectImage('magento2-mysql', 'DOCKER_MYSQL_IMAGE');
         $this->elasticsearchImage = $this->selectImage('magento2-elasticsearch', 'DOCKER_ELASTICSEARCH_IMAGE');
 
+        if ($this->isVariableUsed('DOCKER_REDIS_IMAGE')) {
+            $this->redisImage = $this->output->ask('Type the image to use for Redis', $this->getVariableValue('DOCKER_REDIS_IMAGE'));
+            $this->setVariableValue('DOCKER_REDIS_IMAGE', $this->redisImage);
+        }
+
         $types = ['blackfire', 'mysql'];
         foreach ($types as $type) {
             if ($this->output->confirm('Do you want to configure <fg=yellow>' . ucfirst($type) . '</> ?')) {
@@ -565,14 +568,25 @@ class Emakina implements EnvironmentInterface
             $image = $availableTags[0];
         }
 
+        $this->setVariableValue($variable, $image);
+
+        return $image;
+    }
+
+    /**
+     * Update local .env file with the variable value.
+     *
+     * @param string $variable
+     * @param string $image
+     */
+    private function setVariableValue(string $variable, string $image): void
+    {
         $value = "{$variable}={$image}";
-        $replacement = preg_replace("/({$variable}=\\S*)/i", $value, $this->localEnvContent);
+        $replacement = preg_replace("/({$variable}=\\S*)/i", $value, $this->getLocalEnvData());
         if ($replacement === null) {
             throw new EnvironmentException("Error while configuring variable {$variable}.");
         }
         $this->localEnvContent = $replacement;
-
-        return $image;
     }
 
     /**
@@ -589,7 +603,7 @@ class Emakina implements EnvironmentInterface
                 $conf = $this->output->ask($match[1], $match[2] ?? null);
                 if ($conf !== '' && $match[2] !== $conf) {
                     $pattern = "/({$match[1]}=)(\\w*)/i";
-                    $content = preg_replace($pattern, "$1{$conf}", $this->localEnvContent);
+                    $content = preg_replace($pattern, "$1{$conf}", $this->getLocalEnvData());
                     if (!\is_string($content)) {
                         throw new EnvironmentException('Error while configuring environment.');
                     }
