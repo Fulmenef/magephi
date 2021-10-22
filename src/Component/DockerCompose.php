@@ -28,28 +28,34 @@ class DockerCompose
     /**
      * Open a TTY terminal to the given container.
      *
-     * @param string $container Container name
-     * @param string $arguments
+     * @param string               $container Container name
+     * @param array<string,string> $arguments
      *
      * @throws EnvironmentException
      * @throws ProcessException
      */
-    public function openTerminal(string $container, string $arguments): void
+    public function openTerminal(string $container, array $arguments): void
     {
         if (!$this->isContainerUp($container)) {
             throw new EnvironmentException(sprintf('The container %s is not started.', $container));
         }
+
         if (!\Symfony\Component\Process\Process::isTtySupported()) {
             throw new ProcessException(
                 'TTY is not supported, ensure you\'re running the application from the command line.'
             );
         }
-        $commands = ['docker-compose', 'exec'];
-        if ($arguments !== '') {
-            $commands = array_merge($commands, ['-u', $arguments]);
+
+        $commands = ['docker', 'exec', '--interactive', '--tty'];
+        if (!empty($arguments)) {
+            foreach ($arguments as $argument => $value) {
+                $commands[] = "--{$argument}={$value}";
+            }
         }
+        $commands = array_merge($commands, ["$(docker compose ps --quiet {$container})", 'bash', '--login']);
+
         $this->processFactory->runInteractiveProcess(
-            array_merge($commands, [$container, 'sh', '-l']),
+            $commands,
             null,
             $this->environment->getDockerRequiredVariables()
         );

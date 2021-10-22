@@ -7,6 +7,7 @@ namespace Magephi\Component;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Process\Process as SymfonyProcess;
 
 class ProcessFactory
 {
@@ -129,7 +130,7 @@ class ProcessFactory
      */
     public function runInteractiveProcess(array $command, ?float $timeout = null, array $env = null): Process
     {
-        return $this->runOutputProcess($command, $timeout, $env, false, true);
+        return $this->runOutputProcess($command, $timeout, $env, true, true);
     }
 
     /**
@@ -152,10 +153,10 @@ class ProcessFactory
     ): Process {
         $process = $this->createProcess($command, $timeout, $env, $shell);
 
-        $process->getProcess()->setTty($tty ? \Symfony\Component\Process\Process::isTtySupported() : $tty);
+        $process->getProcess()->setTty($tty ? SymfonyProcess::isTtySupported() : $tty);
         $process->run(
-            static function (string $type, string $buffer) {
-                echo $buffer;
+            static function (string $type, string $buffer): void {
+                echo SymfonyProcess::ERR === $type ? "ERR > {$buffer}" : $buffer;
             }
         );
 

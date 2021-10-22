@@ -117,10 +117,10 @@ class Manager
     /**
      * Open a terminal to the given container for the current environment.
      *
-     * @param string $container
-     * @param string $arguments
+     * @param string               $container
+     * @param array<string,string> $arguments
      */
-    public function openTerminal(string $container, string $arguments): void
+    public function openTerminal(string $container, array $arguments): void
     {
         $this->dockerCompose->openTerminal($container, $arguments);
     }

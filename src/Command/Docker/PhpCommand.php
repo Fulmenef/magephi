@@ -18,7 +18,7 @@ class PhpCommand extends AbstractDockerCommand
 
     protected string $service = 'php';
 
-    protected string $arguments = self::ARGUMENT_WWW_DATA;
+    protected array $arguments = ['user' => self::ARGUMENT_WWW_DATA];
 
     protected function configure(): void
     {
@@ -36,7 +36,7 @@ class PhpCommand extends AbstractDockerCommand
         parent::initialize($input, $output);
 
         if ($input->getOption(self::OPTION_ROOT)) {
-            $this->arguments = self::ARGUMENT_ROOT;
+            $this->arguments['user'] = self::ARGUMENT_ROOT;
         }
     }
 }
