@@ -17,7 +17,8 @@ abstract class AbstractDockerCommand extends AbstractCommand
 {
     protected string $service = '';
 
-    protected string $arguments = '';
+    /** @var array<string,string> */
+    protected array $arguments = [];
 
     protected function configure(): void
     {

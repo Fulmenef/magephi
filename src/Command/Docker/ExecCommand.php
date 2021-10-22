@@ -26,7 +26,7 @@ class ExecCommand extends AbstractCommand
     {
         $command = $input->getArgument('content');
         $container = $input->getArgument('container');
-        if ($container !== null && \is_string($container)) {
+        if (\is_string($container)) {
             $process = $this->dockerCompose->executeContainerCommand(
                 (string) $container,
                 (string) $command
