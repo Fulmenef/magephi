@@ -184,7 +184,7 @@ class DockerCompose
             $this->environment->getDockerRequiredVariables()
         );
 
-        $regex = '/^(?![ -])(\S+).+(?=Up|Exit)(\S+)/mi';
+        $regex = '/^(?![ -])(\S+).+(?=running|exited)(\S+)/mi';
 
         $output = $process->getProcess()->getOutput();
 
