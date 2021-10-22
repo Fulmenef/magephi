@@ -68,7 +68,7 @@ jobs:
         uses: php-actions/composer@v4
         with:
           php_version: ${{env.PHP_VERSION}}
-          composer_version: 1
+          composer_version: 2
           command: create-project
           args: --repository-url=https://repo.magento.com/ magento/project-community-edition ${{env.MAGENTO_DIRECTORY}} --ignore-platform-reqs --no-install
           dev: no
@@ -80,7 +80,7 @@ jobs:
         uses: php-actions/composer@v4
         with:
           php_version: ${{env.PHP_VERSION}}
-          composer_version: 1
+          composer_version: 2
           command: require emakinafr/docker-magento2
           args: --prefer-dist --ignore-platform-reqs --no-progress -d ${{env.MAGENTO_DIRECTORY}}
         env:
