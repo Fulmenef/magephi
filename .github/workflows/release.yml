@@ -22,31 +22,17 @@ jobs:
       - uses: actions/checkout@v2
       - run: git fetch --prune --unshallow
 
-      - name: Setup PHP with composer v2
+      - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{env.PHP_VERSION}}
-          tools: composer:v2
 
-      - name: Validate composer.json and composer.lock
-        run: composer validate
-
-      - name: Install dependencies
-        run: composer install --ignore-platform-reqs --prefer-dist --no-progress --no-dev --optimize-autoloader --classmap-authoritative
-
-      - name: Compilation
-        run: |
-          mkdir ~/.magephi
-          make box
-          ./build/magephi.phar list
+      - name: Rename phar
+        run: mv bin/magephi magephi.phar
 
       - name: Prepare release
         id: prepare_release
-        run: |
-          old_tag=$(git tag --sort=-creatordate | head -n 2 | tail -n 1)
-          changelog=$(git log $old_tag..${{ github.ref }} --format='* %s (%h)' --no-merges --reverse)
-          changelog=${changelog//$'\n'/'%0A'}
-          echo "::set-output name=changelog::${changelog}"
+        run: echo "::set-output name=changelog::$(git log -1 --pretty=%B)"
 
       - name: Create Release
         id: create_release
@@ -54,5 +40,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          draft: true
           body: ${{ steps.prepare_release.outputs.changelog }}
-          files: ./build/magephi.phar
+          files: magephi.phar

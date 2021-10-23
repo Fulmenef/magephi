@@ -10,64 +10,7 @@
         }
     ],
     "require": {
-        "php": "^7.4.0",
-        "ext-ctype": "*",
-        "ext-iconv": "*",
-        "ext-json": "*",
-        "ext-posix": "*",
-        "nadar/php-composer-reader": "^1.3",
-        "padraic/phar-updater": "^1.0",
-        "symfony/console": "^5.0",
-        "symfony/dotenv": "^5.0",
-        "symfony/flex": "^1.3.1",
-        "symfony/framework-bundle": "^5.0",
-        "symfony/http-client": "^5.0",
-        "symfony/process": "^5.0",
-        "symfony/yaml": "^5.0"
+        "php": "^7.4.0"
     },
-    "require-dev": {
-        "captainhook/captainhook": "^5.1",
-        "captainhook/plugin-composer": "^5.0",
-        "friendsofphp/php-cs-fixer": "^2.18",
-        "nyholm/psr7": "^1.2",
-        "phpstan/phpstan-symfony": "^0.12.1",
-        "roave/security-advisories": "dev-latest",
-        "symfony/var-dumper": "^5.0"
-    },
-    "config": {
-        "preferred-install": {
-            "*": "dist"
-        },
-        "sort-packages": true
-    },
-    "autoload": {
-        "psr-4": {
-            "Magephi\\": "src/"
-        }
-    },
-    "replace": {
-        "paragonie/random_compat": "2.*",
-        "symfony/polyfill-ctype": "*",
-        "symfony/polyfill-iconv": "*",
-        "symfony/polyfill-php71": "*",
-        "symfony/polyfill-php70": "*",
-        "symfony/polyfill-php56": "*"
-    },
-    "scripts": {
-        "auto-scripts": {
-            "cache:clear": "symfony-cmd"
-        },
-        "post-autoload-dump": [
-            "@auto-scripts"
-        ]
-    },
-    "conflict": {
-        "symfony/symfony": "*"
-    },
-    "extra": {
-        "symfony": {
-            "allow-contrib": false,
-            "require": "5.*"
-        }
-    }
+    "bin": "bin/magephi"
 }

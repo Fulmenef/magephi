@@ -27,24 +27,10 @@ jobs:
         run: |
           wget -qO- "https://github.com/havoc-io/mutagen/releases/download/$MUTAGEN_VERSION/mutagen_linux_amd64_$MUTAGEN_VERSION.tar.gz" | sudo tar xvz -C "/usr/local/bin/"
           mutagen daemon start
-          sudo ln -s "$PWD/bin/console" "/usr/local/bin/magephi"
+          chmod +x bin/magephi
+          sudo ln -s "$PWD/bin/magephi" "/usr/local/bin/magephi"
         env:
           MUTAGEN_VERSION: v0.11.8
-
-      - name: Cache Magephi dependencies
-        id: cache-magephi
-        uses: actions/cache@v1
-        with:
-          path: vendor
-          key: ${{ runner.OS }}-build-${{ hashFiles('**/composer.lock') }}
-
-      - name: Install dependencies
-        if: steps.cache-magephi.outputs.cache-hit != 'true'
-        uses: php-actions/composer@v4
-        with:
-          php_version: ${{env.PHP_VERSION}}
-          args: --ignore-platform-reqs --prefer-dist --optimize-autoloader --classmap-authoritative
-          dev: no
 
       - name: Initialize Magento 2 project directory
         run: mkdir -p ${{env.MAGENTO_DIRECTORY}}
