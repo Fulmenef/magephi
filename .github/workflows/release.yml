@@ -7,32 +7,31 @@
 name: Release version
 
 on:
-  push:
-    tags:
-      - '*.*.*'
+  workflow_run:
+    workflows: ["Continuous integration"]
+    branches: ["master"]
+    types:
+      - completed
 
 jobs:
   build:
     name: Release
     runs-on: ubuntu-latest
-    env:
-      PHP_VERSION: 7.4
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
       - uses: actions/checkout@v2
       - run: git fetch --prune --unshallow
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{env.PHP_VERSION}}
 
       - name: Rename phar
         run: mv bin/magephi magephi.phar
 
       - name: Prepare release
         id: prepare_release
-        run: echo "::set-output name=changelog::$(git log -1 --pretty=%B)"
+        run: |
+          changelog=$(git log -1 --pretty=%b)
+          changelog=${changelog//$'\n'/'%0A'}
+          echo "::set-output name=changelog::$changelog"
 
       - name: Create Release
         id: create_release
@@ -42,4 +41,6 @@ jobs:
         with:
           draft: true
           body: ${{ steps.prepare_release.outputs.changelog }}
-          files: magephi.phar
+          files: |
+            magephi.phar
+            magephi.phar.asc

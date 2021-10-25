@@ -4,24 +4,37 @@
 #
 ##################################################
 
-name: Continuous testing
+name: Continuous integration
 
 on:
   push:
     branches:
-      - '**'
-      - '!master'
+      - "**"
+
+env:
+  MAGENTO_DIRECTORY: ./tmp/magento
 
 jobs:
-  run:
+  magento:
     name: Test application on Magento
     runs-on: ubuntu-latest
-    env:
-      MAGENTO_DIRECTORY: ./tmp/magento
-      PHP_VERSION: 7.4
+
+    strategy:
+      fail-fast: true
+      max-parallel: 2
+      matrix:
+        php-version:
+          - "7.4"
+          - "8.0"
 
     steps:
       - uses: actions/checkout@v2
+
+      - name: Setup PHP with composer v2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          tools: composer:v2
 
       - name: Install system requirements
         run: |
@@ -51,24 +64,13 @@ jobs:
 
       - name: Create a Magento Open Source project
         if: steps.cache-magento.outputs.cache-hit != 'true'
-        uses: php-actions/composer@v4
-        with:
-          php_version: ${{env.PHP_VERSION}}
-          composer_version: 2
-          command: create-project
-          args: --repository-url=https://repo.magento.com/ magento/project-community-edition ${{env.MAGENTO_DIRECTORY}} --ignore-platform-reqs --no-install
-          dev: no
+        run: composer create-project --repository-url=https://repo.magento.com/ magento/project-community-edition ${{env.MAGENTO_DIRECTORY}} --ignore-platform-reqs --no-install --no-dev
         env:
           COMPOSER_AUTH: ${{secrets.COMPOSER_AUTH}}
 
       - name: Install the Docker environment through Composer
         if: steps.cache-magento.outputs.cache-hit != 'true'
-        uses: php-actions/composer@v4
-        with:
-          php_version: ${{env.PHP_VERSION}}
-          composer_version: 2
-          command: require emakinafr/docker-magento2
-          args: --prefer-dist --ignore-platform-reqs --no-progress -d ${{env.MAGENTO_DIRECTORY}}
+        run: composer require emakinafr/docker-magento2 --dev --prefer-dist --ignore-platform-reqs --no-progress -d ${{env.MAGENTO_DIRECTORY}}
         env:
           COMPOSER_AUTH: ${{secrets.COMPOSER_AUTH}}
           COMPOSER_MEMORY_LIMIT: 4G
