@@ -30,7 +30,7 @@
         "captainhook/plugin-composer": "^5.0",
         "friendsofphp/php-cs-fixer": "^2.18",
         "nyholm/psr7": "^1.2",
-        "phpstan/phpstan-symfony": "^0.12.1",
+        "phpstan/phpstan-symfony": "^1.0.0",
         "roave/security-advisories": "dev-latest",
         "symfony/var-dumper": "^5.0"
     },
