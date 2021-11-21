@@ -17,16 +17,7 @@ For now Magephi has been only tested on Mac with the environment [docker-magento
 ## Installation
 
 ```
-curl -sL https://github.com/Fulmenef/magephi/releases/latest/download/magephi.phar --output /usr/local/bin/magephi
-chmod +x /usr/local/bin/magephi
-```
-
-## Update
-
-The application will display a notice when an update is available. To download it, just use the `update` command:
-
-```
-magephi update
+composer global require fulmenef/magephi
 ```
 
 ## Usage
@@ -47,7 +38,7 @@ magephi list
 
 ## Demo
 
-<p align="center">
+<p>
   <img src="https://gist.githubusercontent.com/fulmenef/6d269a661b9ef62c015d0b961b34d762/raw/22420f21ec32705b6aecd78a0f02eb25a191b608/magephi.gif"
     width="900" alt="demo"/>
 </p>

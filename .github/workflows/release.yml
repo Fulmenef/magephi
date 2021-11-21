@@ -32,6 +32,7 @@ jobs:
           changelog=$(git log -1 --pretty=%b)
           changelog=${changelog//$'\n'/'%0A'}
           echo "::set-output name=changelog::$changelog"
+          echo "::set-output name=tag::$(git describe --tags --exact-match ${{ github.ref }})"
 
       - name: Create Release
         id: create_release
@@ -40,6 +41,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           draft: true
+          tag_name: ${{ steps.prepare_release.outputs.tag }}
           body: ${{ steps.prepare_release.outputs.changelog }}
           files: |
             magephi.phar
