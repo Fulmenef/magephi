@@ -24,8 +24,8 @@ jobs:
       max-parallel: 2
       matrix:
         php-version:
-          - "7.4"
           - "8.0"
+          - "8.1"
 
     steps:
       - uses: actions/checkout@v2
