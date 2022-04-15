@@ -50,10 +50,10 @@ jobs:
 
       - name: Cache Magento application
         id: cache-magento
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         with:
           path: ${{env.MAGENTO_DIRECTORY}}
-          key: ${{ runner.OS }}-build-${{ hashFiles('**/composer.lock') }}-magento-app
+          key: ${{ runner.OS }}-build-${{ hashFiles('**/magephi.phar.asc') }}-magento-app
 
       - name: Regenerate files after cache restore
         if: steps.cache-magento.outputs.cache-hit == 'true'
@@ -81,7 +81,7 @@ jobs:
         working-directory: ${{env.MAGENTO_DIRECTORY}}
 
       - name: Install Magento
-        run: sudo magephi install --no-interaction -v
+        run: magephi install --no-interaction -v
         working-directory: ${{env.MAGENTO_DIRECTORY}}
 
       - name: Check status
