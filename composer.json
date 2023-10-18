@@ -10,7 +10,7 @@
         }
     ],
     "require": {
-        "php": ">=8.0.2"
+        "php": ">=8.1"
     },
     "bin": "bin/magephi"
 }

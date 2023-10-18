@@ -1,7 +1,7 @@
 # Magephi
 ![status](https://img.shields.io/badge/status-stable-important.svg?cacheSeconds=2592000)
-![php](https://img.shields.io/badge/php-^8.0-blue.svg?cacheSeconds=2592000)
-![symfony](https://img.shields.io/badge/symfony-6.0-darkgreen.svg?cacheSeconds=2592000)
+![php](https://img.shields.io/badge/php-^8.1-blue.svg?cacheSeconds=2592000)
+![symfony](https://img.shields.io/badge/symfony-6.1-darkgreen.svg?cacheSeconds=2592000)
 [![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/fulmenef/magephi.svg)](https://github.com/fulmenef/magephi/tags)
 [![GitHub Issues](https://img.shields.io/github/issues/fulmenef/magephi.svg)](https://github.com/fulmenef/magephi/issues)
 ![Contributions welcome](https://img.shields.io/badge/contributions-welcome-green.svg)

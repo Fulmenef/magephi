@@ -25,6 +25,7 @@ jobs:
       matrix:
         php-version:
           - "8.1"
+          - "8.2"
 
     steps:
       - uses: actions/checkout@v2
@@ -37,12 +38,8 @@ jobs:
 
       - name: Install system requirements
         run: |
-          wget -qO- "https://github.com/havoc-io/mutagen/releases/download/$MUTAGEN_VERSION/mutagen_linux_amd64_$MUTAGEN_VERSION.tar.gz" | sudo tar xvz -C "/usr/local/bin/"
-          mutagen daemon start
           chmod +x bin/magephi
           sudo ln -s "$PWD/bin/magephi" "/usr/local/bin/magephi"
-        env:
-          MUTAGEN_VERSION: v0.15.4
 
       - name: Initialize Magento 2 project directory
         run: mkdir -p ${{env.MAGENTO_DIRECTORY}}
